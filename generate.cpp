@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <math.h>
 #include "TriMesh.h"
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
-#include<glm/glm.hpp>
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "shader.h"
@@ -84,12 +84,6 @@ int main()
 	     }while(!correct_entry);
 		holes.push_back(temp);
 	}
-	
-	
-
-
-
-
 
 	TriMesh tri_mesh;
 	tri_mesh.GenMesh(cuboid,holes);
@@ -128,11 +122,12 @@ int main()
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // glad: load all OpenGL function pointers
+    // glew: load all OpenGL function pointers
     // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    glewExperimental = GL_TRUE; // Dude...
+    if (glewInit() != GLEW_OK)
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        std::cout << "Failed to initialize GLEW!" << std::endl;
         return -1;
     }
     glEnable(GL_DEPTH_TEST);
@@ -286,13 +281,8 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
-
-
-
 	
     return 0;
-
-
 
 }
 
