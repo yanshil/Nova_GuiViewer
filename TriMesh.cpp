@@ -23,35 +23,106 @@ Vertex::Vertex(double x_,double y_,double z_)
 
 Hole::Hole()
 {
+    // TODO:
+    this->x = 0.5;
+    this->y = 0.5;
+    this->radius = 0.1;
 
+    initVertex();
 }
 
-Hole::~Hole()
+void Hole::initVertex()
 {
-
-}
-void Hole::Set(double x_, double y_, double radius_)
-{
-    vertices.clear();
-    x = x_;
-    y = y_;
-    radius = radius_;
+    this->vertices.clear();
+    
     Vertex vertex;
     double theta;
+    // TODO: for all 3.14159, Define Math.PI for performance?
     double dtheta = 2.0 * 3.1415926 / segments;
     for (int i = 0; i < segments; i++)
     {
         theta = dtheta * i;
         vertex.x = x + radius * cos(theta);
         vertex.y = y + radius * sin(theta);
-        vertices.push_back(vertex);
+        this->vertices.push_back(vertex);
     }
+}
+
+// TODO: Segments?
+Hole::Hole(double x, double y, double radius)
+    :x(x), y(y), radius(radius)
+{
+    initVertex();
+}
+
+Hole::~Hole()
+{
+
+}
+
+void Hole::Set(double x_, double y_, double radius_)
+{
+    // vertices.clear();
+    // x = x_;
+    // y = y_;
+    // radius = radius_;
+    // Vertex vertex;
+    // double theta;
+    // double dtheta = 2.0 * 3.1415926 / segments;
+    // for (int i = 0; i < segments; i++)
+    // {
+    //     theta = dtheta * i;
+    //     vertex.x = x + radius * cos(theta);
+    //     vertex.y = y + radius * sin(theta);
+    //     vertices.push_back(vertex);
+    // }
+
+    this->x = x_;
+    this->y = y_;
+    this->radius = radius_;
+
+    initVertex();
+}
+
+HoleList::HoleList() { }
+
+HoleList::~HoleList() {}
+
+int HoleList::AddHole(Hole &hole) {
+    // TODO
+    return 0;
+}
+
+int HoleList::ModifyHolebyID(int holeID)
+{
+    // TODO
+    return 0;
+}
+
+int HoleList::DeleteHolebyID(int holeID)
+{
+    // TODO
+    return 0;
 }
 
 
 Cuboid::Cuboid()
 {
+    // TODO:Default constructor with d, w, h = 1,1,1
+    this->n_segments = 4;
+    this->depth = 1.0;
+    this->width = 1.0;
+    this->height = 1.0;
 
+    // this->edge_max = depth>(width>height?width:height)?depth:(width>height?width:height);
+    this->edge_max = std::max(depth, std::max(width, height));
+}
+
+Cuboid::Cuboid(double depth, double width, double height, int n_segments)
+    :depth(depth), width(width), height(height), n_segments(n_segments)
+{
+    // this->edge_max = depth>(width>height?width:height)?depth:(width>height?width:height);
+    this->edge_max = std::max(depth, std::max(width, height));
 }
 
 Cuboid::~Cuboid()

@@ -75,34 +75,53 @@ bool Ascend(Hole ha,Hole hb){ return (ha.x<hb.x);}
 // main
 //#####################################################################
 int main()
-{	
+{
 	Cuboid cuboid;
-	std::vector<Hole> holes;
-	std::vector<Vertex> boundary_vertices;
+	std::vector<Hole> holes;    // TODO: New class for HoleList (move validation into the list)
+	// std::vector<Vertex> boundary_vertices;
 	Hole temp;
-	double tmp_x,tmp_y,tmp_radius;
-	bool correct_entry;
-	int number_of_holes;
-	//holes.push_back(temp);
-	std::cout<<"Enter depth, width and height of the cuboid: "<<std::endl;
-	std::cin>>cuboid.depth>>cuboid.width>>cuboid.height;
-	std::cout<<"Enter number of holes: "<<std::endl;
-	std::cin>>number_of_holes;
-	for(int i=0;i<number_of_holes;i++)
-	{
-	    do{
-		std::cout<<"Enter location  of #"<<i+1<<" hole(p.s.: (x,y)): "<<std::endl;
-		std::cin>>tmp_x>>tmp_y;
-		std::cout<<"Enter radius of #"<<i+1<<" hole: "<<std::endl;
-		std::cin>>tmp_radius;
-		temp.Set(tmp_x,tmp_y,tmp_radius);
-		correct_entry=!Check_Overlap(holes,temp)&&!Check_Out_Of_Boundary(temp,cuboid);
-		if(!correct_entry)
-		std::cout<<"Invaid input! Enter again"<<std::endl;
-	     }while(!correct_entry);
-		holes.push_back(temp);
-	}
+    bool correct_entry;
 
+	// double tmp_x,tmp_y,tmp_radius;
+	// int number_of_holes;
+	//holes.push_back(temp);
+
+	// std::cout<<"Enter depth, width and height of the cuboid: "<<std::endl;
+	// double tmp_depth, tmp_width, tmp_height;
+    // std::cin>>tmp_depth>>tmp_width>>tmp_height;
+    cuboid = Cuboid(5, 5, 5, 4);
+
+	// std::cout<<"Enter number of holes: "<<std::endl;
+	// std::cin>>number_of_holes;
+
+	// for(int i=0;i<number_of_holes;i++)
+	// {
+	//     do{
+	// 	std::cout<<"Enter location  of #"<<i+1<<" hole(p.s.: (x,y)): "<<std::endl;
+	// 	std::cin>>tmp_x>>tmp_y;
+	// 	std::cout<<"Enter radius of #"<<i+1<<" hole: "<<std::endl;
+	// 	std::cin>>tmp_radius;
+	// 	temp.Set(tmp_x,tmp_y,tmp_radius);
+	// 	correct_entry=!Check_Overlap(holes,temp)&&!Check_Out_Of_Boundary(temp,cuboid);
+	// 	if(!correct_entry)
+	// 	std::cout<<"Invaid input! Enter again"<<std::endl;
+	//      }while(!correct_entry);
+	// 	holes.push_back(temp);
+	// }
+
+
+    // TODO: temp 1
+    temp = Hole(1, 1, 0.5);
+    // Check validation in HoleList class
+    holes.push_back(temp);
+
+    // // Cuboid::Cuboid(double depth, double width, double height, int n_segments)
+    // Cuboid cube(5, 5, 5, 4);
+    // // Hole::Hole(double x, double y, double radius)
+    // Hole hole1(1, 1, 0.5);
+
+    // // TODO: check overlap
+    // holes.push_back(hole1);
 
     //#####################################################################
     // 
@@ -110,9 +129,8 @@ int main()
 	TriMesh tri_mesh;
 	tri_mesh.GenMesh(cuboid,holes);
 
-
-	double max;
-	max = cuboid.depth>(cuboid.width>cuboid.height?cuboid.width:cuboid.height)?cuboid.depth:(cuboid.width>cuboid.height?cuboid.width:cuboid.height);
+	// double max = cuboid.depth>(cuboid.width>cuboid.height?cuboid.width:cuboid.height)?cuboid.depth:(cuboid.width>cuboid.height?cuboid.width:cuboid.height);
+    // double max = cuboid.edge_max;
 
 	
     //#####################################################################
@@ -219,7 +237,9 @@ int main()
 	const int vertex_size = tri_mesh.vertex_list.size();
 	const int triangle_size = tri_mesh.triangle_list.size();
 	double vertices[vertex_size];
-	for(int i=0;i<vertex_size;i++) vertices[i]=tri_mesh.vertex_list[i]/max-0.5;
+
+    // TODO: Here use the cuboid.edge_max
+	for(int i=0;i<vertex_size;i++) vertices[i]=tri_mesh.vertex_list[i]/cuboid.edge_max-0.5;
 
 	unsigned int indices[triangle_size];
 	for(int i=0;i<triangle_size;i++) indices[i]=tri_mesh.triangle_list[i];
@@ -269,9 +289,7 @@ int main()
 
 
     // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
     // render loop

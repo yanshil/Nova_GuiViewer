@@ -10,6 +10,9 @@
 #include <stdio.h>
 #include <math.h>
 
+/**
+ * 
+ */
 class Vertex
 {
   public:
@@ -25,31 +28,50 @@ class Vertex
 };
 
 
-
 class Hole
 {
   public:
     Hole();
+    Hole(double x, double y, double radius);
     ~Hole();
+    // TODO: Change to Modify()?
     void Set(double x_, double y_, double radius_);
-    double x = 0.5;
-    double y = 0.5;
-    double radius = 0.1;
+    double x;
+    double y;
+    double radius;
     std::vector<Vertex> vertices;
+    void initVertex();
 
   //private:
     int segments = 64;
+};
+
+class HoleList
+{
+  public:
+    HoleList();
+    ~HoleList();
+
+    std::vector<Hole> holes;
+
+    int AddHole(Hole &hole);  // return ID
+    int ModifyHolebyID(int holeID);  // return modify status
+    int DeleteHolebyID(int holeID); // return delete status
+
 };
 
 class Cuboid
 {
   public:
     Cuboid();
+    // A cube with bottom left at (0,0,0) with depth, width, height
+    Cuboid(double depth, double width, double height, int n_segments);
     ~Cuboid();
-    int n_segments = 4;
-    double depth = 1.0;
-    double width = 1.0;
-    double height = 1.0;
+    int n_segments;
+    double depth;
+    double width;
+    double height;
+    double edge_max;
 };
 
 class Segment
@@ -62,6 +84,9 @@ class Segment
     int v2;
 };
 
+/**
+ * Generate Triangular Mesh
+ */
 class TriMesh
 {
   public:
