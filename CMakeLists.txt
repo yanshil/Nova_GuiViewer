@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 #add_subdirectory(externals)
 
 add_executable(${PROJECT_NAME} 
-    generate.cpp
+    main.cpp
     triangle.cpp
     TriMesh.cpp
     )

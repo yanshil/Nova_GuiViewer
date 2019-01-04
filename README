@@ -1,5 +1,10 @@
-g++ -O -I/usr/X11R6/include -L/usr/X11R6/lib -c ./triangle.c -lm
+## RUN
+```
+mkdir build
+cd build
+ccmake ..
+make -j8
 
-g++ -O -I/usr/X11R6/include -L/usr/X11R6/lib ./triangle.c ./main.cpp -lm
-
-g++ -O -std=c++11  ./TriMesh.cpp ./triangle.cpp ./glad.c  ./generate.cpp -lglfw3 -lGL -lm -lXrandr -lXi -lX11 -lXxf86vm -lpthread -ldl -lXinerama -lXcursor -lm
+ln -s ../7.3.camera.vs ./
+ln -s ../7.3.camera.fs ./
+```
