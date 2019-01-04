@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.1)
 project(foo CXX)
 set(CMAKE_CXX_STANDARD 11)
 
+## Currently not working???? undefined reference.....
 #add_subdirectory(externals)
 
 add_definitions(
