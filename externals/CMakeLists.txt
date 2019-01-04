@@ -1,6 +1,6 @@
 ## IMGUI
-# include_directories(imgui)
-# include_directories(imgui/examples)
+include_directories(imgui)
+include_directories(imgui/examples)
 
 set(IMGUI_HEADER
   imgui/imgui.h
@@ -16,6 +16,7 @@ set(IMGUI_SOURCE
   imgui/imgui_draw.cpp
   imgui/imgui_widgets.cpp
 )
+
 add_library(imgui STATIC
   ${IMGUI_HEADER}
   ${IMGUI_SOURCE}

@@ -2,16 +2,34 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <vector>
 #include <algorithm>
 #include <math.h>
+
 #include "TriMesh.h"
+#include "shader.h"
+
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "shader.h"
+
+
+// Imgui
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+
+//#####################################################################
+// Global Setting
+//#####################################################################
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -48,14 +66,14 @@ const char *fragmentShaderSource = "#version 330 core\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
 
-
-
-
-
 double Distance(double x1_,double y1_,double x2_,double y2_);
 bool Check_Overlap(std::vector<Hole> hs_, Hole h_);
 bool Check_Out_Of_Boundary(Hole h_,Cuboid c_);
 bool Ascend(Hole ha,Hole hb){ return (ha.x<hb.x);}
+
+//#####################################################################
+// main
+//#####################################################################
 int main()
 {	
 	Cuboid cuboid;
@@ -85,6 +103,10 @@ int main()
 		holes.push_back(temp);
 	}
 
+
+    //#####################################################################
+    // 
+    //#####################################################################
 	TriMesh tri_mesh;
 	tri_mesh.GenMesh(cuboid,holes);
 
@@ -93,17 +115,15 @@ int main()
 	max = cuboid.depth>(cuboid.width>cuboid.height?cuboid.width:cuboid.height)?cuboid.depth:(cuboid.width>cuboid.height?cuboid.width:cuboid.height);
 
 	
-
+    //#####################################################################
+    // glfw Windows
+    //#####################################################################
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
-#endif
 
     // glfw window creation
     // --------------------
@@ -121,6 +141,28 @@ int main()
 
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+
+    //#####################################################################
+    // Setup Dear ImGui 
+    //#####################################################################
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+
+    const char* glsl_version = "#version 330";
+    ImGui_ImplOpenGL3_Init(glsl_version);
+    //---------------------------------------------------------------------
 
     // glew: load all OpenGL function pointers
     // ---------------------------------------
@@ -229,10 +271,42 @@ int main()
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+
+
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        glfwPollEvents();
+
+//############# Dear  ImGui Frame ######################
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+        
+        static float f = 0.0f;
+        static int counter = 0;
+
+        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            
+        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            counter++;
+        ImGui::SameLine();
+        ImGui::Text("counter = %d", counter);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();        
+
+//###################################################
+
+
         // per-frame time logic
         // --------------------
         float currentFrame = glfwGetTime();
@@ -264,12 +338,19 @@ int main()
         //glUseProgram(shaderProgram);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawElements(GL_TRIANGLES, triangle_size, GL_UNSIGNED_INT, 0);
-        // glBindVertexArray(0); // no need to unbind iverticest every time 
- 
+        // glBindVertexArray(0); // no need to unbind iverticest every time
+
+        // -------------------------------------------------------------------------------
+        // Rendering
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        // -------------------------------------------------------------------------------
+
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
-        glfwPollEvents();
+        
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
@@ -324,11 +405,6 @@ double Distance(double x1_,double y1_,double x2_,double y2_)
 
 	return sqrt((x1_-x2_)*(x1_-x2_)+(y1_-y2_)*(y1_-y2_));
 }
-
-
-
-
-
 
 void processInput(GLFWwindow *window)
 {
