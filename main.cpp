@@ -252,17 +252,6 @@ int main()
     glm::vec3 cubePositions[] = {
         glm::vec3(0.0f, 0.0f, 1.0f)};
 
-    // float vertices[] = {
-    //      0.5f,  0.5f, 0.0f,  // top right
-    //      0.5f, -0.5f, 0.0f,  // bottom right
-    //     -0.5f, -0.5f, 0.0f,  // bottom left
-    //     -0.5f,  0.5f, 0.0f   // top left
-    // };
-    // unsigned int indices[] = {  // note that we start from 0!
-    //     0, 1, 3,  // first Triangle
-    //     1, 2, 3   // second Triangle
-    // };
-
     std::cout << vertex_size << "   " << triangle_size << std::endl;
 
     unsigned int VBO, VAO, EBO;
@@ -518,23 +507,6 @@ static void ShowWindowLayout(bool *p_open)
     static float vec4a[4] = {5.0f, 5.0f, 5.0f, 0.44f};
     ImGui::InputFloat3("Cube Size", vec4a);
 
-    // if (ImGui::Button("Render")) // Buttons return true when clicked (most widgets return true when edited/activated)
-    // {
-    //     Cuboid cube = Cuboid(vec4a[0], vec4a[1], vec4a[2], 4);
-
-    //     // Temp Hole for test
-    //     Hole temp = Hole(2, 2, 0.4);
-    //     // Check validation in HoleList class
-    //     std::vector<Hole> holes;
-    //     holes.push_back(temp);
-    //     TriMesh tri_mesh;
-    //     tri_mesh.GenMesh(cube, holes);
-
-    //     //================= TODO ===================
-    //     // Unbind and Redraw
-    //     glBindVertexArray(0);
-    // }
-    // ImGui::SameLine();
     ImGui::Text("depth = %f, width = %f, height = %f", vec4a[0], vec4a[1], vec4a[2]);
 
     // Cylinder
@@ -626,7 +598,7 @@ static void ShowWindowLayout(bool *p_open)
 
         //================= TODO ===================
         // Unbind and Redraw
-        
+
 
     }
     ImGui::PopStyleColor(3);
