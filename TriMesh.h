@@ -42,6 +42,10 @@ class Hole
     std::vector<Vertex> vertices;
     void initVertex();
 
+    // ID?
+
+    // converge coordinate to char * for display
+
   //private:
     int segments = 64;
 };
@@ -58,7 +62,13 @@ class HoleList
     int AddHole(Hole &hole);  // return ID
     int ModifyHolebyID(int holeID);  // return modify status
     int DeleteHolebyID(int holeID); // return delete status
-
+    int size(); // Get the size of holes
+  private:
+    int sNextID;
+    int getNextId();
+    bool isEntryValid(Hole &temp);
+    bool Check_Overlap(Hole &temp);
+    double Distance(double x1_, double y1_, double x2_, double y2_);
 };
 
 class Cuboid
