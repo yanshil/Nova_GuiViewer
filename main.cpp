@@ -72,6 +72,7 @@ bool Ascend(Hole ha, Hole hb) { return (ha.x < hb.x); }
 //#####################################################################
 static void ShowWindowLayout(bool *p_open);
 static bool show_gui_layout = true;
+static bool show_wireframe = true;
 
 //#####################################################################
 // main
@@ -301,25 +302,6 @@ int main()
         if (show_gui_layout)
             ShowWindowLayout(&show_gui_layout);
 
-        // static float f = 0.0f;
-        // static int counter = 0;
-
-        // ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-        // ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-
-        // if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        //     counter++;
-        // ImGui::SameLine();
-        // ImGui::Text("counter = %d", counter);
-
-        // // ?What the fourth element for?
-        // static float vec4a[4] = { 5.0f, 5.0f, 5.0f, 0.44f };
-        // ImGui::InputFloat3("input float3", vec4a);
-
-        // ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        // ImGui::End();
-
         //###################################################
 
         // per-frame time logic
@@ -355,11 +337,19 @@ int main()
         glDrawElements(GL_TRIANGLES, triangle_size, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind iverticest every time
 
+        //###################################################
         // -------------------------------------------------------------------------------
         // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        
+        // Display Setting
         // -------------------------------------------------------------------------------
+        if (show_wireframe)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        //###################################################
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -598,11 +588,10 @@ static void ShowWindowLayout(bool *p_open)
 
         //================= TODO ===================
         // Unbind and Redraw
-
-
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
+    ImGui::Checkbox("Wireframe", &show_wireframe);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
