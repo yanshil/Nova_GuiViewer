@@ -63,6 +63,7 @@ class HoleList
     int ModifyHolebyID(int holeID);  // return modify status
     int DeleteHolebyID(int holeID); // return delete status
     int size(); // Get the size of holes
+    void RemoveAllHole();
   private:
     int sNextID;
     int getNextId();

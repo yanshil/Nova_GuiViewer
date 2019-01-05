@@ -91,14 +91,20 @@ HoleList::HoleList()
 
 HoleList::~HoleList() {}
 
-int HoleList::AddHole(Hole &hole) 
+void HoleList::RemoveAllHole()
+{
+    sNextID = 0;
+    holes.clear();
+}
+
+int HoleList::AddHole(Hole &temp) 
 {
     int id = getNextId();
 
-    if(!isEntryValid(hole))
+    if(!isEntryValid(temp))
         return 0;   // Unvalid
 
-    holes.push_back(hole);
+    holes.push_back(temp);
     return id;
 }
 

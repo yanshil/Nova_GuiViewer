@@ -78,6 +78,10 @@ static bool show_wireframe = true;
 //#####################################################################
 TriMesh tri_mesh;
 HoleList holeLists;
+unsigned int VBO, VAO, EBO;
+
+int vertex_size;
+int triangle_size;
 
 //#####################################################################
 // main
@@ -202,8 +206,8 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    const int vertex_size = tri_mesh.vertex_list.size();
-    const int triangle_size = tri_mesh.triangle_list.size();
+    vertex_size = tri_mesh.vertex_list.size();
+    triangle_size = tri_mesh.triangle_list.size();
     double vertices[vertex_size];
 
     // TODO: Here use the cuboid.edge_max
@@ -218,7 +222,6 @@ int main()
 
     std::cout << vertex_size << "   " << triangle_size << std::endl;
 
-    unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -235,14 +238,14 @@ int main()
     glEnableVertexAttribArray(0);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
+    // glBindVertexArray(0);
 
     // uncomment this call to draw in wireframe polygons.
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -288,7 +291,7 @@ int main()
         // camera/view transformation
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         ourShader.setMat4("view", view);
-        glBindVertexArray(VAO);
+        // glBindVertexArray(VAO);
         glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         model = glm::translate(model, cubePositions[0]);
         float angle = 20.0f * 0;
@@ -296,7 +299,8 @@ int main()
         ourShader.setMat4("model", model);
         // draw our first triangle
         //glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        // glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        
         glDrawElements(GL_TRIANGLES, triangle_size, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind iverticest every time
 
@@ -422,6 +426,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 
 static void ShowWindowLayout(bool *p_open)
 {
+
     // NULL for no_close
     if (!ImGui::Begin("Generate Object", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
@@ -454,35 +459,42 @@ static void ShowWindowLayout(bool *p_open)
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1 / 7.0f, 0.8f, 0.8f));
     if (ImGui::Button("Generate")) // Buttons return true when clicked (most widgets return true when edited/activated)
     {
+        // TODO: Should clear HoleList First!
+        holeLists.RemoveAllHole();
+
         Cuboid cube = Cuboid(vec4a[0], vec4a[1], vec4a[2], 4);
-
         // Temp Hole for test
-        Hole temp = Hole(2, 2, 0.4);
-        // Check validation in HoleList class
-        std::vector<Hole> holes;
-        holes.push_back(temp);
+        Hole temp3 = Hole(3, 3, 0.5);
 
-        tri_mesh.GenMesh(cube, holes);
+        if(!Check_Out_Of_Boundary(temp3,cube))
+            holeLists.AddHole(temp3);
+
+        std::cout << holeLists.size() << std::endl;
+
+        // tri_mesh.GenMesh(cube, holes);
+        // TODO: TriMesh cannot set as global because lack of destructor when regenerate mesh
+        TriMesh tri_mesh2;
+        tri_mesh2.GenMesh(cube, holeLists.holes);
 
         //================= TODO ===================
         // Unbind and Redraw
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
-        // const int vertex_size = tri_mesh.vertex_list.size();
-        // const int triangle_size = tri_mesh.triangle_list.size();
-        // double vertices[vertex_size];
+        vertex_size = tri_mesh2.vertex_list.size();
+        triangle_size = tri_mesh2.triangle_list.size();
+        double vertices[vertex_size];
 
-        // // TODO: Here use the cuboid.edge_max
-        // for (int i = 0; i < vertex_size; i++)
-        //     vertices[i] = tri_mesh.vertex_list[i] / cube.edge_max - 0.5;
+        // TODO: Here use the cuboid.edge_max
+        for (int i = 0; i < vertex_size; i++)
+            vertices[i] = tri_mesh2.vertex_list[i] / cube.edge_max - 0.5;
 
-        // unsigned int indices[triangle_size];
-        // for (int i = 0; i < triangle_size; i++)
-        //     indices[i] = tri_mesh.triangle_list[i];
-        // glm::vec3 cubePositions[] = {
-        //     glm::vec3(0.0f, 0.0f, 1.0f)};
+        unsigned int indices[triangle_size];
+        for (int i = 0; i < triangle_size; i++)
+            indices[i] = tri_mesh2.triangle_list[i];
+        glm::vec3 cubePositions[] = {
+            glm::vec3(0.0f, 0.0f, 1.0f)};
 
-        // std::cout << vertex_size << "   " << triangle_size << std::endl;
+        std::cout << vertex_size << "   " << triangle_size << std::endl;
 
         // unsigned int VBO, VAO, EBO;
         // glGenVertexArrays(1, &VAO);
@@ -492,26 +504,26 @@ static void ShowWindowLayout(bool *p_open)
         // glBindVertexArray(VAO);
 
         // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
         // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indices), indices);
 
-        // glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
-        // glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
+        glEnableVertexAttribArray(0);
 
-        // // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+        glDrawElements(GL_TRIANGLES, triangle_size, GL_UNSIGNED_INT, 0);
+
+        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        // // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-        // // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        // // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-        // // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
         // glBindVertexArray(0);
 
-        // // uncomment this call to draw in wireframe polygons.
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
