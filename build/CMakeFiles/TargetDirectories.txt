@@ -1,0 +1,4 @@
+/home/hertz/Documents/ModernGL/build/CMakeFiles/rebuild_cache.dir
+/home/hertz/Documents/ModernGL/build/CMakeFiles/edit_cache.dir
+/home/hertz/Documents/ModernGL/build/CMakeFiles/foo.dir
+/home/hertz/Documents/ModernGL/build/CMakeFiles/imgui.dir

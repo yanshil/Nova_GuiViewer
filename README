@@ -1,5 +1,0 @@
-g++ -O -I/usr/X11R6/include -L/usr/X11R6/lib -c ./triangle.c -lm
-
-g++ -O -I/usr/X11R6/include -L/usr/X11R6/lib ./triangle.c ./main.cpp -lm
-
-g++ -O -std=c++11  ./TriMesh.cpp ./triangle.cpp ./glad.c  ./generate.cpp -lglfw3 -lGL -lm -lXrandr -lXi -lX11 -lXxf86vm -lpthread -ldl -lXinerama -lXcursor -lm
