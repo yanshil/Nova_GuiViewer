@@ -21,12 +21,15 @@ Vertex::Vertex(double x_,double y_,double z_)
         z = z_;
 }
 
+int Hole::sNextID = 0;
+
 Hole::Hole()
 {
     // TODO:
     this->x = 0.5;
     this->y = 0.5;
     this->radius = 0.1;
+    this->id = getNextId();
 
     initVertex();
 }
@@ -53,29 +56,21 @@ Hole::Hole(double x, double y, double radius)
     :x(x), y(y), radius(radius)
 {
     initVertex();
+    this->id = getNextId();
+    std::cout << "id = " << id << std::endl;
 }
 
 Hole::~Hole()
 {
 
 }
+int Hole::getNextId()
+{
+    return ++this->sNextID;
+}
 
 void Hole::Set(double x_, double y_, double radius_)
 {
-    // vertices.clear();
-    // x = x_;
-    // y = y_;
-    // radius = radius_;
-    // Vertex vertex;
-    // double theta;
-    // double dtheta = 2.0 * 3.1415926 / segments;
-    // for (int i = 0; i < segments; i++)
-    // {
-    //     theta = dtheta * i;
-    //     vertex.x = x + radius * cos(theta);
-    //     vertex.y = y + radius * sin(theta);
-    //     vertices.push_back(vertex);
-    // }
 
     this->x = x_;
     this->y = y_;
@@ -86,20 +81,18 @@ void Hole::Set(double x_, double y_, double radius_)
 
 HoleList::HoleList()
 {
-    sNextID = 0;
 }
 
 HoleList::~HoleList() {}
 
 void HoleList::RemoveAllHole()
 {
-    sNextID = 0;
     holes.clear();
 }
 
 int HoleList::AddHole(Hole &temp) 
 {
-    int id = getNextId();
+    int id = temp.id;
 
     if(!isEntryValid(temp))
         return 0;   // Unvalid
@@ -123,11 +116,6 @@ int HoleList::DeleteHolebyID(int holeID)
 int HoleList::size()
 {
     return holes.size();
-}
-
-int HoleList::getNextId()
-{
-    return sNextID++;
 }
 
 bool HoleList::isEntryValid(Hole &temp)

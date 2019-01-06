@@ -43,11 +43,18 @@ class Hole
     void initVertex();
 
     // ID?
+    int id;
+
+    static int sNextID;
 
     // converge coordinate to char * for display
 
   //private:
     int segments = 64;
+  private:
+    
+    int getNextId();
+    
 };
 
 // TODO
@@ -59,14 +66,14 @@ class HoleList
 
     std::vector<Hole> holes;
 
+    int size(); // Get the size of holes
     int AddHole(Hole &hole);  // return ID
     int ModifyHolebyID(int holeID);  // return modify status
     int DeleteHolebyID(int holeID); // return delete status
-    int size(); // Get the size of holes
     void RemoveAllHole();
+    
   private:
-    int sNextID;
-    int getNextId();
+
     bool isEntryValid(Hole &temp);
     bool Check_Overlap(Hole &temp);
     double Distance(double x1_, double y1_, double x2_, double y2_);

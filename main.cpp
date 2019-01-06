@@ -49,19 +49,6 @@ float fov = 45.0f;
 float deltaTime = 0.0f; // time between current frame and last frame
 float lastFrame = 0.0f;
 
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                 "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                   "}\n\0";
-
 bool Check_Out_Of_Boundary(Hole h_, Cuboid c_);
 bool Ascend(Hole ha, Hole hb) { return (ha.x < hb.x); }
 
@@ -77,6 +64,7 @@ static bool show_wireframe = true;
 // The Global Object for the cutted holes mesh
 //#####################################################################
 TriMesh tri_mesh;
+Cuboid cube;
 HoleList holeLists;
 unsigned int VBO, VAO, EBO;
 
@@ -88,18 +76,30 @@ int triangle_size;
 //#####################################################################
 int main()
 {
-    Cuboid cuboid;
-    cuboid = Cuboid(5, 5, 5, 4);
+    cube = Cuboid(5, 5, 5, 4);
 
+    // TODO: Seg Fault when Buffer Size is too small..... So I render 5 holes in the first round
     Hole temp = Hole(2, 1, 0.5);
-    if(!Check_Out_Of_Boundary(temp,cuboid))
+    if(!Check_Out_Of_Boundary(temp,cube))
         holeLists.AddHole(temp);    // will return an ID here
 
-    Hole temp2 = Hole(4, 4, 0.5);
-    if(!Check_Out_Of_Boundary(temp2,cuboid))
+    Hole temp2 = Hole(4, 4, 0.3);
+    if(!Check_Out_Of_Boundary(temp2,cube))
         holeLists.AddHole(temp2);    // will return an ID here
 
-    tri_mesh.GenMesh(cuboid, holeLists.holes);
+    Hole temp3 = Hole(3, 3, 0.2);
+    if(!Check_Out_Of_Boundary(temp3,cube))
+        holeLists.AddHole(temp3);    // will return an ID here
+
+    Hole temp4 = Hole(1, 1, 0.1);
+    if(!Check_Out_Of_Boundary(temp4,cube))
+        holeLists.AddHole(temp4);    // will return an ID here
+
+    Hole temp5 = Hole(4.5, 4.5, 0.02);
+    if(!Check_Out_Of_Boundary(temp5,cube))
+        holeLists.AddHole(temp5);    // will return an ID here
+
+    tri_mesh.GenMesh(cube, holeLists.holes);
 
     //#####################################################################
     // glfw Windows
@@ -140,7 +140,8 @@ int main()
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
+    // ImGui::StyleColorsDark();
+    ImGui::StyleColorsLight();
     //ImGui::StyleColorsClassic();
 
     // Setup Platform/Renderer bindings
@@ -160,49 +161,6 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
     Shader ourShader("7.3.camera.vs", "7.3.camera.fs");
-    // build and compile our shader program
-    // ------------------------------------
-    // vertex shader
-    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    // fragment shader
-    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    // link shaders
-    int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -212,7 +170,7 @@ int main()
 
     // TODO: Here use the cuboid.edge_max
     for (int i = 0; i < vertex_size; i++)
-        vertices[i] = tri_mesh.vertex_list[i] / cuboid.edge_max - 0.5;
+        vertices[i] = tri_mesh.vertex_list[i] / cube.edge_max - 0.5;
 
     unsigned int indices[triangle_size];
     for (int i = 0; i < triangle_size; i++)
@@ -440,6 +398,7 @@ static void ShowWindowLayout(bool *p_open)
     ImGui::Text("Enter cube size below (depth, width, height)"); // Display some text (you can use a format strings too)
 
     // // ?What the fourth element for?
+    // TODO: Change Input Float!!!!! Because we want double rather than float
     static float vec4a[4] = {5.0f, 5.0f, 5.0f, 0.44f};
     ImGui::InputFloat3("Cube Size", vec4a);
 
@@ -459,17 +418,16 @@ static void ShowWindowLayout(bool *p_open)
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1 / 7.0f, 0.8f, 0.8f));
     if (ImGui::Button("Generate")) // Buttons return true when clicked (most widgets return true when edited/activated)
     {
-        // TODO: Should clear HoleList First!
-        holeLists.RemoveAllHole();
 
-        Cuboid cube = Cuboid(vec4a[0], vec4a[1], vec4a[2], 4);
+        // TODO: called destructor for the previous cubes
+
+        cube = Cuboid(vec4a[0], vec4a[1], vec4a[2], 4);
         // Temp Hole for test
-        Hole temp3 = Hole(3, 3, 0.5);
+        
+        // Hole temp3 = Hole(3, 3, 0.5);
 
-        if(!Check_Out_Of_Boundary(temp3,cube))
-            holeLists.AddHole(temp3);
-
-        std::cout << holeLists.size() << std::endl;
+        // if(!Check_Out_Of_Boundary(temp3,cube))
+        //     holeLists.AddHole(temp3);
 
         // tri_mesh.GenMesh(cube, holes);
         // TODO: TriMesh cannot set as global because lack of destructor when regenerate mesh
@@ -556,10 +514,10 @@ static void ImGui_HoleList(HoleList &holeLists)
 
         for(int i = 0; i < holeLists.size(); i++)
         {
-            char label[32];
-            sprintf(label, "%04d", i+1);    // TODO Modify as ID!! Hole itself should have ID
+            char holeID[32];
+            sprintf(holeID, "%04d", holeLists.holes[i].id);
             
-            if (ImGui::Selectable(label, selected == i, ImGuiSelectableFlags_SpanAllColumns))
+            if (ImGui::Selectable(holeID, selected == i, ImGuiSelectableFlags_SpanAllColumns))
                 selected = i;
 
             ImGui::NextColumn();
@@ -579,14 +537,69 @@ static void ImGui_HoleList(HoleList &holeLists)
 
         if (ImGui::Button("Add"))
         {
+            ImGui::OpenPopup("Add Hole");
         }
+
+        if (ImGui::BeginPopupModal("Add Hole"))
+        {
+            ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)"); // Display some text (you can use a format strings too)
+
+            // // ?What the fourth element for?
+            static double temp_x = 0.0;
+            ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
+            static double temp_y = 0.0;
+            ImGui::InputDouble("Hole Y", &temp_y, 0.01f, 0.2f, "%.8f");
+            static double temp_raduis = 0.5;
+            ImGui::InputDouble("Raduis", &temp_raduis, 0.01f, 0.2f, "%.8f");
+
+            if (ImGui::Button("Add"))
+            {
+                // TODO : Change the validation std::out output to ImGui::Text
+                Hole temp = Hole(temp_x, temp_y, temp_raduis);
+                if(!Check_Out_Of_Boundary(temp,cube))
+                {
+                    if(holeLists.AddHole(temp)) // != 0: return an ID
+                    {
+                        ImGui::OpenPopup("Success!");               
+                    }
+                }
+                
+            }
+
+            bool dummy_open = true;
+            if (ImGui::BeginPopupModal("Success!", &dummy_open))
+            {
+                ImGui::Text("Insert a hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
+
+                if (ImGui::Button("Close"))
+                    ImGui::CloseCurrentPopup();
+                    
+                ImGui::EndPopup();
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Close"))
+                ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+
+
         ImGui::SameLine();
         if (ImGui::Button("Modify"))
         {
+            // Get the Index by ID fist, and then modify it
+            // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
         }
         ImGui::SameLine();
         if (ImGui::Button("Delete"))
         {
+            // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Remove All"))
+        {
+            holeLists.RemoveAllHole();
         }
         ImGui::Separator();
         ImGui::TreePop();
