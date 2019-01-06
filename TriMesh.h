@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <nova/Geometry/Topology_Based_Geometry/Triangulated_Surface.h>
 
+using namespace Nova;
 /**
  * 
  */

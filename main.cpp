@@ -245,11 +245,11 @@ int main()
 
     // TODO: Here use the cuboid.edge_max
     for (int i = 0; i < vertex_size; i++)
-        vertices[i] = tri_mesh.vertex_list[i] / cuboid.edge_max - 0.5;
+        vertices[i] = tri_mesh.vertex_list[i/3][i%3] / cuboid.edge_max - 0.5;
 
     unsigned int indices[triangle_size];
     for (int i = 0; i < triangle_size; i++)
-        indices[i] = tri_mesh.triangle_list[i];
+        indices[i] = tri_mesh.triangle_list[i/3][i%3];
     glm::vec3 cubePositions[] = {
         glm::vec3(0.0f, 0.0f, 1.0f)};
 

@@ -98,6 +98,22 @@ sstream
 iostream
 -
 
+/home/hertz/Documents/ModernGL/triangle.cpp
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+math.h
+-
+float.h
+-
+fpu_control.h
+-
+triangle.h
+/home/hertz/Documents/ModernGL/triangle.h
+
 /home/hertz/Documents/ModernGL/triangle.h
 
 /usr/local/include/GLFW/glfw3.h
