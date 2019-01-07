@@ -274,7 +274,7 @@ int main()
         //glUseProgram(shaderProgram);
         // glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         
-        glDrawElements(GL_TRIANGLES, triangle_size*3, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 3*tri_mesh.triangle_list.size(), GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind iverticest every time
 
         //###################################################
@@ -446,15 +446,14 @@ static void ShowWindowLayout(bool *p_open)
 
         // tri_mesh.GenMesh(cube, holes);
         // TODO: TriMesh cannot set as global because lack of destructor when regenerate mesh
-        TriMesh tri_mesh2;
-        tri_mesh2.GenMesh(cube, holeLists.holes);
+        tri_mesh.GenMesh(cube, holeLists.holes);
 
         //================= TODO ===================
         // Unbind and Redraw
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
-        vertex_size = tri_mesh2.vertex_list.size();
-        triangle_size = tri_mesh2.triangle_list.size();
+        vertex_size = tri_mesh.vertex_list.size();
+        triangle_size = tri_mesh.triangle_list.size();
         double vertices[3*vertex_size];
 
         // TODO: Here use the cuboid.edge_max
@@ -462,7 +461,7 @@ static void ShowWindowLayout(bool *p_open)
         {
             for(int j = 0; j < 3; j++)
             {
-            vertices[3*i+j] = tri_mesh2.vertex_list[i][j] / cube.edge_max - 0.5;
+            vertices[3*i+j] = tri_mesh.vertex_list[i][j] / cube.edge_max - 0.5;
             }
         }    
             
@@ -473,7 +472,7 @@ static void ShowWindowLayout(bool *p_open)
             
             for(int j = 0; j < 3; j++)
             {
-                indices[3*i+j] = tri_mesh2.triangle_list[i][j];
+                indices[3*i+j] = tri_mesh.triangle_list[i][j];
             }
             
         }
@@ -491,26 +490,28 @@ static void ShowWindowLayout(bool *p_open)
         // // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
         // glBindVertexArray(VAO);
 
-        // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indices), indices);
+        //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
         glEnableVertexAttribArray(0);
 
-        glDrawElements(GL_TRIANGLES, triangle_size, GL_UNSIGNED_INT, 0);
 
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        // glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
-        // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    //      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    //     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indices), indices);
 
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-        // glBindVertexArray(0);
+    //     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
+    //    glEnableVertexAttribArray(0);
+
+        glDrawElements(GL_TRIANGLES, 3*tri_mesh.triangle_list.size(), GL_UNSIGNED_INT, 0);
+
 
     }
     ImGui::PopStyleColor(3);
