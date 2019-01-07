@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/hertz/Documents/ModernGL/TriMesh.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/foo.dir/TriMesh.cpp.o"
-  "/home/hertz/Documents/ModernGL/main.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/foo.dir/main.cpp.o"
-  "/home/hertz/Documents/ModernGL/triangle.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/foo.dir/triangle.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/TriMesh.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/foo.dir/TriMesh.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/main.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/foo.dir/main.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/triangle.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/foo.dir/triangle.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -25,7 +25,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/home/hertz/Documents/ModernGL/build/CMakeFiles/imgui.dir/DependInfo.cmake"
+  "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/imgui.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

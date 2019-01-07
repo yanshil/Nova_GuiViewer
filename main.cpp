@@ -49,21 +49,6 @@ float fov = 45.0f;
 float deltaTime = 0.0f; // time between current frame and last frame
 float lastFrame = 0.0f;
 
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                 "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                   "}\n\0";
-
-double Distance(double x1_, double y1_, double x2_, double y2_);
-bool Check_Overlap(std::vector<Hole> hs_, Hole h_);
 bool Check_Out_Of_Boundary(Hole h_, Cuboid c_);
 bool Ascend(Hole ha, Hole hb) { return (ha.x < hb.x); }
 
@@ -71,68 +56,50 @@ bool Ascend(Hole ha, Hole hb) { return (ha.x < hb.x); }
 // ImGui Display
 //#####################################################################
 static void ShowWindowLayout(bool *p_open);
+static void ImGui_HoleList(HoleList &holeLists);
 static bool show_gui_layout = true;
 static bool show_wireframe = true;
+
+//#####################################################################
+// The Global Object for the cutted holes mesh
+//#####################################################################
+TriMesh tri_mesh;
+Cuboid cube;
+HoleList holeLists;
+unsigned int VBO, VAO, EBO;
+
+int vertex_size;
+int triangle_size;
 
 //#####################################################################
 // main
 //#####################################################################
 int main()
 {
-    Cuboid cuboid;
-    std::vector<Hole> holes; // TODO: New class for HoleList (move validation into the list)
-    // std::vector<Vertex> boundary_vertices;
-    Hole temp;
-    bool correct_entry;
+    cube = Cuboid(5, 5, 5, 4);
 
-    // double tmp_x,tmp_y,tmp_radius;
-    // int number_of_holes;hole(1,
-    //holes.push_back(temp);
+    // TODO: Seg Fault when Buffer Size is too small..... So I render 5 holes in the first round
+    Hole temp = Hole(2, 1, 0.5);
+    if(!Check_Out_Of_Boundary(temp,cube))
+        holeLists.AddHole(temp);    // will return an ID here
 
-    // std::cout<<"Enter depth, width and height of the cuboid: "<<std::endl;
-    // double tmp_depth, tmp_width, tmp_height;
-    // std::cin>>tmp_depth>>tmp_width>>tmp_height;
-    cuboid = Cuboid(5, 5, 5, 4);
+    Hole temp2 = Hole(4, 4, 0.3);
+    if(!Check_Out_Of_Boundary(temp2,cube))
+        holeLists.AddHole(temp2);    // will return an ID here
 
-    // std::cout<<"Enter number of holes: "<<std::endl;
-    // std::cin>>number_of_holes;
+    Hole temp3 = Hole(3, 3, 0.2);
+    if(!Check_Out_Of_Boundary(temp3,cube))
+        holeLists.AddHole(temp3);    // will return an ID here
 
-    // for(int i=0;i<number_of_holes;i++)
-    // {
-    //     do{
-    // 	std::cout<<"Enter location  of #"<<i+1<<" hole(p.s.: (x,y)): "<<std::endl;
-    // 	std::cin>>tmp_x>>tmp_y;
-    // 	std::cout<<"Enter radius of #"<<i+1<<" hole: "<<std::endl;
-    // 	std::cin>>tmp_radius;
-    // 	temp.Set(tmp_x,tmp_y,tmp_radius);
-    // 	correct_entry=!Check_Overlap(holes,temp)&&!Check_Out_Of_Boundary(temp,cuboid);
-    // 	if(!correct_entry)
-    // 	std::cout<<"Invaid input! Enter again"<<std::endl;
-    //      }while(!correct_entry);
-    // 	holes.push_back(temp);
-    // }
+    Hole temp4 = Hole(1, 1, 0.1);
+    if(!Check_Out_Of_Boundary(temp4,cube))
+        holeLists.AddHole(temp4);    // will return an ID here
 
-    // TODO: temp 1
-    temp = Hole(1, 1, 0.5);
-    // Check validation in HoleList class
-    holes.push_back(temp);
+    Hole temp5 = Hole(4.5, 4.5, 0.02);
+    if(!Check_Out_Of_Boundary(temp5,cube))
+        holeLists.AddHole(temp5);    // will return an ID here
 
-    // // Cuboid::Cuboid(double depth, double width, double height, int n_segments)
-    // Cuboid cube(5, 5, 5, 4);
-    // // Hole::Hole(double x, double y, double radius)
-    // Hole hole1(1, 1, 0.5);
-
-    // // TODO: check overlap
-    // holes.push_back(hole1);
-
-    //#####################################################################
-    //
-    //#####################################################################
-    TriMesh tri_mesh;
-    tri_mesh.GenMesh(cuboid, holes);
-
-    // double max = cuboid.depth>(cuboid.width>cuboid.height?cuboid.width:cuboid.height)?cuboid.depth:(cuboid.width>cuboid.height?cuboid.width:cuboid.height);
-    // double max = cuboid.edge_max;
+    tri_mesh.GenMesh(cube, holeLists.holes);
 
     //#####################################################################
     // glfw Windows
@@ -155,7 +122,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    // glfwSetCursorPosCallback(window, mouse_callback);
+    //glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
     // tell GLFW to capture our mouse
@@ -173,7 +140,8 @@ int main()
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
     // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
+    // ImGui::StyleColorsDark();
+    ImGui::StyleColorsLight();
     //ImGui::StyleColorsClassic();
 
     // Setup Platform/Renderer bindings
@@ -192,70 +160,41 @@ int main()
         return -1;
     }
     glEnable(GL_DEPTH_TEST);
-    Shader ourShader("7.3.camera.vs", "7.3.camera.fs");
-    // build and compile our shader program
-    // ------------------------------------
-    // vertex shader
-    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    // fragment shader
-    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    // link shaders
-    int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    Shader ourShader("camera.vs", "camera.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    const int vertex_size = tri_mesh.vertex_list.size();
-    const int triangle_size = tri_mesh.triangle_list.size();
-    double vertices[vertex_size];
+    vertex_size = tri_mesh.vertex_list.size();
+    triangle_size = tri_mesh.triangle_list.size();
+    double vertices[3*vertex_size];
 
     // TODO: Here use the cuboid.edge_max
     for (int i = 0; i < vertex_size; i++)
-        vertices[i] = tri_mesh.vertex_list[i/3][i%3] / cuboid.edge_max - 0.5;
-
-    unsigned int indices[triangle_size];
+    {   
+        for(int j = 0; j < 3; j++)
+        {
+            vertices[3*i+j] = tri_mesh.vertex_list[i][j] / (double)cube.edge_max - 0.5;
+            
+        }
+        
+        //std::cout<<i<<": "<<tri_mesh.vertex_list[i][0]<<", "<<tri_mesh.vertex_list[i][1]<<", "<<tri_mesh.vertex_list[i][2]<<std::endl;
+    }    
+    unsigned int indices[3*triangle_size];
     for (int i = 0; i < triangle_size; i++)
-        indices[i] = tri_mesh.triangle_list[i/3][i%3];
+    {    
+        for(int j = 0; j < 3; j++)
+        {
+            indices[3*i+j] = tri_mesh.triangle_list[i][j];   
+        }
+
+        std::cout<<i<<": "<<tri_mesh.triangle_list[i][0]<<", "<<tri_mesh.triangle_list[i][1]<<", "<<tri_mesh.triangle_list[i][2]<<std::endl;
+    }    
+
     glm::vec3 cubePositions[] = {
         glm::vec3(0.0f, 0.0f, 1.0f)};
 
     std::cout << vertex_size << "   " << triangle_size << std::endl;
 
-    unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -272,14 +211,14 @@ int main()
     glEnableVertexAttribArray(0);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
+    // glBindVertexArray(0);
 
     // uncomment this call to draw in wireframe polygons.
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -325,7 +264,7 @@ int main()
         // camera/view transformation
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         ourShader.setMat4("view", view);
-        glBindVertexArray(VAO);
+        // glBindVertexArray(VAO);
         glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         model = glm::translate(model, cubePositions[0]);
         float angle = 20.0f * 0;
@@ -333,7 +272,8 @@ int main()
         ourShader.setMat4("model", model);
         // draw our first triangle
         //glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        // glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        
         glDrawElements(GL_TRIANGLES, triangle_size, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind iverticest every time
 
@@ -342,7 +282,7 @@ int main()
         // Rendering
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
+
         // Display Setting
         // -------------------------------------------------------------------------------
         if (show_wireframe)
@@ -369,22 +309,6 @@ int main()
     return 0;
 }
 
-bool Check_Overlap(std::vector<Hole> hs_, Hole h_)
-{
-    for (int i = 0; i < hs_.size(); i++)
-    {
-        std::cout << "We are here" << std::endl;
-        std::cout << "r1:" << hs_[i].radius << ", r2:" << h_.radius << ", d:" << Distance(hs_[i].x, hs_[i].y, h_.x, h_.y) << std::endl;
-        if (Distance(hs_[i].x, hs_[i].y, h_.x, h_.y) <= (hs_[i].radius + h_.radius))
-        {
-            std::cout << "r1:" << hs_[i].radius << ", r2:" << h_.radius << ", d:" << Distance(hs_[i].x, hs_[i].y, h_.x, h_.y) << std::endl;
-            std::cout << "Overlapped with #" << i + 1 << "!" << std::endl;
-            return true;
-        }
-    }
-    return false;
-}
-
 bool Check_Out_Of_Boundary(Hole h_, Cuboid c_)
 {
 
@@ -398,12 +322,6 @@ bool Check_Out_Of_Boundary(Hole h_, Cuboid c_)
         std::cout << "Out of boundary!" << std::endl;
         return true;
     }
-}
-
-double Distance(double x1_, double y1_, double x2_, double y2_)
-{
-
-    return sqrt((x1_ - x2_) * (x1_ - x2_) + (y1_ - y2_) * (y1_ - y2_));
 }
 
 void processInput(GLFWwindow *window)
@@ -481,6 +399,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 
 static void ShowWindowLayout(bool *p_open)
 {
+
     // NULL for no_close
     if (!ImGui::Begin("Generate Object", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
@@ -494,6 +413,7 @@ static void ShowWindowLayout(bool *p_open)
     ImGui::Text("Enter cube size below (depth, width, height)"); // Display some text (you can use a format strings too)
 
     // // ?What the fourth element for?
+    // TODO: Change Input Float!!!!! Because we want double rather than float
     static float vec4a[4] = {5.0f, 5.0f, 5.0f, 0.44f};
     ImGui::InputFloat3("Cube Size", vec4a);
 
@@ -502,7 +422,109 @@ static void ShowWindowLayout(bool *p_open)
     // Cylinder
     // ======================================================
     ImGui::Separator();
+    ImGui_HoleList(holeLists);
+
     // ======================================================
+    ImGui::Separator();
+    // ======================================================
+    ImGui::PushID(1);
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(1 / 7.0f, 0.6f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(1 / 7.0f, 0.7f, 0.7f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1 / 7.0f, 0.8f, 0.8f));
+    if (ImGui::Button("Generate")) // Buttons return true when clicked (most widgets return true when edited/activated)
+    {
+
+        // TODO: called destructor for the previous cubes
+
+        cube = Cuboid(vec4a[0], vec4a[1], vec4a[2], 4);
+        // Temp Hole for test
+        
+        // Hole temp3 = Hole(3, 3, 0.5);
+
+        // if(!Check_Out_Of_Boundary(temp3,cube))
+        //     holeLists.AddHole(temp3);
+
+        // tri_mesh.GenMesh(cube, holes);
+        // TODO: TriMesh cannot set as global because lack of destructor when regenerate mesh
+        TriMesh tri_mesh2;
+        tri_mesh2.GenMesh(cube, holeLists.holes);
+
+        //================= TODO ===================
+        // Unbind and Redraw
+        // set up vertex data (and buffer(s)) and configure vertex attributes
+        // ------------------------------------------------------------------
+        vertex_size = tri_mesh2.vertex_list.size();
+        triangle_size = tri_mesh2.triangle_list.size();
+        double vertices[3*vertex_size];
+
+        // TODO: Here use the cuboid.edge_max
+        for (int i = 0; i < vertex_size; i++)
+        {
+            for(int j = 0; j < 3; j++)
+            {
+            vertices[3*i+j] = tri_mesh2.vertex_list[i][j] / cube.edge_max - 0.5;
+            }
+        }    
+            
+
+        unsigned int indices[3*triangle_size];
+        for (int i = 0; i < triangle_size; i++)
+        {
+            
+            for(int j = 0; j < 3; j++)
+            {
+                indices[3*i+j] = tri_mesh2.triangle_list[i][j];
+            }
+            
+        }
+
+        
+        glm::vec3 cubePositions[] = {
+            glm::vec3(0.0f, 0.0f, 1.0f)};
+
+        std::cout << vertex_size << "   " << triangle_size << std::endl;
+
+        // unsigned int VBO, VAO, EBO;
+        // glGenVertexArrays(1, &VAO);
+        // glGenBuffers(1, &VBO);
+        // glGenBuffers(1, &EBO);
+        // // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+        // glBindVertexArray(VAO);
+
+        // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(indices), indices);
+
+        glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
+        glEnableVertexAttribArray(0);
+
+        glDrawElements(GL_TRIANGLES, triangle_size, GL_UNSIGNED_INT, 0);
+
+        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+        // glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+        // glBindVertexArray(0);
+
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
+    ImGui::Checkbox("Wireframe", &show_wireframe);
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+    ImGui::End();
+}
+
+static void ImGui_HoleList(HoleList &holeLists)
+{
     // Basic columns
     if (ImGui::TreeNode("Hole List"))
     {
@@ -517,88 +539,100 @@ static void ShowWindowLayout(bool *p_open)
         ImGui::Text("raduis");
         ImGui::NextColumn();
         ImGui::Separator();
-        const char *hole_x[3] = {"1.2", "2.2", "1.1"};
-        const char *hole_y[3] = {"1.0", "1.33", "2.2"};
+
         static int selected = -1;
-        for (int i = 0; i < 3; i++)
+
+        for(int i = 0; i < holeLists.size(); i++)
         {
-            char label[32];
-            sprintf(label, "%04d", i);
-            if (ImGui::Selectable(label, selected == i, ImGuiSelectableFlags_SpanAllColumns))
+            char holeID[32];
+            sprintf(holeID, "%04d", holeLists.holes[i].id);
+            
+            if (ImGui::Selectable(holeID, selected == i, ImGuiSelectableFlags_SpanAllColumns))
                 selected = i;
-            bool hovered = ImGui::IsItemHovered();
+
             ImGui::NextColumn();
-            ImGui::Text(hole_x[i]);
+            
+            ImGui::Text("%04f", holeLists.holes[i].x);
             ImGui::NextColumn();
-            ImGui::Text(hole_y[i]);
+
+            ImGui::Text("%04f", holeLists.holes[i].y);
             ImGui::NextColumn();
-            ImGui::Text("%d", hovered);
+
+            ImGui::Text("%04f", holeLists.holes[i].radius);
             ImGui::NextColumn();
         }
+
         ImGui::Columns(1);
         ImGui::Separator();
+
         if (ImGui::Button("Add"))
         {
+            ImGui::OpenPopup("Add Hole");
         }
+
+        if (ImGui::BeginPopupModal("Add Hole"))
+        {
+            ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)"); // Display some text (you can use a format strings too)
+
+            // // ?What the fourth element for?
+            static double temp_x = 0.0;
+            ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
+            static double temp_y = 0.0;
+            ImGui::InputDouble("Hole Y", &temp_y, 0.01f, 0.2f, "%.8f");
+            static double temp_raduis = 0.5;
+            ImGui::InputDouble("Raduis", &temp_raduis, 0.01f, 0.2f, "%.8f");
+
+            if (ImGui::Button("Add"))
+            {
+                // TODO : Change the validation std::out output to ImGui::Text
+                Hole temp = Hole(temp_x, temp_y, temp_raduis);
+                if(!Check_Out_Of_Boundary(temp,cube))
+                {
+                    if(holeLists.AddHole(temp)) // != 0: return an ID
+                    {
+                        ImGui::OpenPopup("Success!");               
+                    }
+                }
+                
+            }
+
+            bool dummy_open = true;
+            if (ImGui::BeginPopupModal("Success!", &dummy_open))
+            {
+                ImGui::Text("Insert a hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
+
+                if (ImGui::Button("Close"))
+                    ImGui::CloseCurrentPopup();
+                    
+                ImGui::EndPopup();
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Close"))
+                ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+
+
         ImGui::SameLine();
         if (ImGui::Button("Modify"))
         {
+            // Get the Index by ID fist, and then modify it
+            // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
         }
         ImGui::SameLine();
         if (ImGui::Button("Delete"))
         {
+            // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Remove All"))
+        {
+            holeLists.RemoveAllHole();
         }
         ImGui::Separator();
         ImGui::TreePop();
     }
 
-    if (ImGui::TreeNode("Basic trees"))
-    {
-        for (int i = 0; i < 5; i++)
-            if (ImGui::TreeNode((void *)(intptr_t)i, "Child %d", i))
-            {
-                ImGui::Text("blah blah");
-                ImGui::SameLine();
-                if (ImGui::SmallButton("button"))
-                {
-                };
-                ImGui::TreePop();
-            }
-        ImGui::TreePop();
-    }
-
-    // ======================================================
-    ImGui::Separator();
-    // ======================================================
-    ImGui::PushID(1);
-    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(1 / 7.0f, 0.6f, 0.6f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(1 / 7.0f, 0.7f, 0.7f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1 / 7.0f, 0.8f, 0.8f));
-    if (ImGui::Button("Generate")) // Buttons return true when clicked (most widgets return true when edited/activated)
-    {
-        Cuboid cube = Cuboid(vec4a[0], vec4a[1], vec4a[2], 4);
-
-        // Temp Hole for test
-        Hole temp = Hole(2, 2, 0.4);
-        // Check validation in HoleList class
-        std::vector<Hole> holes;
-        holes.push_back(temp);
-        TriMesh tri_mesh;
-        tri_mesh.GenMesh(cube, holes);
-
-        //================= TODO ===================
-        // Unbind and Redraw
-    }
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
-    ImGui::Checkbox("Wireframe", &show_wireframe);
-
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-    // static int lines = 10;
-    // ImGui::Text("Window will resize every-frame to the size of its content.\nNote that you probably don't want to query the window size to\noutput your content because that would create a feedback loop.");
-    // ImGui::SliderInt("Number of lines", &lines, 1, 20);
-    // for (int i = 0; i < lines; i++)
-    //     ImGui::Text("%*sThis is line %d", i * 4, "", i); // Pad with space to extend size horizontally
-    ImGui::End();
 }

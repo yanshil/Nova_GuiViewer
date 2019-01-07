@@ -21,12 +21,15 @@ Vertex::Vertex(double x_,double y_,double z_)
         z = z_;
 }
 
+int Hole::sNextID = 0;
+
 Hole::Hole()
 {
     // TODO:
     this->x = 0.5;
     this->y = 0.5;
     this->radius = 0.1;
+    this->id = getNextId();
 
     initVertex();
 }
@@ -53,29 +56,21 @@ Hole::Hole(double x, double y, double radius)
     :x(x), y(y), radius(radius)
 {
     initVertex();
+    this->id = getNextId();
+    std::cout << "id = " << id << std::endl;
 }
 
 Hole::~Hole()
 {
 
 }
+int Hole::getNextId()
+{
+    return ++this->sNextID;
+}
 
 void Hole::Set(double x_, double y_, double radius_)
 {
-    // vertices.clear();
-    // x = x_;
-    // y = y_;
-    // radius = radius_;
-    // Vertex vertex;
-    // double theta;
-    // double dtheta = 2.0 * 3.1415926 / segments;
-    // for (int i = 0; i < segments; i++)
-    // {
-    //     theta = dtheta * i;
-    //     vertex.x = x + radius * cos(theta);
-    //     vertex.y = y + radius * sin(theta);
-    //     vertices.push_back(vertex);
-    // }
 
     this->x = x_;
     this->y = y_;
@@ -84,13 +79,26 @@ void Hole::Set(double x_, double y_, double radius_)
     initVertex();
 }
 
-HoleList::HoleList() { }
+HoleList::HoleList()
+{
+}
 
 HoleList::~HoleList() {}
 
-int HoleList::AddHole(Hole &hole) {
-    // TODO
-    return 0;
+void HoleList::RemoveAllHole()
+{
+    holes.clear();
+}
+
+int HoleList::AddHole(Hole &temp) 
+{
+    int id = temp.id;
+
+    if(!isEntryValid(temp))
+        return 0;   // Unvalid
+
+    holes.push_back(temp);
+    return id;
 }
 
 int HoleList::ModifyHolebyID(int holeID)
@@ -103,6 +111,38 @@ int HoleList::DeleteHolebyID(int holeID)
 {
     // TODO
     return 0;
+}
+
+int HoleList::size()
+{
+    return holes.size();
+}
+
+bool HoleList::isEntryValid(Hole &temp)
+{
+    bool correct_entry;
+    correct_entry=!Check_Overlap(temp);
+    return correct_entry;
+}
+
+bool HoleList::Check_Overlap(Hole &temp)
+{
+    for (int i = 0; i < holes.size(); i++)
+    {
+        if (Distance(holes[i].x, holes[i].y, temp.x, temp.y) <= (holes[i].radius + temp.radius))
+        {
+            std::cout << "r1:" << holes[i].radius << ", r2:" << temp.radius << ", d:" << Distance(holes[i].x, holes[i].y, temp.x, temp.y) << std::endl;
+            std::cout << "Overlapped with #" << i + 1 << "!" << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
+double HoleList::Distance(double x1_, double y1_, double x2_, double y2_)
+{
+
+    return sqrt((x1_ - x2_) * (x1_ - x2_) + (y1_ - y2_) * (y1_ - y2_));
 }
 
 
@@ -324,7 +364,7 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
         // bottom
         for(int i = 0; i < mid.numberoftriangles; i++)
         {
-            triangle_list.Append(Vector<int,3>({mid.trianglelist[3*i],mid.trianglelist[3*i+1],mid.trianglelist[3*i+2]}));
+            triangle_list.Append(Vector<int,3>({mid.trianglelist[3*i+2],mid.trianglelist[3*i+1],mid.trianglelist[3*i]}));
         }
         
         // top
@@ -340,12 +380,12 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
         
         for(int i = 0; i < 3; i++)
         {
-            triangle_list.Append(Vector<int,3>({i,i+mid.numberofpoints,i+1}));
-            triangle_list.Append(Vector<int,3>({i+mid.numberofpoints,i+mid.numberofpoints+1,i+1}));
+            triangle_list.Append(Vector<int,3>({i+1,i+mid.numberofpoints,i}));
+            triangle_list.Append(Vector<int,3>({i+1,i+mid.numberofpoints+1,i+mid.numberofpoints}));
         }
 
-        triangle_list.Append(Vector<int,3>({3,3+mid.numberofpoints,0}));
-        triangle_list.Append(Vector<int,3>({3+mid.numberofpoints,0+mid.numberofpoints,0}));
+        triangle_list.Append(Vector<int,3>({0,3+mid.numberofpoints,3}));
+        triangle_list.Append(Vector<int,3>({0,0+mid.numberofpoints,3+mid.numberofpoints}));
         
         
         for(int i = 0; i < hs_.size(); i++)
@@ -401,7 +441,8 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
     fprintf(stream,"f %d %d %d\n",triangle_list[i][0]+1,triangle_list[i][1]+1,triangle_list[i][2]+1);
     fclose(stream);
 
-
+    std::cout<<"ATTENTION!:"<<vertex_list.size()<<std::endl;
 
         
 }
+

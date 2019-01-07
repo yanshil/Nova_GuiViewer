@@ -30,17 +30,17 @@ stdint.h
 imgui_user.h
 .././externals/imgui/imgui_user.h
 
-/home/hertz/Documents/ModernGL/TriMesh.cpp
+/home/hertz/Desktop/imgui/moderngl/TriMesh.cpp
 TriMesh.h
-/home/hertz/Documents/ModernGL/TriMesh.h
+/home/hertz/Desktop/imgui/moderngl/TriMesh.h
 
-/home/hertz/Documents/ModernGL/TriMesh.h
+/home/hertz/Desktop/imgui/moderngl/TriMesh.h
 vector
 -
 iostream
 -
 triangle.h
-/home/hertz/Documents/ModernGL/triangle.h
+/home/hertz/Desktop/imgui/moderngl/triangle.h
 stdlib.h
 -
 stdio.h
@@ -48,7 +48,7 @@ stdio.h
 math.h
 -
 
-/home/hertz/Documents/ModernGL/main.cpp
+/home/hertz/Desktop/imgui/moderngl/main.cpp
 fstream
 -
 iostream
@@ -64,9 +64,9 @@ algorithm
 math.h
 -
 TriMesh.h
-/home/hertz/Documents/ModernGL/TriMesh.h
+/home/hertz/Desktop/imgui/moderngl/TriMesh.h
 shader.h
-/home/hertz/Documents/ModernGL/shader.h
+/home/hertz/Desktop/imgui/moderngl/shader.h
 GL/glew.h
 -
 GLFW/glfw3.h
@@ -78,13 +78,13 @@ glm/gtc/matrix_transform.hpp
 glm/gtc/type_ptr.hpp
 -
 imgui.h
-/home/hertz/Documents/ModernGL/imgui.h
+/home/hertz/Desktop/imgui/moderngl/imgui.h
 imgui_impl_glfw.h
-/home/hertz/Documents/ModernGL/imgui_impl_glfw.h
+/home/hertz/Desktop/imgui/moderngl/imgui_impl_glfw.h
 imgui_impl_opengl3.h
-/home/hertz/Documents/ModernGL/imgui_impl_opengl3.h
+/home/hertz/Desktop/imgui/moderngl/imgui_impl_opengl3.h
 
-/home/hertz/Documents/ModernGL/shader.h
+/home/hertz/Desktop/imgui/moderngl/shader.h
 GL/glew.h
 -
 glm/glm.hpp
@@ -98,7 +98,7 @@ sstream
 iostream
 -
 
-/home/hertz/Documents/ModernGL/triangle.cpp
+/home/hertz/Desktop/imgui/moderngl/triangle.cpp
 stdio.h
 -
 stdlib.h
@@ -112,9 +112,9 @@ float.h
 fpu_control.h
 -
 triangle.h
-/home/hertz/Documents/ModernGL/triangle.h
+/home/hertz/Desktop/imgui/moderngl/triangle.h
 
-/home/hertz/Documents/ModernGL/triangle.h
+/home/hertz/Desktop/imgui/moderngl/triangle.h
 
 /usr/local/include/GLFW/glfw3.h
 stddef.h

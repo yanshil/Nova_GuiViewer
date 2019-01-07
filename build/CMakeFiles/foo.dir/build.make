@@ -43,10 +43,10 @@ RM = /opt/cmake-3.13.2-Linux-x86_64/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/hertz/Documents/ModernGL
+CMAKE_SOURCE_DIR = /home/hertz/Desktop/imgui/moderngl
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/hertz/Documents/ModernGL/build
+CMAKE_BINARY_DIR = /home/hertz/Desktop/imgui/moderngl/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/foo.dir/depend.make
@@ -59,42 +59,42 @@ include CMakeFiles/foo.dir/flags.make
 
 CMakeFiles/foo.dir/main.cpp.o: CMakeFiles/foo.dir/flags.make
 CMakeFiles/foo.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hertz/Documents/ModernGL/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/foo.dir/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/foo.dir/main.cpp.o -c /home/hertz/Documents/ModernGL/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/foo.dir/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/foo.dir/main.cpp.o -c /home/hertz/Desktop/imgui/moderngl/main.cpp
 
 CMakeFiles/foo.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/foo.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hertz/Documents/ModernGL/main.cpp > CMakeFiles/foo.dir/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hertz/Desktop/imgui/moderngl/main.cpp > CMakeFiles/foo.dir/main.cpp.i
 
 CMakeFiles/foo.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/foo.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hertz/Documents/ModernGL/main.cpp -o CMakeFiles/foo.dir/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hertz/Desktop/imgui/moderngl/main.cpp -o CMakeFiles/foo.dir/main.cpp.s
 
 CMakeFiles/foo.dir/triangle.cpp.o: CMakeFiles/foo.dir/flags.make
 CMakeFiles/foo.dir/triangle.cpp.o: ../triangle.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hertz/Documents/ModernGL/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/foo.dir/triangle.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/foo.dir/triangle.cpp.o -c /home/hertz/Documents/ModernGL/triangle.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/foo.dir/triangle.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/foo.dir/triangle.cpp.o -c /home/hertz/Desktop/imgui/moderngl/triangle.cpp
 
 CMakeFiles/foo.dir/triangle.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/foo.dir/triangle.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hertz/Documents/ModernGL/triangle.cpp > CMakeFiles/foo.dir/triangle.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hertz/Desktop/imgui/moderngl/triangle.cpp > CMakeFiles/foo.dir/triangle.cpp.i
 
 CMakeFiles/foo.dir/triangle.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/foo.dir/triangle.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hertz/Documents/ModernGL/triangle.cpp -o CMakeFiles/foo.dir/triangle.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hertz/Desktop/imgui/moderngl/triangle.cpp -o CMakeFiles/foo.dir/triangle.cpp.s
 
 CMakeFiles/foo.dir/TriMesh.cpp.o: CMakeFiles/foo.dir/flags.make
 CMakeFiles/foo.dir/TriMesh.cpp.o: ../TriMesh.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hertz/Documents/ModernGL/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/foo.dir/TriMesh.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/foo.dir/TriMesh.cpp.o -c /home/hertz/Documents/ModernGL/TriMesh.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/foo.dir/TriMesh.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/foo.dir/TriMesh.cpp.o -c /home/hertz/Desktop/imgui/moderngl/TriMesh.cpp
 
 CMakeFiles/foo.dir/TriMesh.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/foo.dir/TriMesh.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hertz/Documents/ModernGL/TriMesh.cpp > CMakeFiles/foo.dir/TriMesh.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/hertz/Desktop/imgui/moderngl/TriMesh.cpp > CMakeFiles/foo.dir/TriMesh.cpp.i
 
 CMakeFiles/foo.dir/TriMesh.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/foo.dir/TriMesh.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hertz/Documents/ModernGL/TriMesh.cpp -o CMakeFiles/foo.dir/TriMesh.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/hertz/Desktop/imgui/moderngl/TriMesh.cpp -o CMakeFiles/foo.dir/TriMesh.cpp.s
 
 # Object files for target foo
 foo_OBJECTS = \
@@ -113,7 +113,7 @@ foo: libimgui.a
 foo: /usr/lib/x86_64-linux-gnu/libGL.so
 foo: /usr/lib/x86_64-linux-gnu/libGLU.so
 foo: CMakeFiles/foo.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hertz/Documents/ModernGL/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable foo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable foo"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/foo.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -126,6 +126,6 @@ CMakeFiles/foo.dir/clean:
 .PHONY : CMakeFiles/foo.dir/clean
 
 CMakeFiles/foo.dir/depend:
-	cd /home/hertz/Documents/ModernGL/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/hertz/Documents/ModernGL /home/hertz/Documents/ModernGL /home/hertz/Documents/ModernGL/build /home/hertz/Documents/ModernGL/build /home/hertz/Documents/ModernGL/build/CMakeFiles/foo.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/hertz/Desktop/imgui/moderngl/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/hertz/Desktop/imgui/moderngl /home/hertz/Desktop/imgui/moderngl /home/hertz/Desktop/imgui/moderngl/build /home/hertz/Desktop/imgui/moderngl/build /home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/foo.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/foo.dir/depend
 

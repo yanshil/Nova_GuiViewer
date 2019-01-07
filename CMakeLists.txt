@@ -1,23 +1,25 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(foo)
+project(foo CXX)
 set(CMAKE_CXX_STANDARD 11)
 
 ## Currently not working???? undefined reference.....
 #add_subdirectory(externals)
 
+configure_file(./camera.fs ${CMAKE_BINARY_DIR}/bin/camera.fs COPYONLY)
+configure_file(./camera.vs ${CMAKE_BINARY_DIR}/bin/camera.vs COPYONLY)
+
 add_definitions(
   -DIMGUI_IMPL_OPENGL_LOADER_GLEW
 )
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} 
     main.cpp
     triangle.cpp
     TriMesh.cpp
     )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
     nova::tools
     nova::geometry
 ) 
@@ -37,14 +39,13 @@ endif(NOT GLM_FOUND)
 ### imgui
 include_directories(./externals/imgui)
 include_directories(./externals/imgui/examples)
-
-add_library(imgui ./externals/imgui/imgui.cpp ./externals/imgui/imgui_demo.cpp ./externals/imgui/imgui_draw.cpp ./externals/imgui/imgui_widgets.cpp ./externals/imgui/examples/imgui_impl_glfw.cpp ./externals/imgui/examples/imgui_impl_opengl3.cpp)
+add_library(imgui ./externals/imgui/imgui.cpp ./externals/imgui/imgui_demo.cpp ./externals/imgui/imgui_draw.cpp ./externals/imgui/imgui_widgets.cpp ./externals/imgui/examples/imgui_impl_glfw.cpp ./externals/imgui/examples/imgui_impl_opengl3.cpp )
 
 ## Target Link Libraries
-target_link_libraries(foo
-    PRIVATE
+target_link_libraries(${PROJECT_NAME}
     imgui
     glfw 
     GLEW
     ${OPENGL_LIBRARIES}    
     )
+

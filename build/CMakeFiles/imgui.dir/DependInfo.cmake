@@ -4,12 +4,12 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/hertz/Documents/ModernGL/externals/imgui/examples/imgui_impl_glfw.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/imgui.dir/externals/imgui/examples/imgui_impl_glfw.cpp.o"
-  "/home/hertz/Documents/ModernGL/externals/imgui/examples/imgui_impl_opengl3.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/imgui.dir/externals/imgui/examples/imgui_impl_opengl3.cpp.o"
-  "/home/hertz/Documents/ModernGL/externals/imgui/imgui.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/imgui.dir/externals/imgui/imgui.cpp.o"
-  "/home/hertz/Documents/ModernGL/externals/imgui/imgui_demo.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/imgui.dir/externals/imgui/imgui_demo.cpp.o"
-  "/home/hertz/Documents/ModernGL/externals/imgui/imgui_draw.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/imgui.dir/externals/imgui/imgui_draw.cpp.o"
-  "/home/hertz/Documents/ModernGL/externals/imgui/imgui_widgets.cpp" "/home/hertz/Documents/ModernGL/build/CMakeFiles/imgui.dir/externals/imgui/imgui_widgets.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/externals/imgui/examples/imgui_impl_glfw.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/imgui.dir/externals/imgui/examples/imgui_impl_glfw.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/externals/imgui/examples/imgui_impl_opengl3.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/imgui.dir/externals/imgui/examples/imgui_impl_opengl3.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/externals/imgui/imgui.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/imgui.dir/externals/imgui/imgui.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/externals/imgui/imgui_demo.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/imgui.dir/externals/imgui/imgui_demo.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/externals/imgui/imgui_draw.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/imgui.dir/externals/imgui/imgui_draw.cpp.o"
+  "/home/hertz/Desktop/imgui/moderngl/externals/imgui/imgui_widgets.cpp" "/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/imgui.dir/externals/imgui/imgui_widgets.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

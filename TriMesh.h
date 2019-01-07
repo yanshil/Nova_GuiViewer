@@ -10,11 +10,10 @@
 #include <stdio.h>
 #include <math.h>
 #include <nova/Geometry/Topology_Based_Geometry/Triangulated_Surface.h>
-
-using namespace Nova;
 /**
  * 
  */
+using namespace Nova;
 class Vertex
 {
   public:
@@ -44,8 +43,19 @@ class Hole
     std::vector<Vertex> vertices;
     void initVertex();
 
+    // ID?
+    int id;
+
+    static int sNextID;
+
+    // converge coordinate to char * for display
+
   //private:
     int segments = 64;
+  private:
+    
+    int getNextId();
+    
 };
 
 // TODO
@@ -57,10 +67,17 @@ class HoleList
 
     std::vector<Hole> holes;
 
+    int size(); // Get the size of holes
     int AddHole(Hole &hole);  // return ID
     int ModifyHolebyID(int holeID);  // return modify status
     int DeleteHolebyID(int holeID); // return delete status
+    void RemoveAllHole();
+    
+  private:
 
+    bool isEntryValid(Hole &temp);
+    bool Check_Overlap(Hole &temp);
+    double Distance(double x1_, double y1_, double x2_, double y2_);
 };
 
 class Cuboid

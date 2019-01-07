@@ -1,1 +1,1 @@
-/usr/bin/c++  -O3 -DNDEBUG  -rdynamic CMakeFiles/foo.dir/main.cpp.o CMakeFiles/foo.dir/triangle.cpp.o CMakeFiles/foo.dir/TriMesh.cpp.o  -o foo libimgui.a -lglfw -lGLEW -lGL -lGLU 
+/usr/bin/c++    -rdynamic CMakeFiles/foo.dir/main.cpp.o CMakeFiles/foo.dir/triangle.cpp.o CMakeFiles/foo.dir/TriMesh.cpp.o  -o foo libimgui.a -lglfw -lGLEW -lGL -lGLU 
