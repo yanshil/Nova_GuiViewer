@@ -51,7 +51,7 @@ class Hole
     // converge coordinate to char * for display
 
   //private:
-    int segments = 8;
+    int segments = 64;
   private:
     
     int getNextId();
