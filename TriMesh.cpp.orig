@@ -51,11 +51,6 @@ void Hole::initVertex()
     }
 }
 
-Hole::~Hole()
-{
-
-}
-
 // TODO: Segments?
 Hole::Hole(double x, double y, double radius)
     :x(x), y(y), radius(radius)
@@ -65,11 +60,24 @@ Hole::Hole(double x, double y, double radius)
     std::cout << "id = " << id << std::endl;
 }
 
+Hole::~Hole()
+{
+
+}
 int Hole::getNextId()
 {
     return ++this->sNextID;
 }
 
+void Hole::Set(double x_, double y_, double radius_)
+{
+
+    this->x = x_;
+    this->y = y_;
+    this->radius = radius_;
+
+    initVertex();
+}
 
 HoleList::HoleList()
 {
@@ -121,6 +129,11 @@ bool HoleList::Check_Overlap(Hole &temp)
 {
     for (int i = 0; i < holes.size(); i++)
     {
+<<<<<<< HEAD
+=======
+        std::cout << "We are here" << std::endl;
+        std::cout << "r1:" << holes[i].radius << ", r2:" << temp.radius << ", d:" << Distance(holes[i].x, holes[i].y, temp.x, temp.y) << std::endl;
+>>>>>>> imgui
         if (Distance(holes[i].x, holes[i].y, temp.x, temp.y) <= (holes[i].radius + temp.radius))
         {
             std::cout << "r1:" << holes[i].radius << ", r2:" << temp.radius << ", d:" << Distance(holes[i].x, holes[i].y, temp.x, temp.y) << std::endl;
@@ -437,3 +450,4 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
 
         
 }
+

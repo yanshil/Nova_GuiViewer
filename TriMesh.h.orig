@@ -9,11 +9,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+<<<<<<< HEAD
 #include <nova/Geometry/Topology_Based_Geometry/Triangulated_Surface.h>
 /**
  * 
  */
 using namespace Nova;
+=======
+
+/**
+ * 
+ */
+>>>>>>> imgui
 class Vertex
 {
   public:
@@ -29,14 +36,14 @@ class Vertex
 };
 
 
-
 class Hole
 {
   public:
     Hole();
     Hole(double x, double y, double radius);
     ~Hole();
-
+    // TODO: Change to Modify()?
+    void Set(double x_, double y_, double radius_);
     double x;
     double y;
     double radius;
