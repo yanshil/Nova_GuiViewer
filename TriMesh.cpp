@@ -21,37 +21,150 @@ Vertex::Vertex(double x_,double y_,double z_)
         z = z_;
 }
 
+int Hole::sNextID = 0;
+
 Hole::Hole()
 {
+    // TODO:
+    this->x = 0.5;
+    this->y = 0.5;
+    this->radius = 0.1;
+    this->id = getNextId();
 
+    initVertex();
 }
 
-Hole::~Hole()
+void Hole::initVertex()
 {
-
-}
-void Hole::Set(double x_, double y_, double radius_)
-{
-    vertices.clear();
-    x = x_;
-    y = y_;
-    radius = radius_;
+    this->vertices.clear();
+    
     Vertex vertex;
     double theta;
+    // TODO: for all 3.14159, Define Math.PI for performance?
     double dtheta = 2.0 * 3.1415926 / segments;
     for (int i = 0; i < segments; i++)
     {
         theta = dtheta * i;
         vertex.x = x + radius * cos(theta);
         vertex.y = y + radius * sin(theta);
-        vertices.push_back(vertex);
+        this->vertices.push_back(vertex);
     }
+}
+
+// TODO: Segments?
+Hole::Hole(double x, double y, double radius)
+    :x(x), y(y), radius(radius)
+{
+    initVertex();
+    this->id = getNextId();
+    std::cout << "id = " << id << std::endl;
+}
+
+Hole::~Hole()
+{
+
+}
+int Hole::getNextId()
+{
+    return ++this->sNextID;
+}
+
+void Hole::Set(double x_, double y_, double radius_)
+{
+
+    this->x = x_;
+    this->y = y_;
+    this->radius = radius_;
+
+    initVertex();
+}
+
+HoleList::HoleList()
+{
+}
+
+HoleList::~HoleList() {}
+
+void HoleList::RemoveAllHole()
+{
+    holes.clear();
+}
+
+int HoleList::AddHole(Hole &temp) 
+{
+    int id = temp.id;
+
+    if(!isEntryValid(temp))
+        return 0;   // Unvalid
+
+    holes.push_back(temp);
+    return id;
+}
+
+int HoleList::ModifyHolebyID(int holeID)
+{
+    // TODO
+    return 0;
+}
+
+int HoleList::DeleteHolebyID(int holeID)
+{
+    // TODO
+    return 0;
+}
+
+int HoleList::size()
+{
+    return holes.size();
+}
+
+bool HoleList::isEntryValid(Hole &temp)
+{
+    bool correct_entry;
+    correct_entry=!Check_Overlap(temp);
+    return correct_entry;
+}
+
+bool HoleList::Check_Overlap(Hole &temp)
+{
+    for (int i = 0; i < holes.size(); i++)
+    {
+        std::cout << "We are here" << std::endl;
+        std::cout << "r1:" << holes[i].radius << ", r2:" << temp.radius << ", d:" << Distance(holes[i].x, holes[i].y, temp.x, temp.y) << std::endl;
+        if (Distance(holes[i].x, holes[i].y, temp.x, temp.y) <= (holes[i].radius + temp.radius))
+        {
+            std::cout << "r1:" << holes[i].radius << ", r2:" << temp.radius << ", d:" << Distance(holes[i].x, holes[i].y, temp.x, temp.y) << std::endl;
+            std::cout << "Overlapped with #" << i + 1 << "!" << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
+double HoleList::Distance(double x1_, double y1_, double x2_, double y2_)
+{
+
+    return sqrt((x1_ - x2_) * (x1_ - x2_) + (y1_ - y2_) * (y1_ - y2_));
 }
 
 
 Cuboid::Cuboid()
 {
+    // TODO:Default constructor with d, w, h = 1,1,1
+    this->n_segments = 4;
+    this->depth = 1.0;
+    this->width = 1.0;
+    this->height = 1.0;
 
+    // this->edge_max = depth>(width>height?width:height)?depth:(width>height?width:height);
+    this->edge_max = std::max(depth, std::max(width, height));
+}
+
+Cuboid::Cuboid(double depth, double width, double height, int n_segments)
+    :depth(depth), width(width), height(height), n_segments(n_segments)
+{
+    // this->edge_max = depth>(width>height?width:height)?depth:(width>height?width:height);
+    this->edge_max = std::max(depth, std::max(width, height));
 }
 
 Cuboid::~Cuboid()
