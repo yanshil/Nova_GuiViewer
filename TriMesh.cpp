@@ -212,8 +212,8 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
 
         triangle_list.Append(Vector<int,3>({0,1,2}));
         triangle_list.Append(Vector<int,3>({0,2,3}));
-        triangle_list.Append(Vector<int,3>({4,5,6}));
-        triangle_list.Append(Vector<int,3>({4,6,7}));
+        triangle_list.Append(Vector<int,3>({6,5,4}));
+        triangle_list.Append(Vector<int,3>({7,6,4}));
         
         
         for(int i = 0; i <= 2; i++)

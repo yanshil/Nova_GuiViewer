@@ -177,7 +177,7 @@ int main()
             
         }
         
-        //std::cout<<i<<": "<<tri_mesh.vertex_list[i][0]<<", "<<tri_mesh.vertex_list[i][1]<<", "<<tri_mesh.vertex_list[i][2]<<std::endl;
+        std::cout<<i<<": "<<vertices[3*i]<<", "<<vertices[3*i+1]<<", "<<vertices[3*i+2]<<std::endl;
     }    
     unsigned int indices[3*triangle_size];
     for (int i = 0; i < triangle_size; i++)
@@ -187,7 +187,7 @@ int main()
             indices[3*i+j] = tri_mesh.triangle_list[i][j];   
         }
 
-        std::cout<<i<<": "<<tri_mesh.triangle_list[i][0]<<", "<<tri_mesh.triangle_list[i][1]<<", "<<tri_mesh.triangle_list[i][2]<<std::endl;
+        //std::cout<<i<<": "<<tri_mesh.triangle_list[i][0]<<", "<<tri_mesh.triangle_list[i][1]<<", "<<tri_mesh.triangle_list[i][2]<<std::endl;
     }    
 
     glm::vec3 cubePositions[] = {
@@ -274,7 +274,7 @@ int main()
         //glUseProgram(shaderProgram);
         // glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         
-        glDrawElements(GL_TRIANGLES, triangle_size, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, triangle_size*3, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind iverticest every time
 
         //###################################################
