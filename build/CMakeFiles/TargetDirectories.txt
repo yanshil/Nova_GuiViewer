@@ -1,4 +1,0 @@
-/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/rebuild_cache.dir
-/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/edit_cache.dir
-/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/foo.dir
-/home/hertz/Desktop/imgui/moderngl/build/CMakeFiles/imgui.dir
