@@ -17,6 +17,8 @@ add_executable(${PROJECT_NAME}
     main.cpp
     triangle.cpp
     TriMesh.cpp
+    ImGui_Wrapper.cpp
+    Sim_Object.cpp
     )
 
 target_link_libraries(${PROJECT_NAME}

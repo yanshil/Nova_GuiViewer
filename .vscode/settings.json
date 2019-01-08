@@ -41,6 +41,10 @@
         "tuple": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "utility": "cpp"
-    }
+        "utility": "cpp",
+        "cstdarg": "cpp",
+        "list": "cpp",
+        "memory": "cpp"
+    },
+    "cpplint.cpplintPath": "/home/yanshi/anaconda3/bin/cpplint"
 }

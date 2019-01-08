@@ -82,7 +82,7 @@ void HoleList::RemoveAllHole()
     holes.clear();
 }
 
-int HoleList::AddHole(Hole &temp) 
+int HoleList::AddHole(const Hole &temp) 
 {
     int id = temp.id;
 
@@ -110,14 +110,14 @@ int HoleList::size()
     return holes.size();
 }
 
-bool HoleList::isEntryValid(Hole &temp)
+bool HoleList::isEntryValid(const Hole &temp)
 {
     bool correct_entry;
     correct_entry=!Check_Overlap(temp);
     return correct_entry;
 }
 
-bool HoleList::Check_Overlap(Hole &temp)
+bool HoleList::Check_Overlap(const Hole &temp)
 {
     for (int i = 0; i < holes.size(); i++)
     {

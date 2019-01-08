@@ -1,3 +1,6 @@
+#ifndef TRIMESH_H_
+#define TRIMESH_H_
+
 #pragma once
 #include <vector>
 #define REAL double
@@ -68,15 +71,15 @@ class HoleList
     std::vector<Hole> holes;
 
     int size(); // Get the size of holes
-    int AddHole(Hole &hole);  // return ID
+    int AddHole(const Hole &hole);  // return ID
     int ModifyHolebyID(int holeID);  // return modify status
     int DeleteHolebyID(int holeID); // return delete status
     void RemoveAllHole();
     
   private:
 
-    bool isEntryValid(Hole &temp);
-    bool Check_Overlap(Hole &temp);
+    bool isEntryValid(const  Hole &temp);
+    bool Check_Overlap(const  Hole &temp);
     double Distance(double x1_, double y1_, double x2_, double y2_);
 };
 
@@ -117,3 +120,5 @@ class TriMesh
     Triangulated_Surface<double> triangulated_surface;
     void GenMesh(Cuboid cuboid_, std::vector<Hole> hs_);
 };
+
+#endif  //TRIMESH_H_
