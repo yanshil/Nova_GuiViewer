@@ -172,7 +172,6 @@ void ImGui_Wrapper::DisplayHoleModule()
 
             if (ImGui::Button("Add"))
             {
-                // TODO : Change the validation std::out output to ImGui::Text
                 Hole temp = Hole(temp_x, temp_y, temp_raduis);
                 if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
                 {
@@ -180,6 +179,14 @@ void ImGui_Wrapper::DisplayHoleModule()
                     {
                         ImGui::OpenPopup("Success!");
                     }
+                    else
+                    {
+                        ImGui::OpenPopup("Hole Overlapped with Previous Holes");
+                    }
+                }
+                else
+                {
+                    ImGui::OpenPopup("Hole Out of Boundary");
                 }
             }
 
@@ -187,6 +194,26 @@ void ImGui_Wrapper::DisplayHoleModule()
             if (ImGui::BeginPopupModal("Success!", &dummy_open))
             {
                 ImGui::Text("Insert a hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
+
+                if (ImGui::Button("Close"))
+                    ImGui::CloseCurrentPopup();
+
+                ImGui::EndPopup();
+            }
+
+            if (ImGui::BeginPopupModal("Hole Out of Boundary", &dummy_open))
+            {
+                ImGui::Text("You are trying to add an out-of-boundary hole.");
+
+                if (ImGui::Button("Close"))
+                    ImGui::CloseCurrentPopup();
+
+                ImGui::EndPopup();
+            }
+
+            if (ImGui::BeginPopupModal("Hole Overlapped with Previous Holes", &dummy_open))
+            {
+                ImGui::Text("You are trying to add an overlap hole.");
 
                 if (ImGui::Button("Close"))
                     ImGui::CloseCurrentPopup();
@@ -223,7 +250,7 @@ void ImGui_Wrapper::DisplayHoleModule()
         //     if (ImGui::BeginPopupModal("Modify Hole"))
         //     {
         //         std::cout << "..." << std::endl;
-                
+
         //         ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)");
 
         //         static double temp_x = selected_hole.x;
@@ -235,7 +262,6 @@ void ImGui_Wrapper::DisplayHoleModule()
 
         //         if (ImGui::Button("Modify"))
         //         {
-        //             // TODO : Change the validation std::out output to ImGui::Text
         //             Hole temp = Hole(temp_x, temp_y, temp_raduis);
         //             if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
         //             {
@@ -278,6 +304,7 @@ void ImGui_Wrapper::DisplayHoleModule()
                     if (holeID == main_object->holes->holes[i].id)
                     {
                         main_object->holes->holes.erase(main_object->holes->holes.begin() + i);
+                        break;
                     }
                 }
             }
@@ -370,7 +397,6 @@ void ImGui_Wrapper::NewBuffer()
     int triangle_size = main_object->trimesh->triangle_list.size();
     double vertices[3 * vertex_size];
 
-    // TODO: Here use the cuboNewBufferid.edge_max
     for (int i = 0; i < vertex_size; i++)
     {
         for (int j = 0; j < 3; j++)
