@@ -27,7 +27,7 @@ public:
 
   GLuint VBO, VAO, EBO;
 
-  void InitUI();
+  void UIFrame();
   void DisplayUI();
 
   void test_GenObject();

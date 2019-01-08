@@ -68,7 +68,7 @@ void ImGui_Wrapper::Render()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGui_Wrapper::InitUI()
+void ImGui_Wrapper::UIFrame()
 {
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();

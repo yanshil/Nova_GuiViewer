@@ -45,9 +45,6 @@ float fov = 45.0f;
 float deltaTime = 0.0f; // time between current frame and last frame
 float lastFrame = 0.0f;
 
-bool Check_Out_Of_Boundary(Hole h_, Cuboid c_);
-bool Ascend(Hole ha, Hole hb) { return (ha.x < hb.x); }
-
 //#####################################################################
 // main
 //#####################################################################
@@ -80,9 +77,6 @@ int main()
     // tell GLFW to capture our mouse
     // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    opengl_gui_viewer::ImGui_Wrapper guiWrapper;
-    guiWrapper.Initialize(window);
-
     //---------------------------------------------------------------------
 
     // glew: load all OpenGL function pointers
@@ -95,6 +89,9 @@ int main()
     }
     glEnable(GL_DEPTH_TEST);
     Shader ourShader("camera.vs", "camera.fs");
+
+    opengl_gui_viewer::ImGui_Wrapper guiWrapper;
+    guiWrapper.Initialize(window);
 
     guiWrapper.test_GenObject();
     guiWrapper.InitBuffer();
@@ -109,7 +106,7 @@ int main()
 
         //############# Dear  ImGui Frame ######################
 
-        guiWrapper.InitUI();
+        guiWrapper.UIFrame();
 
         //###################################################
 
