@@ -203,70 +203,70 @@ void ImGui_Wrapper::DisplayHoleModule()
 
         ImGui::SameLine();
 
+        // // TODO: ImGUI Bug for selected object & popup
+        // // https://github.com/ocornut/imgui/issues/2200
+        // if (ImGui::Button("Modify"))
+        // {
+        //     Hole selected_hole;
+        //     // Get the Index by ID fist, and then modify it
+        //     // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
+        //     // ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
+        //     if (selected != -1)
+        //     {
+        //         selected_hole = main_object->holes->holes[selected];
+        //         int holeID = selected_hole.id;
+        //         ImGui::OpenPopup("Modify Hole");
+        //         std::cout << "Try tp Modify " << holeID << std::endl;
+        //     }
+        //     // ImGui::PopItemFlag();
 
-        // TODO: ImGUI Bug for selected object & popup
-        if (ImGui::Button("Modify"))
-        {
-            Hole selected_hole;
-            // Get the Index by ID fist, and then modify it
-            // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
-            // ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-            if (selected != -1)
-            {
-                selected_hole = main_object->holes->holes[selected];
-                int holeID = selected_hole.id;
-                ImGui::OpenPopup("Modify Hole");
-                std::cout << "Try tp Modify " << holeID << std::endl;
-            }
-            // ImGui::PopItemFlag();
-
-            if (ImGui::BeginPopupModal("Modify Hole"))
-            {
-                std::cout << "..." << std::endl;
+        //     if (ImGui::BeginPopupModal("Modify Hole"))
+        //     {
+        //         std::cout << "..." << std::endl;
                 
-                ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)");
+        //         ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)");
 
-                static double temp_x = selected_hole.x;
-                ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
-                static double temp_y = selected_hole.y;
-                ImGui::InputDouble("Hole Y", &temp_y, 0.01f, 0.2f, "%.8f");
-                static double temp_raduis = selected_hole.radius;
-                ImGui::InputDouble("Raduis", &temp_raduis, 0.01f, 0.2f, "%.8f");
+        //         static double temp_x = selected_hole.x;
+        //         ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
+        //         static double temp_y = selected_hole.y;
+        //         ImGui::InputDouble("Hole Y", &temp_y, 0.01f, 0.2f, "%.8f");
+        //         static double temp_raduis = selected_hole.radius;
+        //         ImGui::InputDouble("Raduis", &temp_raduis, 0.01f, 0.2f, "%.8f");
 
-                if (ImGui::Button("Modify"))
-                {
-                    // TODO : Change the validation std::out output to ImGui::Text
-                    Hole temp = Hole(temp_x, temp_y, temp_raduis);
-                    if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
-                    {
-                        selected_hole.x = temp_x;
-                        selected_hole.y = temp_y;
-                        selected_hole.radius = temp_raduis;
-                        selected_hole.initVertex();
+        //         if (ImGui::Button("Modify"))
+        //         {
+        //             // TODO : Change the validation std::out output to ImGui::Text
+        //             Hole temp = Hole(temp_x, temp_y, temp_raduis);
+        //             if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
+        //             {
+        //                 selected_hole.x = temp_x;
+        //                 selected_hole.y = temp_y;
+        //                 selected_hole.radius = temp_raduis;
+        //                 selected_hole.initVertex();
 
-                        ImGui::OpenPopup("success!");
-                    }
-                }
+        //                 ImGui::OpenPopup("success!");
+        //             }
+        //         }
 
-                // bool dummy_open = true;
-                // if (ImGui::BeginPopupModal(".!", &dummy_open))
-                // {
-                //     ImGui::Text("Update the hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
+        //         // bool dummy_open = true;
+        //         // if (ImGui::BeginPopupModal(".!", &dummy_open))
+        //         // {
+        //         //     ImGui::Text("Update the hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
 
-                //     if (ImGui::Button("Close"))
-                //         ImGui::CloseCurrentPopup();
+        //         //     if (ImGui::Button("Close"))
+        //         //         ImGui::CloseCurrentPopup();
 
-                //     ImGui::EndPopup();
-                // }
+        //         //     ImGui::EndPopup();
+        //         // }
 
-                // ImGui::SameLine();
+        //         // ImGui::SameLine();
 
-                // if (ImGui::Button("Close"))
-                //     ImGui::CloseCurrentPopup();
-                ImGui::EndPopup();
-            }
-        }
-        ImGui::SameLine();
+        //         // if (ImGui::Button("Close"))
+        //         //     ImGui::CloseCurrentPopup();
+        //         ImGui::EndPopup();
+        //     }
+        // }
+        // ImGui::SameLine();
         if (ImGui::Button("Delete"))
         {
             // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
