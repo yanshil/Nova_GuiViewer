@@ -19,13 +19,12 @@ Sim_Object::~Sim_Object()
 }
 
 
-bool Sim_Object::Check_Out_Of_Boundary(Hole h_, Cuboid c_)
+bool Sim_Object::Check_Out_Of_Boundary(Hole h_)
 {
-
     if ((h_.x - h_.radius) > 0 &&
-        (h_.x + h_.radius) < c_.depth &&
+        (h_.x + h_.radius) < cube->depth &&
         (h_.y - h_.radius) > 0 &&
-        (h_.y + h_.radius) < c_.width)
+        (h_.y + h_.radius) < cube->width)
         return false;
     else
     {

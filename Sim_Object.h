@@ -25,7 +25,7 @@ public:
   // int option_material;
 
   // Auxiliary Functions
-  bool Check_Out_Of_Boundary(Hole h_, Cuboid c_);
+  bool Check_Out_Of_Boundary(Hole h_);
 
 private:
 };

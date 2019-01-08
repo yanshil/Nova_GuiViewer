@@ -30,7 +30,8 @@ public:
   void InitUI();
   void DisplayUI();
 
-  void Setup_Mesh();
+  void test_GenObject();
+  void InitBuffer();
   void NewBuffer();
   // Listen for every frame
   void ApplyDisplayOption();

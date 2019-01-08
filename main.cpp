@@ -96,7 +96,8 @@ int main()
     glEnable(GL_DEPTH_TEST);
     Shader ourShader("camera.vs", "camera.fs");
 
-    guiWrapper.Setup_Mesh();
+    guiWrapper.test_GenObject();
+    guiWrapper.InitBuffer();
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 

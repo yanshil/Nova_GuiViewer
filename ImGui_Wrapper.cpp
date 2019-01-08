@@ -173,7 +173,7 @@ void ImGui_Wrapper::DisplayHoleModule()
             if (ImGui::Button("Add"))
             {
                 Hole temp = Hole(temp_x, temp_y, temp_raduis);
-                if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
+                if (!main_object->Check_Out_Of_Boundary(temp))
                 {
                     if (main_object->holes->AddHole(temp)) // != 0: return an ID
                     {
@@ -227,72 +227,8 @@ void ImGui_Wrapper::DisplayHoleModule()
                 ImGui::CloseCurrentPopup();
             ImGui::EndPopup();
         }
-
         ImGui::SameLine();
 
-        // // TODO: ImGUI Bug for selected object & popup
-        // // https://github.com/ocornut/imgui/issues/2200
-        // if (ImGui::Button("Modify"))
-        // {
-        //     Hole selected_hole;
-        //     // Get the Index by ID fist, and then modify it
-        //     // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
-        //     // ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-        //     if (selected != -1)
-        //     {
-        //         selected_hole = main_object->holes->holes[selected];
-        //         int holeID = selected_hole.id;
-        //         ImGui::OpenPopup("Modify Hole");
-        //         std::cout << "Try tp Modify " << holeID << std::endl;
-        //     }
-        //     // ImGui::PopItemFlag();
-
-        //     if (ImGui::BeginPopupModal("Modify Hole"))
-        //     {
-        //         std::cout << "..." << std::endl;
-
-        //         ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)");
-
-        //         static double temp_x = selected_hole.x;
-        //         ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
-        //         static double temp_y = selected_hole.y;
-        //         ImGui::InputDouble("Hole Y", &temp_y, 0.01f, 0.2f, "%.8f");
-        //         static double temp_raduis = selected_hole.radius;
-        //         ImGui::InputDouble("Raduis", &temp_raduis, 0.01f, 0.2f, "%.8f");
-
-        //         if (ImGui::Button("Modify"))
-        //         {
-        //             Hole temp = Hole(temp_x, temp_y, temp_raduis);
-        //             if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
-        //             {
-        //                 selected_hole.x = temp_x;
-        //                 selected_hole.y = temp_y;
-        //                 selected_hole.radius = temp_raduis;
-        //                 selected_hole.initVertex();
-
-        //                 ImGui::OpenPopup("success!");
-        //             }
-        //         }
-
-        //         // bool dummy_open = true;
-        //         // if (ImGui::BeginPopupModal(".!", &dummy_open))
-        //         // {
-        //         //     ImGui::Text("Update the hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
-
-        //         //     if (ImGui::Button("Close"))
-        //         //         ImGui::CloseCurrentPopup();
-
-        //         //     ImGui::EndPopup();
-        //         // }
-
-        //         // ImGui::SameLine();
-
-        //         // if (ImGui::Button("Close"))
-        //         //     ImGui::CloseCurrentPopup();
-        //         ImGui::EndPopup();
-        //     }
-        // }
-        // ImGui::SameLine();
         if (ImGui::Button("Delete"))
         {
             // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
@@ -364,7 +300,7 @@ void ImGui_Wrapper::DisplayAnimation()
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
 
-void ImGui_Wrapper::Setup_Mesh()
+void ImGui_Wrapper::test_GenObject()
 {
     main_object = new Sim_Object();
     main_object->cube = new Cuboid(5, 5, 5);
@@ -377,9 +313,10 @@ void ImGui_Wrapper::Setup_Mesh()
     main_object->holes->AddHole(Hole(4.5, 4.5, 0.2));
 
     main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
+}
 
-    //====================================================
-
+void ImGui_Wrapper::InitBuffer()
+{
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -389,6 +326,7 @@ void ImGui_Wrapper::Setup_Mesh()
     NewBuffer();
 }
 
+// Only called after main_object is assigned with data...
 void ImGui_Wrapper::NewBuffer()
 {
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -427,9 +365,8 @@ void ImGui_Wrapper::NewBuffer()
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
     glEnableVertexAttribArray(0);
 
+    // =======================================
     ApplyDisplayOption();
-
-    // glNewBufferElements(GL_TRIANGLES, 3 * main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
 }
 
 } // namespace opengl_gui_viewer
