@@ -20,7 +20,7 @@ namespace opengl_gui_viewer
  * Constructor
  */
 ImGui_Wrapper::ImGui_Wrapper()
-    :_window(NULL), main_object(NULL)
+    : _window(NULL), main_object(NULL)
 {
 }
 
@@ -48,7 +48,6 @@ void ImGui_Wrapper::Initialize(GLFWwindow *window)
 
     const char *glsl_version = "#version 330";
     ImGui_ImplOpenGL3_Init(glsl_version);
-
 }
 
 /**
@@ -56,6 +55,9 @@ void ImGui_Wrapper::Initialize(GLFWwindow *window)
  */
 ImGui_Wrapper::~ImGui_Wrapper()
 {
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 }
 
 void ImGui_Wrapper::Render()
@@ -97,13 +99,18 @@ void ImGui_Wrapper::DisplayCubeModule()
     // ======================================================
     ImGui::Text("Enter cube size below (depth, width, height)"); // Display some text (you can use a format strings too)
 
-    // // ?What the fourth element for?
-    // TODO: Change Input Float!!!!! Because we want double rather than float
-    static float vec4a[4] = {5.0f, 5.0f, 5.0f, 0.44f};
-    ImGui::InputFloat3("Cube Size", vec4a);
+    static double tmp_d = 5.0, tmp_w = 5.0, tmp_h = 5.0;
+    ImGui::InputDouble("Depth", &tmp_d, 0.01f, 0.2f, "%.4f");
+    ImGui::InputDouble("Width", &tmp_w, 0.01f, 0.2f, "%.4f");
+    ImGui::InputDouble("Height", &tmp_h, 0.01f, 0.2f, "%.4f");
 
-    ImGui::Text("depth = %f, width = %f, height = %f", vec4a[0], vec4a[1], vec4a[2]);
+    this->tmpParas_cube[0] = tmp_d;
+    this->tmpParas_cube[1] = tmp_w;
+    this->tmpParas_cube[2] = tmp_h;
+
+    ImGui::Text("depth = %f, width = %f, height = %f", tmp_d, tmp_w, tmp_h);
 }
+
 void ImGui_Wrapper::DisplayHoleModule()
 {
     // Basic columns
@@ -155,7 +162,6 @@ void ImGui_Wrapper::DisplayHoleModule()
         {
             ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)"); // Display some text (you can use a format strings too)
 
-            // // ?What the fourth element for?
             static double temp_x = 0.0;
             ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
             static double temp_y = 0.0;
@@ -214,6 +220,23 @@ void ImGui_Wrapper::DisplayHoleModule()
         ImGui::TreePop();
     }
 }
+
+void ImGui_Wrapper::DisplayOptionModule()
+{
+    ImGui::Checkbox("Wireframe", &main_object->option_wireframe);
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+}
+
+void ImGui_Wrapper::ApplyDisplayOption()
+{
+    // WireFrame
+    if (main_object->option_wireframe)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
 void ImGui_Wrapper::DisplayGenerateModule()
 {
     ImGui::PushID(1);
@@ -222,24 +245,20 @@ void ImGui_Wrapper::DisplayGenerateModule()
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1 / 7.0f, 0.8f, 0.8f));
     if (ImGui::Button("Generate")) // Buttons return true when clicked (most widgets return true when edited/activated)
     {
-        // TODO: called destructor for the previous cubes
-
         delete main_object->cube;
-
-        static float vec4a[4] = {5.0f, 5.0f, 5.0f, 0.44f};
-        ImGui::InputFloat3("Cube Size", vec4a);
-        main_object->cube = new Cuboid(vec4a[0], vec4a[1], vec4a[2], 4);
+        main_object->cube = new Cuboid(tmpParas_cube[0], tmpParas_cube[1], tmpParas_cube[2]);
 
         delete main_object->trimesh;
         main_object->trimesh = new TriMesh();
-        
+
         main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
 
-        Draw();
+        NewBuffer();
     }
     ImGui::PopStyleColor(3);
     ImGui::PopID();
 }
+
 void ImGui_Wrapper::DisplayAnimation()
 {
     ImGui::Checkbox("Wireframe", &(main_object->option_wireframe));
@@ -250,7 +269,7 @@ void ImGui_Wrapper::DisplayAnimation()
 void ImGui_Wrapper::Setup_Mesh()
 {
     main_object = new Sim_Object();
-    main_object->cube = new Cuboid(5, 5, 5, 4);
+    main_object->cube = new Cuboid(5, 5, 5);
     main_object->holes = new HoleList();
     main_object->trimesh = new TriMesh();
     main_object->holes->AddHole(Hole(2, 1, 0.5));
@@ -259,82 +278,28 @@ void ImGui_Wrapper::Setup_Mesh()
     main_object->holes->AddHole(Hole(1, 1, 0.1));
     main_object->holes->AddHole(Hole(4.5, 4.5, 0.2));
 
-    std::cout << "Any0?" << std::endl;
-    std::cout <<main_object->holes->holes.size() <<std::endl;
-    std::cout <<main_object->cube->edge_max <<std::endl;
-
     main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
-
-    std::cout << "Any?" << std::endl;
 
     //====================================================
 
     glGenVertexArrays(1, &VAO);
-    std::cout << "Gen Buffer" << std::endl;
     glGenBuffers(1, &VBO);
-    std::cout << "Gen Buffer" << std::endl;
     glGenBuffers(1, &EBO);
-    std::cout << "Gen Buffer" << std::endl;
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
 
-    std::cout << "Bind VAO" << std::endl;
-
-    // Draw();
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    int vertex_size = main_object->trimesh->vertex_list.size();
-    int triangle_size = main_object->trimesh->triangle_list.size();
-    double vertices[3 * vertex_size];
-
-    // TODO: Here use the cuboid.edge_max
-    for (int i = 0; i < vertex_size; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            vertices[3 * i + j] = main_object->trimesh->vertex_list[i][j] / (double)main_object->cube->edge_max - 0.5;
-        }
-
-        std::cout << i << ": " << vertices[3 * i] << ", " << vertices[3 * i + 1] << ", " << vertices[3 * i + 2] << std::endl;
-    }
-    unsigned int indices[3 * triangle_size];
-    for (int i = 0; i < triangle_size; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            indices[3 * i + j] = main_object->trimesh->triangle_list[i][j];
-        }
-
-        //std::cout<<i<<": "<<main_object->trimesh->triangle_list[i][0]<<", "<<main_object->trimesh->triangle_list[i][1]<<", "<<main_object->trimesh->triangle_list[i][2]<<std::endl;
-    }
-
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f, 0.0f, 1.0f)};
-
-    std::cout << vertex_size << "   " << triangle_size << std::endl;
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
-    glEnableVertexAttribArray(0);
-
+    NewBuffer();
 }
-void ImGui_Wrapper::Draw()
+
+void ImGui_Wrapper::NewBuffer()
 {
-    //================= TODO ===================
-    // Unbind and Redraw
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     int vertex_size = main_object->trimesh->vertex_list.size();
     int triangle_size = main_object->trimesh->triangle_list.size();
     double vertices[3 * vertex_size];
 
-    // TODO: Here use the cuboDrawid.edge_max
+    // TODO: Here use the cuboNewBufferid.edge_max
     for (int i = 0; i < vertex_size; i++)
     {
         for (int j = 0; j < 3; j++)
@@ -353,19 +318,10 @@ void ImGui_Wrapper::Draw()
         }
     }
 
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f, 0.0f, 1.0f)};
-
-    std::cout << vertex_size << "   " << triangle_size << std::endl;
-
-    // unsigned int VBO, VAO, EBO;
-    // glGenVertexArrays(1, &VAO);
-    // glGenBuffers(1, &VBO);
-    // glGenBuffers(1, &EBO);
     // // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    // glBindVertexArray(VAO);
+    glBindVertexArray(VAO);
 
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -374,7 +330,9 @@ void ImGui_Wrapper::Draw()
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
     glEnableVertexAttribArray(0);
 
-    glDrawElements(GL_TRIANGLES, 3 * main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
+    ApplyDisplayOption();
+
+    // glNewBufferElements(GL_TRIANGLES, 3 * main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
 }
 
 } // namespace opengl_gui_viewer

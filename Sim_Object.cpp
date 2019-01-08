@@ -4,7 +4,8 @@ namespace opengl_gui_viewer
 {
 
 Sim_Object::Sim_Object()
-  :cube(nullptr), holes(nullptr), trimesh(nullptr)
+  :cube(nullptr), holes(nullptr), trimesh(nullptr),
+  option_wireframe(true)
 {}
 
 Sim_Object::~Sim_Object()
@@ -16,6 +17,7 @@ Sim_Object::~Sim_Object()
   if(trimesh != nullptr)
     delete trimesh;
 }
+
 
 bool Sim_Object::Check_Out_Of_Boundary(Hole h_, Cuboid c_)
 {

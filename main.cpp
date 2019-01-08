@@ -49,28 +49,10 @@ bool Check_Out_Of_Boundary(Hole h_, Cuboid c_);
 bool Ascend(Hole ha, Hole hb) { return (ha.x < hb.x); }
 
 //#####################################################################
-// ImGui Display
-//#####################################################################
-static void ShowWindowLayout(bool *p_open);
-static void ImGui_HoleList(HoleList &holeLists);
-static bool show_gui_layout = true;
-static bool show_wireframe = true;
-
-//#####################################################################
-// The Global Object for the cutted holes mesh
-//#####################################################################
-
-unsigned int VBO, VAO, EBO;
-
-int vertex_size;
-int triangle_size;
-
-//#####################################################################
 // main
 //#####################################################################
 int main()
 {
-
     //#####################################################################
     // glfw Windows
     //#####################################################################
@@ -154,6 +136,7 @@ int main()
         // glBindVertexArray(VAO);
         glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
 
+        // TODO Cube Positions Pass
         glm::vec3 cubePositions[] = {
             glm::vec3(0.0f, 0.0f, 1.0f)};
 
@@ -161,37 +144,17 @@ int main()
         float angle = 20.0f * 0;
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         ourShader.setMat4("model", model);
-        // draw our first triangle
-        //glUseProgram(shaderProgram);
-        // glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
         glDrawElements(GL_TRIANGLES, 3 * guiWrapper.main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind iverticest every time
 
-        //###################################################
-        // -------------------------------------------------------------------------------
-
+        guiWrapper.ApplyDisplayOption();
         guiWrapper.Render();
-
-        // // Display Setting
-        // // -------------------------------------------------------------------------------
-        // if (show_wireframe)
-        //     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        // else
-        //     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        //###################################################
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
     }
-
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();

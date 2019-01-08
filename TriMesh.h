@@ -46,17 +46,14 @@ class Hole
     std::vector<Vertex> vertices;
     void initVertex();
 
-    // ID?
     int id;
 
     static int sNextID;
 
-    // converge coordinate to char * for display
-
-  //private:
+  // TODO: 
     int segments = 64;
+
   private:
-    
     int getNextId();
     
 };
@@ -88,9 +85,10 @@ class Cuboid
   public:
     Cuboid();
     // A cube with bottom left at (0,0,0) with depth, width, height
-    Cuboid(double depth, double width, double height, int n_segments);
+    Cuboid(double depth, double width, double height);
     ~Cuboid();
-    int n_segments;
+    // TODO: Not sure what this for...
+    int n_segments = 4;
     double depth;
     double width;
     double height;

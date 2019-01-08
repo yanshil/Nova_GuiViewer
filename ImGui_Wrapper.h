@@ -31,11 +31,16 @@ public:
   void DisplayUI();
 
   void Setup_Mesh();
-  void Draw();
+  void NewBuffer();
+  // Listen for every frame
+  void ApplyDisplayOption();
 
 private:
+  double tmpParas_cube[3];
+
   void DisplayCubeModule();
   void DisplayHoleModule();
+  void DisplayOptionModule();
   void DisplayGenerateModule();
   void DisplayAnimation();
 };

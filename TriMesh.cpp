@@ -150,8 +150,8 @@ Cuboid::Cuboid()
     this->edge_max = std::max(depth, std::max(width, height));
 }
 
-Cuboid::Cuboid(double depth, double width, double height, int n_segments)
-    :depth(depth), width(width), height(height), n_segments(n_segments)
+Cuboid::Cuboid(double depth, double width, double height)
+    :depth(depth), width(width), height(height)
 {
     // this->edge_max = depth>(width>height?width:height)?depth:(width>height?width:height);
     this->edge_max = std::max(depth, std::max(width, height));

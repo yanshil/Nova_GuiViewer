@@ -28,8 +28,6 @@ public:
   bool Check_Out_Of_Boundary(Hole h_, Cuboid c_);
 
 private:
-  
-
 };
 
 } // namespace opengl_gui_viewer
