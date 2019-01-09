@@ -109,7 +109,7 @@ void ImGui_Wrapper::DisplayCubeModule()
     this->tmpParas_cube[1] = tmp_w;
     this->tmpParas_cube[2] = tmp_h;
 
-    ImGui::Text("depth = %f, width = %f, height = %f", tmp_d, tmp_w, tmp_h);
+    ImGui::Text("depth = %f, width = %f, height = %f", main_object->cube->depth, main_object->cube->width, main_object->cube->height);
 }
 
 void ImGui_Wrapper::DisplayHoleModule()
@@ -167,13 +167,13 @@ void ImGui_Wrapper::DisplayHoleModule()
             ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
             static double temp_y = 0.0;
             ImGui::InputDouble("Hole Y", &temp_y, 0.01f, 0.2f, "%.8f");
-            static double temp_raduis = 0.5;
-            ImGui::InputDouble("Raduis", &temp_raduis, 0.01f, 0.2f, "%.8f");
+            static double temp_radius = 0.5;
+            ImGui::InputDouble("Raduis", &temp_radius, 0.01f, 0.2f, "%.8f");
 
             if (ImGui::Button("Add"))
             {
-                Hole temp = Hole(temp_x, temp_y, temp_raduis);
-                if (!main_object->Check_Out_Of_Boundary(temp))
+                Hole temp = Hole(temp_x, temp_y, temp_radius);
+                if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
                 {
                     if (main_object->holes->AddHole(temp)) // != 0: return an ID
                     {
@@ -193,7 +193,7 @@ void ImGui_Wrapper::DisplayHoleModule()
             bool dummy_open = true;
             if (ImGui::BeginPopupModal("Success!", &dummy_open))
             {
-                ImGui::Text("Insert a hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
+                ImGui::Text("Insert a hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_radius);
 
                 if (ImGui::Button("Close"))
                     ImGui::CloseCurrentPopup();
@@ -228,6 +228,70 @@ void ImGui_Wrapper::DisplayHoleModule()
             ImGui::EndPopup();
         }
         ImGui::SameLine();
+
+        // ====================================================
+
+        // if (ImGui::Button("Modify") & (selected != -1))
+        // {
+        //         ImGui::OpenPopup("Modify Hole");
+        // }
+
+        // if (ImGui::BeginPopupModal("Modify Hole"))
+        // {
+        //     // selected != -1
+        //     int holeID = main_object->holes->holes[selected].id;
+        //     Hole modified = main_object->holes->holes[selected];
+
+        //     ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)"); // Display some text (you can use a format strings too)
+
+        //     static double temp_m_x = modified.x;
+        //     ImGui::InputDouble("Hole X", &temp_m_x, 0.01f, 0.2f, "%.8f");
+        //     static double temp_m_y = modified.y;
+        //     ImGui::InputDouble("Hole Y", &temp_m_y, 0.01f, 0.2f, "%.8f");
+        //     static double temp_m_radius = modified.radius;
+        //     ImGui::InputDouble("Raduis", &temp_m_radius, 0.01f, 0.2f, "%.8f");
+
+        //     if (ImGui::Button("Modify"))
+        //     {
+        //         Hole temp = Hole(temp_m_x, temp_m_y, temp_m_radius);
+        //         if (!main_object->Check_Out_Of_Boundary(temp))
+        //         {
+        //             // TODO: Check overlap.... -(holeID)
+        //             if (true)
+        //             {
+        //                 main_object->holes->holes[selected].x = temp_m_x;
+        //                 main_object->holes->holes[selected].y = temp_m_y;
+        //                 main_object->holes->holes[selected].radius = temp_m_radius;
+        //                 ImGui::OpenPopup("Modification Success!");
+        //             }
+        //             else
+        //             {
+        //                 ImGui::OpenPopup("Hole Overlapped with Previous Holes");
+        //             }
+        //         }
+        //         else
+        //         {
+        //             ImGui::OpenPopup("Hole Out of Boundary");
+        //         }
+        //     }
+
+        //     bool dummy_open = true;
+        //     if (ImGui::BeginPopupModal("Modification Success!", &dummy_open))
+        //     {
+        //         ImGui::Text("Modify the hole with x = %f, y = %f, raduis = %f", temp_m_x, temp_m_y, temp_m_radius);
+
+        //         if (ImGui::Button("Close"))
+        //             ImGui::CloseCurrentPopup();
+
+        //         ImGui::EndPopup();
+        //     }
+        //     ImGui::SameLine();
+
+        //     if (ImGui::Button("Close"))
+        //         ImGui::CloseCurrentPopup();
+        //     ImGui::EndPopup();
+        // }
+        // ImGui::SameLine();
 
         if (ImGui::Button("Delete"))
         {
@@ -277,18 +341,44 @@ void ImGui_Wrapper::DisplayGenerateModule()
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(1 / 7.0f, 0.6f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(1 / 7.0f, 0.7f, 0.7f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1 / 7.0f, 0.8f, 0.8f));
-    if (ImGui::Button("Generate")) // Buttons return true when clicked (most widgets return true when edited/activated)
+
+    // =================================
+
+    if (ImGui::Button("Generate"))
     {
-        delete main_object->cube;
-        main_object->cube = new Cuboid(tmpParas_cube[0], tmpParas_cube[1], tmpParas_cube[2]);
+        Cuboid *tmpCube = new Cuboid(tmpParas_cube[0], tmpParas_cube[1], tmpParas_cube[2]);
+        if (!main_object->Check_Validation(*tmpCube))
+        {
+            delete tmpCube;
+            ImGui::OpenPopup("Unvalid");
+        }
+        else
+        {
+            delete main_object->cube;
+            main_object->cube = tmpCube;
 
-        delete main_object->trimesh;
-        main_object->trimesh = new TriMesh();
+            delete main_object->trimesh;
+            main_object->trimesh = new TriMesh();
 
-        main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
+            main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
 
-        NewBuffer();
+            NewBuffer();
+
+        }
     }
+
+    if (ImGui::BeginPopupModal("Unvalid"))
+    {
+        ImGui::Text("Unvalid Generation (Some Hole(s) Out of Boundary)!");
+
+        if (ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
     ImGui::PopStyleColor(3);
     ImGui::PopID();
 }
