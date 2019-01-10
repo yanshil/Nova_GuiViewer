@@ -21,7 +21,8 @@ namespace opengl_gui_viewer
  * Constructor
  */
 ImGui_Wrapper::ImGui_Wrapper()
-    : _window(NULL), main_object(NULL)
+    : _window(NULL), main_object(NULL),
+    _mouse_wheel_(0.0f), _mouse_pressed_{false, false, false}
 {
 }
 
@@ -61,6 +62,11 @@ ImGui_Wrapper::~ImGui_Wrapper()
     glDeleteBuffers(1, &EBO);
 }
 
+void ImGui_Wrapper::MouseWheelScrollCallback(float yoffset)
+{
+    _mouse_wheel_ += yoffset;
+}
+
 void ImGui_Wrapper::Render()
 {
     // Rendering
@@ -70,6 +76,12 @@ void ImGui_Wrapper::Render()
 
 void ImGui_Wrapper::UIFrame()
 {
+    ImGuiIO &io = ImGui::GetIO();
+
+    io.MouseWheel = _mouse_wheel_;
+    _mouse_wheel_ = 0.0f;
+
+    //==========================
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();

@@ -17,44 +17,47 @@ namespace opengl_gui_viewer
 
 class Viewer
 {
-  private:
-    // Window
-    GLFWwindow *window;
-    
-    
-    const unsigned int SCR_WIDTH;
-    const unsigned int SCR_HEIGHT;
+private:
+  // Window
+  GLFWwindow *window;
+  Shader shader;
 
-    // Orbit Control (Only works for Object view?)
-    glm::vec3 cameraPos;
-    glm::vec3 cameraFront;
-    glm::vec3 cameraUp;
+  // Static data member.
+  static Viewer viewer_;
 
-    bool firstMouse;
-    float yaw;
-    float pitch;
-    float lastX;
-    float lastY;
-    float fov;
+  const unsigned int SCR_WIDTH;
+  const unsigned int SCR_HEIGHT;
 
-    // timing
-    float deltaTime;
-    float lastFrame;
+  // Orbit Control (Only works for Object view?)
+  glm::vec3 cameraPos;
+  glm::vec3 cameraFront;
+  glm::vec3 cameraUp;
 
-    Shader shader;
+  bool firstMouse;
+  float yaw;
+  float pitch;
+  float lastX;
+  float lastY;
+  float fov;
 
-  public:
-    Viewer();
-    ~Viewer();
+  // timing
+  float deltaTime;
+  float lastFrame;
 
-    ImGui_Wrapper guiWrapper;
+public:
+  Viewer();
+  ~Viewer();
 
-    int Initialize();
-    void Main_Loop();
-    void Terminate();
-    void MouseWheelScrollCallback(const float y_offset);
-    void MouseDragCallback(const float x_pos, const float y_pos);
-    void KeyboardCallback(const int key, const int action);
+  static Viewer &GetViewer();
+
+  ImGui_Wrapper guiWrapper;
+
+  int Initialize();
+  void Main_Loop();
+  void Terminate();
+  void MouseWheelScrollCallback(const float y_offset);
+  void MouseDragCallback(const float x_pos, const float y_pos);
+  void KeyboardCallback(const int key, const int action);
 
 }; // namespace opengl_gui_viewer
 

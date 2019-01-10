@@ -36,7 +36,15 @@ public:
   // Listen for every frame
   void ApplyDisplayOption();
 
+  // ImGui Orbit Control
+  void MouseWheelScrollCallback(float yoffset);
+
 private:
+  // Mouse states.
+  bool _mouse_pressed_[3];
+  float _mouse_wheel_;
+
+  // Cube Paras
   double tmpParas_cube[3];
 
   void DisplayCubeModule();

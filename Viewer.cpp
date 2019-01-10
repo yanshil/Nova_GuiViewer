@@ -5,7 +5,9 @@ using namespace opengl_gui_viewer;
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-void processInput(GLFWwindow *window);
+// void processInput(GLFWwindow *window);
+
+Viewer Viewer::viewer_ = Viewer();
 
 Viewer::Viewer()
     : window(NULL), SCR_WIDTH(800), SCR_HEIGHT(600)
@@ -29,12 +31,16 @@ Viewer::Viewer()
 
 Viewer::~Viewer()
 {
+}
 
+Viewer &Viewer::GetViewer()
+{
+    return viewer_;
 }
 
 void Viewer::Terminate()
 {
-    if(window)
+    if (window)
     {
         glfwTerminate();
         window = NULL;
@@ -87,13 +93,11 @@ int Viewer::Initialize()
         return -1;
     }
     glEnable(GL_DEPTH_TEST);
-    // Shader ourShader("camera.vs", "camera.fs");
 
     // Shader
     shader.initializeFromFile("camera.vs", "camera.fs");
 
     guiWrapper.Initialize(window);
-
     guiWrapper.test_GenObject();
     guiWrapper.InitBuffer();
 }
@@ -120,14 +124,24 @@ void Viewer::Main_Loop()
         lastFrame = currentFrame;
         // input
         // -----
-        processInput(window);
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+
+        float cameraSpeed = 2.5 * deltaTime;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            cameraPos += cameraSpeed * cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            cameraPos -= cameraSpeed * cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 
         // render
         // ------
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
         glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         shader.setMat4("projection", projection);
 
@@ -158,15 +172,26 @@ void Viewer::Main_Loop()
     }
 }
 
+void Viewer::KeyboardCallback(const int key, const int action)
+{
+}
+void Viewer::MouseWheelScrollCallback(const float y_offset)
+{
+}
+
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
+    // make sure the viewport matches the new window dimensions; note that width and
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
 }
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
 }
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
+    Viewer::GetViewer().MouseWheelScrollCallback(static_cast<float>(yoffset));
 }
-void processInput(GLFWwindow *window)
-{
-}
+// void processInput(GLFWwindow *window)
+// {
+// }
