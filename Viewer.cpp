@@ -18,7 +18,7 @@ Viewer::Viewer()
     local_camera_up = glm::vec3(0.0f, 0.0f, 1.0f);
 
 
-    global_camera_pos = glm::vec3(0.0f, -3.0f, -0.0f);
+    global_camera_pos = glm::vec3(0.0f, -5.0f, -0.0f);
     global_camera_front = glm::vec3(0.0f, 1.0f, 0.0f);
     global_camera_up = glm::vec3(0.0f, 0.0f, 1.0f);
 
@@ -150,9 +150,9 @@ void Viewer::Main_Loop()
 
         //local_camera_pos = glm::vec3(0.0f,-3.0f+0.3f*cos(t_copy/2000.0f),- t * 0.0001f+0.3f*sin(t_copy/2000.0f));
 
-        local_camera_pos = glm::vec3(0.0f + 3.0f * sin(t_copy/5000.0f)  , -3.0f*cos(t_copy/5000.0f),  0.5 * sin(t * 0.0001f)/guiWrapper.main_object->cube->edge_max );
+        local_camera_pos = glm::vec3(0.0f + 2.0f * sin(t_copy/5000.0f)  , -3.0f*cos(t_copy/5000.0f),  0.5 * 5*sin(t_copy * 0.0001f)/guiWrapper.main_object->cube->edge_max );
         //std::cout<<"AAAAA:"<<sin(30)<<std::endl;
-        glm::vec3 center = glm::vec3(0.0f, 0.0f, -sin(t*0.0001f)/guiWrapper.main_object->cube->edge_max);
+        glm::vec3 center = glm::vec3(0.0f, 0.0f, -5*sin(t_copy*0.0001f)/guiWrapper.main_object->cube->edge_max);
 
         glm::vec3 front = center - local_camera_pos;
         local_camera_front = glm::normalize(front);
@@ -187,7 +187,7 @@ void Viewer::Main_Loop()
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
-        LinearUpdateTest(t);
+        LinearUpdateTest(t_copy);
 
         
         if ((t_copy/6280)%2 == 0) {
