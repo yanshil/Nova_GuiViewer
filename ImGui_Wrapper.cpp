@@ -21,7 +21,8 @@ namespace opengl_gui_viewer
  * Constructor
  */
 ImGui_Wrapper::ImGui_Wrapper()
-    : _window(NULL), main_object(NULL)
+    : _window(NULL), main_object(NULL),
+    _mouse_wheel_(0.0f), _mouse_pressed_{false, false, false}
 {
 }
 
@@ -61,6 +62,11 @@ ImGui_Wrapper::~ImGui_Wrapper()
     glDeleteBuffers(1, &EBO);
 }
 
+void ImGui_Wrapper::MouseWheelScrollCallback(float yoffset)
+{
+    _mouse_wheel_ += yoffset;
+}
+
 void ImGui_Wrapper::Render()
 {
     // Rendering
@@ -68,8 +74,14 @@ void ImGui_Wrapper::Render()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGui_Wrapper::InitUI()
+void ImGui_Wrapper::UIFrame()
 {
+    ImGuiIO &io = ImGui::GetIO();
+
+    io.MouseWheel = _mouse_wheel_;
+    _mouse_wheel_ = 0.0f;
+
+    //==========================
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -100,7 +112,7 @@ void ImGui_Wrapper::DisplayCubeModule()
     // ======================================================
     ImGui::Text("Enter cube size below (depth, width, height)"); // Display some text (you can use a format strings too)
 
-    static double tmp_d = 5.0, tmp_w = 5.0, tmp_h = 5.0;
+    static double tmp_d = 5.0, tmp_w = 5.0, tmp_h = 0.1;
     ImGui::InputDouble("Depth", &tmp_d, 0.01f, 0.2f, "%.4f");
     ImGui::InputDouble("Width", &tmp_w, 0.01f, 0.2f, "%.4f");
     ImGui::InputDouble("Height", &tmp_h, 0.01f, 0.2f, "%.4f");
@@ -109,7 +121,7 @@ void ImGui_Wrapper::DisplayCubeModule()
     this->tmpParas_cube[1] = tmp_w;
     this->tmpParas_cube[2] = tmp_h;
 
-    ImGui::Text("depth = %f, width = %f, height = %f", tmp_d, tmp_w, tmp_h);
+    ImGui::Text("depth = %f, width = %f, height = %f", main_object->cube->depth, main_object->cube->width, main_object->cube->height);
 }
 
 void ImGui_Wrapper::DisplayHoleModule()
@@ -167,12 +179,12 @@ void ImGui_Wrapper::DisplayHoleModule()
             ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
             static double temp_y = 0.0;
             ImGui::InputDouble("Hole Y", &temp_y, 0.01f, 0.2f, "%.8f");
-            static double temp_raduis = 0.5;
-            ImGui::InputDouble("Raduis", &temp_raduis, 0.01f, 0.2f, "%.8f");
+            static double temp_radius = 0.5;
+            ImGui::InputDouble("Raduis", &temp_radius, 0.01f, 0.2f, "%.8f");
 
             if (ImGui::Button("Add"))
             {
-                Hole temp = Hole(temp_x, temp_y, temp_raduis);
+                Hole temp = Hole(temp_x, temp_y, temp_radius);
                 if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
                 {
                     if (main_object->holes->AddHole(temp)) // != 0: return an ID
@@ -193,7 +205,7 @@ void ImGui_Wrapper::DisplayHoleModule()
             bool dummy_open = true;
             if (ImGui::BeginPopupModal("Success!", &dummy_open))
             {
-                ImGui::Text("Insert a hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
+                ImGui::Text("Insert a hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_radius);
 
                 if (ImGui::Button("Close"))
                     ImGui::CloseCurrentPopup();
@@ -227,72 +239,72 @@ void ImGui_Wrapper::DisplayHoleModule()
                 ImGui::CloseCurrentPopup();
             ImGui::EndPopup();
         }
-
         ImGui::SameLine();
 
-        // // TODO: ImGUI Bug for selected object & popup
-        // // https://github.com/ocornut/imgui/issues/2200
-        // if (ImGui::Button("Modify"))
+        // ====================================================
+
+        // if (ImGui::Button("Modify") & (selected != -1))
         // {
-        //     Hole selected_hole;
-        //     // Get the Index by ID fist, and then modify it
-        //     // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
-        //     // ImGui::PushItemFlag(ImGuiItemFlags_SelectableDontClosePopup, true);
-        //     if (selected != -1)
-        //     {
-        //         selected_hole = main_object->holes->holes[selected];
-        //         int holeID = selected_hole.id;
         //         ImGui::OpenPopup("Modify Hole");
-        //         std::cout << "Try tp Modify " << holeID << std::endl;
-        //     }
-        //     // ImGui::PopItemFlag();
+        // }
 
-        //     if (ImGui::BeginPopupModal("Modify Hole"))
+        // if (ImGui::BeginPopupModal("Modify Hole"))
+        // {
+        //     // selected != -1
+        //     int holeID = main_object->holes->holes[selected].id;
+        //     Hole modified = main_object->holes->holes[selected];
+
+        //     ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)"); // Display some text (you can use a format strings too)
+
+        //     static double temp_m_x = modified.x;
+        //     ImGui::InputDouble("Hole X", &temp_m_x, 0.01f, 0.2f, "%.8f");
+        //     static double temp_m_y = modified.y;
+        //     ImGui::InputDouble("Hole Y", &temp_m_y, 0.01f, 0.2f, "%.8f");
+        //     static double temp_m_radius = modified.radius;
+        //     ImGui::InputDouble("Raduis", &temp_m_radius, 0.01f, 0.2f, "%.8f");
+
+        //     if (ImGui::Button("Modify"))
         //     {
-        //         std::cout << "..." << std::endl;
-
-        //         ImGui::Text("Enter Hole Coordinate and Raduis (x, y, raduis)");
-
-        //         static double temp_x = selected_hole.x;
-        //         ImGui::InputDouble("Hole X", &temp_x, 0.01f, 0.2f, "%.8f");
-        //         static double temp_y = selected_hole.y;
-        //         ImGui::InputDouble("Hole Y", &temp_y, 0.01f, 0.2f, "%.8f");
-        //         static double temp_raduis = selected_hole.radius;
-        //         ImGui::InputDouble("Raduis", &temp_raduis, 0.01f, 0.2f, "%.8f");
-
-        //         if (ImGui::Button("Modify"))
+        //         Hole temp = Hole(temp_m_x, temp_m_y, temp_m_radius);
+        //         if (!main_object->Check_Out_Of_Boundary(temp))
         //         {
-        //             Hole temp = Hole(temp_x, temp_y, temp_raduis);
-        //             if (!main_object->Check_Out_Of_Boundary(temp, *(main_object->cube)))
+        //             // TODO: Check overlap.... -(holeID)
+        //             if (true)
         //             {
-        //                 selected_hole.x = temp_x;
-        //                 selected_hole.y = temp_y;
-        //                 selected_hole.radius = temp_raduis;
-        //                 selected_hole.initVertex();
-
-        //                 ImGui::OpenPopup("success!");
+        //                 main_object->holes->holes[selected].x = temp_m_x;
+        //                 main_object->holes->holes[selected].y = temp_m_y;
+        //                 main_object->holes->holes[selected].radius = temp_m_radius;
+        //                 ImGui::OpenPopup("Modification Success!");
+        //             }
+        //             else
+        //             {
+        //                 ImGui::OpenPopup("Hole Overlapped with Previous Holes");
         //             }
         //         }
+        //         else
+        //         {
+        //             ImGui::OpenPopup("Hole Out of Boundary");
+        //         }
+        //     }
 
-        //         // bool dummy_open = true;
-        //         // if (ImGui::BeginPopupModal(".!", &dummy_open))
-        //         // {
-        //         //     ImGui::Text("Update the hole with x = %f, y = %f, raduis = %f", temp_x, temp_y, temp_raduis);
+        //     bool dummy_open = true;
+        //     if (ImGui::BeginPopupModal("Modification Success!", &dummy_open))
+        //     {
+        //         ImGui::Text("Modify the hole with x = %f, y = %f, raduis = %f", temp_m_x, temp_m_y, temp_m_radius);
 
-        //         //     if (ImGui::Button("Close"))
-        //         //         ImGui::CloseCurrentPopup();
+        //         if (ImGui::Button("Close"))
+        //             ImGui::CloseCurrentPopup();
 
-        //         //     ImGui::EndPopup();
-        //         // }
-
-        //         // ImGui::SameLine();
-
-        //         // if (ImGui::Button("Close"))
-        //         //     ImGui::CloseCurrentPopup();
         //         ImGui::EndPopup();
         //     }
+        //     ImGui::SameLine();
+
+        //     if (ImGui::Button("Close"))
+        //         ImGui::CloseCurrentPopup();
+        //     ImGui::EndPopup();
         // }
         // ImGui::SameLine();
+
         if (ImGui::Button("Delete"))
         {
             // https://stackoverflow.com/questions/35787142/how-to-find-and-remove-an-object-from-a-vector
@@ -341,18 +353,44 @@ void ImGui_Wrapper::DisplayGenerateModule()
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(1 / 7.0f, 0.6f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(1 / 7.0f, 0.7f, 0.7f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(1 / 7.0f, 0.8f, 0.8f));
-    if (ImGui::Button("Generate")) // Buttons return true when clicked (most widgets return true when edited/activated)
+
+    // =================================
+
+    if (ImGui::Button("Generate"))
     {
-        delete main_object->cube;
-        main_object->cube = new Cuboid(tmpParas_cube[0], tmpParas_cube[1], tmpParas_cube[2]);
+        Cuboid *tmpCube = new Cuboid(tmpParas_cube[0], tmpParas_cube[1], tmpParas_cube[2]);
+        if (!main_object->Check_Validation(*tmpCube))
+        {
+            delete tmpCube;
+            ImGui::OpenPopup("Unvalid");
+        }
+        else
+        {
+            delete main_object->cube;
+            main_object->cube = tmpCube;
 
-        delete main_object->trimesh;
-        main_object->trimesh = new TriMesh();
+            delete main_object->trimesh;
+            main_object->trimesh = new TriMesh();
 
-        main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
+            main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
 
-        NewBuffer();
+            NewBuffer();
+
+        }
     }
+
+    if (ImGui::BeginPopupModal("Unvalid"))
+    {
+        ImGui::Text("Unvalid Generation (Some Hole(s) Out of Boundary)!");
+
+        if (ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
     ImGui::PopStyleColor(3);
     ImGui::PopID();
 }
@@ -364,10 +402,10 @@ void ImGui_Wrapper::DisplayAnimation()
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
 
-void ImGui_Wrapper::Setup_Mesh()
+void ImGui_Wrapper::test_GenObject()
 {
     main_object = new Sim_Object();
-    main_object->cube = new Cuboid(5, 5, 5);
+    main_object->cube = new Cuboid(5, 5, 0.1);
     main_object->holes = new HoleList();
     main_object->trimesh = new TriMesh();
     main_object->holes->AddHole(Hole(2, 1, 0.5));
@@ -377,9 +415,10 @@ void ImGui_Wrapper::Setup_Mesh()
     main_object->holes->AddHole(Hole(4.5, 4.5, 0.2));
 
     main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
+}
 
-    //====================================================
-
+void ImGui_Wrapper::InitBuffer()
+{
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -389,6 +428,7 @@ void ImGui_Wrapper::Setup_Mesh()
     NewBuffer();
 }
 
+// Only called after main_object is assigned with data...
 void ImGui_Wrapper::NewBuffer()
 {
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -399,10 +439,9 @@ void ImGui_Wrapper::NewBuffer()
 
     for (int i = 0; i < vertex_size; i++)
     {
-        for (int j = 0; j < 3; j++)
-        {
-            vertices[3 * i + j] = main_object->trimesh->vertex_list[i][j] / main_object->cube->edge_max - 0.5;
-        }
+        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max - main_object->cube->depth/main_object->cube->edge_max;
+        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max - main_object->cube->width/main_object->cube->edge_max;
+        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - main_object->cube->height/main_object->cube->edge_max;
     }
 
     unsigned int indices[3 * triangle_size];
@@ -427,9 +466,49 @@ void ImGui_Wrapper::NewBuffer()
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
     glEnableVertexAttribArray(0);
 
+    // =======================================
     ApplyDisplayOption();
-
-    // glNewBufferElements(GL_TRIANGLES, 3 * main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
 }
+
+
+void ImGui_Wrapper::LinearUpdateTest(int t)
+{
+    int vertex_size = main_object->trimesh->vertex_list.size();
+    int triangle_size = main_object->trimesh->triangle_list.size();
+    double vertices[3 * vertex_size];
+
+    for (int i = 0; i < vertex_size; i++)
+    {
+        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max - main_object->cube->depth/main_object->cube->edge_max;
+        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max - main_object->cube->width/main_object->cube->edge_max;
+        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - main_object->cube->height/main_object->cube->edge_max- sin(t * 0.0001)/main_object->cube->edge_max;
+    }
+
+    unsigned int indices[3 * triangle_size];
+    for (int i = 0; i < triangle_size; i++)
+    {
+
+        for (int j = 0; j < 3; j++)
+        {
+            indices[3 * i + j] = main_object->trimesh->triangle_list[i][j];
+        }
+    }
+
+    // // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    // =======================================
+    ApplyDisplayOption();             
+}
+
 
 } // namespace opengl_gui_viewer

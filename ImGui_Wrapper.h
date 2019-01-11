@@ -27,15 +27,24 @@ public:
 
   GLuint VBO, VAO, EBO;
 
-  void InitUI();
+  void UIFrame();
   void DisplayUI();
 
-  void Setup_Mesh();
+  void test_GenObject();
+  void InitBuffer();
   void NewBuffer();
   // Listen for every frame
   void ApplyDisplayOption();
 
+  // ImGui Orbit Control
+  void MouseWheelScrollCallback(float yoffset);
+  void LinearUpdateTest(int t);
 private:
+  // Mouse states.
+  bool _mouse_pressed_[3];
+  float _mouse_wheel_;
+
+  // Cube Paras
   double tmpParas_cube[3];
 
   void DisplayCubeModule();
@@ -43,6 +52,8 @@ private:
   void DisplayOptionModule();
   void DisplayGenerateModule();
   void DisplayAnimation();
+  
+
 };
 
 } // namespace opengl_gui_viewer

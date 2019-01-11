@@ -14,9 +14,11 @@ class Shader
 {
 public:
     unsigned int ID;
+
+    Shader() : ID(0) {}
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr)
+    GLuint initializeFromFile(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr)
     {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
@@ -96,11 +98,13 @@ public:
         if(geometryPath != nullptr)
             glDeleteShader(geometry);
 
+        return ID;
     }
     // activate the shader
     // ------------------------------------------------------------------------
     void use() 
-    { 
+    {
+        std::cout << "USE" << std::endl;
         glUseProgram(ID); 
     }
     // utility uniform functions
