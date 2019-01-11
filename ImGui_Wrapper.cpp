@@ -112,7 +112,7 @@ void ImGui_Wrapper::DisplayCubeModule()
     // ======================================================
     ImGui::Text("Enter cube size below (depth, width, height)"); // Display some text (you can use a format strings too)
 
-    static double tmp_d = 5.0, tmp_w = 5.0, tmp_h = 5.0;
+    static double tmp_d = 5.0, tmp_w = 5.0, tmp_h = 0.1;
     ImGui::InputDouble("Depth", &tmp_d, 0.01f, 0.2f, "%.4f");
     ImGui::InputDouble("Width", &tmp_w, 0.01f, 0.2f, "%.4f");
     ImGui::InputDouble("Height", &tmp_h, 0.01f, 0.2f, "%.4f");
@@ -405,7 +405,7 @@ void ImGui_Wrapper::DisplayAnimation()
 void ImGui_Wrapper::test_GenObject()
 {
     main_object = new Sim_Object();
-    main_object->cube = new Cuboid(5, 5, 5);
+    main_object->cube = new Cuboid(5, 5, 0.1);
     main_object->holes = new HoleList();
     main_object->trimesh = new TriMesh();
     main_object->holes->AddHole(Hole(2, 1, 0.5));
@@ -470,5 +470,53 @@ void ImGui_Wrapper::NewBuffer()
     // =======================================
     ApplyDisplayOption();
 }
+
+
+void ImGui_Wrapper::LinearUpdateTest(int t)
+{
+    int vertex_size = main_object->trimesh->vertex_list.size();
+    int triangle_size = main_object->trimesh->triangle_list.size();
+    double vertices[3 * vertex_size];
+
+    for (int i = 0; i < vertex_size; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            vertices[3 * i + j] = main_object->trimesh->vertex_list[i][j] / main_object->cube->edge_max - 0.5 ;
+            
+            if (j == 2) {
+                vertices[3 * i + 2] += t * -0.0001;
+            }
+            
+            
+        }
+    }
+
+    unsigned int indices[3 * triangle_size];
+    for (int i = 0; i < triangle_size; i++)
+    {
+
+        for (int j = 0; j < 3; j++)
+        {
+            indices[3 * i + j] = main_object->trimesh->triangle_list[i][j];
+        }
+    }
+
+    // // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    // =======================================
+    ApplyDisplayOption();             
+}
+
 
 } // namespace opengl_gui_viewer
