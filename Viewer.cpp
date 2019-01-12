@@ -5,7 +5,7 @@ using namespace opengl_gui_viewer;
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-// void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window);
 
 Viewer Viewer::viewer_ = Viewer();
 
@@ -13,21 +13,22 @@ Viewer::Viewer()
     : window(NULL), SCR_WIDTH(800), SCR_HEIGHT(600)
 {
     // Orbit Control (Only works for Object view?)
-    local_camera_pos = glm::vec3(0.0f, -0.5f, 0.0f);
-    local_camera_front = glm::vec3(0.0f, 3.0f, 0.0f);
-    local_camera_up = glm::vec3(0.0f, 0.0f, 1.0f);
+    
+    viewer_.local_camera_pos = glm::vec3(0.0f, -0.5f, 0.0f);
+    viewer_.local_camera_front = glm::vec3(0.0f, 3.0f, 0.0f);
+    viewer_.local_camera_up = glm::vec3(0.0f, 0.0f, 1.0f);
 
 
-    global_camera_pos = glm::vec3(0.0f, -5.0f, -0.0f);
-    global_camera_front = glm::vec3(0.0f, 1.0f, 0.0f);
-    global_camera_up = glm::vec3(0.0f, 0.0f, 1.0f);
+    viewer_.global_camera_pos = glm::vec3(0.0f, -5.0f, -0.0f);
+    viewer_.global_camera_front = glm::vec3(0.0f, 1.0f, 0.0f);
+    viewer_.global_camera_up = glm::vec3(0.0f, 0.0f, 1.0f);
 
-    firstMouse = true;
-    yaw = -90.0f; // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-    pitch = 0.0f;
-    lastX = 800.0f / 2.0;
-    lastY = 600.0 / 2.0;
-    fov = 45.0f;
+    viewer_.firstMouse = true;
+    viewer_.yaw = -90.0f; // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+    viewer_.pitch = 0.0f;
+    viewer_.lastX = 800.0f / 2.0;
+    viewer_.lastY = 600.0 / 2.0;
+    viewer_.fov = 45.0f;
 
     // timing
     deltaTime = 0.0f; // time between current frame and last frame
@@ -66,7 +67,7 @@ int Viewer::Initialize()
 
     // glfw window creation
     // --------------------
-    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    window = glfwCreateWindow(viewer_.SCR_WIDTH, viewer_.SCR_HEIGHT, "Drone", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -126,38 +127,27 @@ void Viewer::Main_Loop()
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        // input
-        // -----
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
+        
 
-        // float cameraSpeed = 2.5 * deltaTime;
-        // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        //     cameraPos += cameraSpeed * cameraFront;
-        // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        //     cameraPos -= cameraSpeed * cameraFront;
-        // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        //     cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-        // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        //     cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-        //cameraPos += glm::vec3(0.0f,0.001f,0.0f);
+        processInput(window);
+
         // render
         // ------
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(viewer_.fov), (float)viewer_.SCR_WIDTH / (float)viewer_.SCR_HEIGHT, 0.1f, 100.0f);
         shader.setMat4("projection", projection);
 
         //local_camera_pos = glm::vec3(0.0f,-3.0f+0.3f*cos(t_copy/2000.0f),- t * 0.0001f+0.3f*sin(t_copy/2000.0f));
 
-        local_camera_pos = glm::vec3(0.0f + 2.0f * sin(t_copy/1000.0f)  , -3.0f*cos(t_copy/1000.0f),  0.5 * 5*sin(t_copy * 0.0005f)/guiWrapper.main_object->cube->edge_max );
+        viewer_.local_camera_pos = glm::vec3(0.0f + 2.0f * sin(t_copy/1000.0f)  , -3.0f*cos(t_copy/1000.0f),  0.5 * 5*sin(t_copy * 0.0005f)/guiWrapper.main_object->cube->edge_max );
         //std::cout<<"AAAAA:"<<sin(30)<<std::endl;
         glm::vec3 center = glm::vec3(0.0f, 0.0f, -5*sin(t_copy*0.0005f)/guiWrapper.main_object->cube->edge_max);
 
-        glm::vec3 front = center - local_camera_pos;
-        local_camera_front = glm::normalize(front);
+        glm::vec3 front = center - viewer_.local_camera_pos;
+        viewer_.local_camera_front = glm::normalize(front);
         // camera/view transformation
-        glm::mat4 local_view = glm::lookAt(local_camera_pos, local_camera_pos + local_camera_front, local_camera_up);
+        glm::mat4 local_view = glm::lookAt(viewer_.local_camera_pos, viewer_.local_camera_pos + viewer_.local_camera_front, viewer_.local_camera_up);
         shader.setMat4("view", local_view);
         // glBindVertexArray(VAO);
         glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
@@ -171,13 +161,13 @@ void Viewer::Main_Loop()
         model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
         shader.setMat4("model", model);
 
-        glViewport(0,0,0.5*SCR_WIDTH,SCR_HEIGHT);
+        glViewport(0,0,0.5*viewer_.SCR_WIDTH,viewer_.SCR_HEIGHT);
         glDrawElements(GL_TRIANGLES, 3 * guiWrapper.main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
 
 
-        glm::mat4 global_view = glm::lookAt(global_camera_pos, global_camera_pos + global_camera_front, global_camera_up);
+        glm::mat4 global_view = glm::lookAt(viewer_.global_camera_pos, viewer_.global_camera_pos + viewer_.global_camera_front, viewer_.global_camera_up);
         shader.setMat4("view", global_view);
-        glViewport(0.5*SCR_WIDTH,0,0.5*SCR_WIDTH,SCR_HEIGHT);
+        glViewport(0.5*viewer_.SCR_WIDTH,0,0.5*viewer_.SCR_WIDTH,viewer_.SCR_HEIGHT);
         glDrawElements(GL_TRIANGLES, 3 * guiWrapper.main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind iverticest every time
 
@@ -187,9 +177,9 @@ void Viewer::Main_Loop()
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
-        LinearUpdateTest(t_copy);
+        UpdateTest(t_copy);
 
-        
+                std::cout<<GLFW_KEY_W<<std::endl;
         if ((t_copy/6280)%2 == 0) {
             t += 1;
         }
@@ -201,8 +191,26 @@ void Viewer::Main_Loop()
     }
 }
 
-void Viewer::KeyboardCallback(const int key, const int action)
+void Viewer::UpdateTest(int t)
 {
+    guiWrapper.UpdateTest(t);
+}
+
+void Viewer::KeyboardCallback(const int key)
+{
+   if(key == GLFW_KEY_ESCAPE)
+    glfwSetWindowShouldClose(window, true);
+
+    float cameraSpeed = 2.5 * 0.0001f;
+    if(key == GLFW_KEY_W)
+        global_camera_pos += cameraSpeed * global_camera_front;
+    if(key == GLFW_KEY_W)
+        global_camera_pos -= cameraSpeed * global_camera_front;
+    if(key == GLFW_KEY_A)
+        global_camera_pos -= glm::normalize(glm::cross(global_camera_front, global_camera_up)) * cameraSpeed;
+    if(key == GLFW_KEY_D)
+        global_camera_pos += glm::normalize(glm::cross(global_camera_front, global_camera_up)) * cameraSpeed;
+
 }
 void Viewer::MouseWheelScrollCallback(const float y_offset)
 {
@@ -218,32 +226,43 @@ void Viewer::MouseWheelScrollCallback(const float y_offset)
 void Viewer::SizeCallback(const int width, const int height)
 {
     SCR_WIDTH = width;
-    SCR_HEIGHT = height;
-    std::cout<<SCR_WIDTH<<"*"<<SCR_HEIGHT<<std::endl;
+    SCR_HEIGHT = height;   
 }
 
 
-  void Viewer::LinearUpdateTest(int t)
-  {
-      guiWrapper.LinearUpdateTest(t);
-  }
+
 
 
 
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
     Viewer::GetViewer().SizeCallback(width,height);
 }
 void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
+    //Viewer::GetViewer().
 }
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     Viewer::GetViewer().MouseWheelScrollCallback(static_cast<float>(yoffset));
 }
-// void processInput(GLFWwindow *window)
-// {
-// }
+void processInput(GLFWwindow *window)
+{
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    Viewer::GetViewer().KeyboardCallback(GLFW_KEY_W);
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    Viewer::GetViewer().KeyboardCallback(GLFW_KEY_S);
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    Viewer::GetViewer().KeyboardCallback(GLFW_KEY_A);
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    Viewer::GetViewer().KeyboardCallback(GLFW_KEY_D);
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    Viewer::GetViewer().KeyboardCallback(GLFW_KEY_ESCAPE);
+}
+
+
+
+
+
+

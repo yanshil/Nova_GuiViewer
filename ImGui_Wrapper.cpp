@@ -471,7 +471,7 @@ void ImGui_Wrapper::NewBuffer()
 }
 
 
-void ImGui_Wrapper::LinearUpdateTest(int t)
+void ImGui_Wrapper::UpdateTest(int t)
 {
     int vertex_size = main_object->trimesh->vertex_list.size();
     int triangle_size = main_object->trimesh->triangle_list.size();

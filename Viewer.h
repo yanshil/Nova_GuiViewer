@@ -25,8 +25,8 @@ private:
   // Static data member.
   static Viewer viewer_;
 
-  unsigned int SCR_WIDTH;
-  unsigned int SCR_HEIGHT;
+  unsigned int SCR_WIDTH = 600;
+  unsigned int SCR_HEIGHT = 800;
 
   // Orbit Control (Only works for Object view?)
   glm::vec3 local_camera_pos;
@@ -62,10 +62,10 @@ public:
   void Terminate();
   void MouseWheelScrollCallback(const float y_offset);
   void MouseDragCallback(const float x_pos, const float y_pos);
-  void KeyboardCallback(const int key, const int action);
+  void KeyboardCallback(const int key);
   void SizeCallback(const int width, const int height);
 
-  void LinearUpdateTest(int t);
+  void UpdateTest(int t);
 
 
 }; // namespace opengl_gui_viewer

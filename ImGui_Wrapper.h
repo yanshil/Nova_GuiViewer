@@ -38,7 +38,7 @@ public:
 
   // ImGui Orbit Control
   void MouseWheelScrollCallback(float yoffset);
-  void LinearUpdateTest(int t);
+  void UpdateTest(int t);
 private:
   // Mouse states.
   bool _mouse_pressed_[3];
