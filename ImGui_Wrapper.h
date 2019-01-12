@@ -27,6 +27,8 @@ public:
 
   GLuint VBO, VAO, EBO;
 
+  // ============ Considering Manage Render Object in another file ========
+
   void UIFrame();
   void DisplayUI();
 
@@ -36,14 +38,19 @@ public:
   // Listen for every frame
   void ApplyDisplayOption();
 
-  // ImGui Orbit Control
+  // ============ Considering Manage Render Object in another file ========
+
+  // ImGui IO
   void MouseWheelScrollCallback(float yoffset);
+  void MouseButtonCallback(const int button, const int action);
+  void KeyboardCallback(const int key, const int action);
 
 private:
   // Mouse states.
   bool _mouse_pressed_[3];
   float _mouse_wheel_;
 
+  // ============ Considering Manage Render Object in another file ========
   // Cube Paras
   double tmpParas_cube[3];
 
@@ -52,6 +59,7 @@ private:
   void DisplayOptionModule();
   void DisplayGenerateModule();
   void DisplayAnimation();
+  // ============ Considering Manage Render Object in another file ========
 };
 
 } // namespace opengl_gui_viewer

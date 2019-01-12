@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.1)
+set(ENABLE_GUIVIEWER_ORIGIN OFF CACHE BOOL "Enable Gui 0")
 
+if(ENABLE_GUIVIEWER_ORIGIN)
 project(gui_viewer CXX)
 set(CMAKE_CXX_STANDARD 11)
 
@@ -52,3 +53,5 @@ target_link_libraries(${PROJECT_NAME}
     GLEW
     ${OPENGL_LIBRARIES}    
     )
+
+endif()

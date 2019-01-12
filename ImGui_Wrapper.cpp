@@ -22,7 +22,7 @@ namespace opengl_gui_viewer
  */
 ImGui_Wrapper::ImGui_Wrapper()
     : _window(NULL), main_object(NULL),
-    _mouse_wheel_(0.0f), _mouse_pressed_{false, false, false}
+      _mouse_wheel_(0.0f), _mouse_pressed_{false, false, false}
 {
 }
 
@@ -65,6 +65,27 @@ ImGui_Wrapper::~ImGui_Wrapper()
 void ImGui_Wrapper::MouseWheelScrollCallback(float yoffset)
 {
     _mouse_wheel_ += yoffset;
+}
+
+void ImGui_Wrapper::MouseButtonCallback(const int button, const int action)
+{
+    if (action == GLFW_PRESS && button >= 0 && button < 3)
+        _mouse_pressed_[button] = true;
+}
+
+void ImGui_Wrapper::KeyboardCallback(const int key, const int action)
+{
+    ImGuiIO &io = ImGui::GetIO();
+
+    if (action == GLFW_PRESS)
+        io.KeysDown[key] = true;
+    if (action == GLFW_RELEASE)
+        io.KeysDown[key] = false;
+
+    io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+    io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+    io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+    io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 }
 
 void ImGui_Wrapper::Render()
@@ -375,7 +396,6 @@ void ImGui_Wrapper::DisplayGenerateModule()
             main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
 
             NewBuffer();
-
         }
     }
 

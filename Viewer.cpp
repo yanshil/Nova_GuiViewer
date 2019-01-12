@@ -3,30 +3,20 @@
 using namespace opengl_gui_viewer;
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void mouse_callback(GLFWwindow *window, int button, int action,
+                    int mods);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
-// void processInput(GLFWwindow *window);
+void keyboard_callback(GLFWwindow* window, int key, int scancode, int action,
+  int mods);
 
 Viewer Viewer::viewer_ = Viewer();
 
 Viewer::Viewer()
     : window(NULL), SCR_WIDTH(800), SCR_HEIGHT(600)
 {
-    // Orbit Control (Only works for Object view?)
-    cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-    firstMouse = true;
-    yaw = -90.0f; // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-    pitch = 0.0f;
-    lastX = 800.0f / 2.0;
-    lastY = 600.0 / 2.0;
-    fov = 45.0f;
-
-    // timing
-    deltaTime = 0.0f; // time between current frame and last frame
-    lastFrame = 0.0f;
+    // // timing
+    // deltaTime = 0.0f; // time between current frame and last frame
+    // lastFrame = 0.0f;
 }
 
 Viewer::~Viewer()
@@ -73,6 +63,8 @@ int Viewer::Initialize()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     //glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetMouseButtonCallback(window, mouse_callback);
+    glfwSetKeyCallback(window, keyboard_callback);
 
     // glew: load all OpenGL function pointers
     // ---------------------------------------
@@ -83,15 +75,6 @@ int Viewer::Initialize()
         return -1;
     }
 
-    // ====== Shader =======
-    // glew: load all OpenGL function pointers
-    // ---------------------------------------
-    glewExperimental = GL_TRUE; // Dude...
-    if (glewInit() != GLEW_OK)
-    {
-        std::cout << "Failed to initialize GLEW!" << std::endl;
-        return -1;
-    }
     glEnable(GL_DEPTH_TEST);
 
     // Shader
@@ -117,48 +100,32 @@ void Viewer::Main_Loop()
 
         //###################################################
 
-        // per-frame time logic
-        // --------------------
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-        // input
-        // -----
+        float camVel = cam.GetCameraSpeed();
+
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-        float cameraSpeed = 2.5 * deltaTime;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            cameraPos += cameraSpeed * cameraFront;
+            cam.Position += camVel * cam.Front;
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            cameraPos -= cameraSpeed * cameraFront;
+            cam.Position -= camVel * cam.Front;
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            cam.Position -= glm::normalize(glm::cross(cam.Front, cam.Up)) * camVel;
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            cam.Position += glm::normalize(glm::cross(cam.Front, cam.Up)) * camVel;
 
         // render
         // ------
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 projection = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        shader.setMat4("projection", projection);
 
-        // camera/view transformation
-        glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        shader.setMat4("view", view);
-        // glBindVertexArray(VAO);
-        glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        cam.Update();
 
-        // TODO Cube Positions Pass
-        glm::vec3 cubePositions[] = {
-            glm::vec3(0.0f, 0.0f, 1.0f)};
-
-        model = glm::translate(model, cubePositions[0]);
-        float angle = 20.0f * 0;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-        shader.setMat4("model", model);
+        shader.setMat4("projection", cam.GetProjectionMatrix());
+        shader.setMat4("view", cam.GetViewMatrix());
+        cam.test_modification();
+        shader.setMat4("model", cam.GetModelMatrix());
 
         glDrawElements(GL_TRIANGLES, 3 * guiWrapper.main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind iverticest every time
@@ -174,9 +141,15 @@ void Viewer::Main_Loop()
 
 void Viewer::KeyboardCallback(const int key, const int action)
 {
+    guiWrapper.KeyboardCallback(key, action);
 }
 void Viewer::MouseWheelScrollCallback(const float y_offset)
 {
+    guiWrapper.MouseWheelScrollCallback(y_offset);
+}
+void Viewer::MouseButtonCallback(const int button, const int action)
+{
+    guiWrapper.MouseButtonCallback(button, action);
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -185,12 +158,20 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
-void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+void mouse_callback(GLFWwindow *window, int button, int action,
+                    int mods)
 {
+    Viewer::GetViewer().MouseButtonCallback(button, action);
 }
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     Viewer::GetViewer().MouseWheelScrollCallback(static_cast<float>(yoffset));
+}
+
+void keyboard_callback(GLFWwindow* window, int key, int scancode, int action,
+  int mods)
+{
+    Viewer::GetViewer().KeyboardCallback(key, action);
 }
 // void processInput(GLFWwindow *window)
 // {
