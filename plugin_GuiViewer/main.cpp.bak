@@ -1,4 +1,4 @@
-#include "Viewer.h"
+#include "../Viewer.h"
 
 using namespace opengl_gui_viewer;
 
