@@ -159,7 +159,7 @@ void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int act
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-     float camVel = world->viewer->GetCamera()->GetCameraSpeed();
+    float camVel = world->viewer->guiWrapper.GetIOFramerate() / 50000.0;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         world->viewer->GetCamera()->Position += camVel * world->viewer->GetCamera()->Front;
@@ -174,13 +174,16 @@ void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int act
 void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, int mods)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
-    
-    // Port to Camera.h?
 
+    // Port to Camera.h?
+    glm::vec2 mouse_position = world->viewer->guiWrapper.GetMousePosition();
+    world->viewer->GetCamera()->Set_Pos(button, action, mouse_position.x, mouse_position.y);
 }
 
 void World::Mouse_Position_Callback(GLFWwindow *window, double x, double y)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
-
+    
+    glm::vec2 mouse_position = world->viewer->guiWrapper.GetMousePosition();
+    world->viewer->GetCamera()->Move_2D(mouse_position.x, mouse_position.y);
 }

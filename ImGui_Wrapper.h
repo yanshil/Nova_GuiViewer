@@ -10,6 +10,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+
 namespace opengl_gui_viewer
 {
 
@@ -44,6 +46,10 @@ public:
   void MouseWheelScrollCallback(float yoffset);
   void MouseButtonCallback(const int button, const int action);
   void KeyboardCallback(const int key, const int action);
+  float GetIOFramerate();
+  glm::vec2 GetMouseDelta();
+  glm::vec2 GetMousePosition();
+
 
 private:
   // Mouse states.

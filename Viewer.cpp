@@ -16,6 +16,7 @@ int Viewer::Initialize()
 {
     // Shader
     shader.initializeFromFile("camera.vs", "camera.fs");
+
     guiWrapper.Initialize(window);
     guiWrapper.test_GenObject();
     guiWrapper.InitBuffer();

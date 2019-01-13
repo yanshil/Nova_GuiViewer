@@ -16,11 +16,13 @@
 namespace opengl_gui_viewer
 {
 
+// class Viewer;
+
 class Camera
 {
   public:
     Camera(const int size_x, const int size_y)
-        : Position(glm::vec3(0.0f, 0.0f, 3.0f)),
+        :Position(glm::vec3(0.0f, 0.0f, 3.0f)),
           Front(glm::vec3(0.0f, 0.0f, -1.0f)),
           Up(glm::vec3(0.0f, 1.0f, 0.0f)),
           WorldUp(glm::vec3(0.0f, 0.0f, 1.0f)),
@@ -33,6 +35,9 @@ class Camera
     ~Camera()
     {
     }
+
+    // Parent Viewer
+    // Viewer *viewer;
 
     glm::vec3 Position, Front, Up, Right;
     glm::vec3 Position_Delta, Mouse_Position;
@@ -148,8 +153,12 @@ class Camera
         // change the pitch and heading
         if (Move_Camera)
         {
+            std::cout << Mouse_Delta.x << "???" << Mouse_Delta.y << std::endl;
             Change_Heading(.08f * Mouse_Delta.x);
             Change_Pitch(.08f * Mouse_Delta.y);
+
+            Position += Position_Delta;
+            Update();
         }
         Mouse_Position = glm::vec3(x, y, 0);
     }

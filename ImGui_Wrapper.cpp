@@ -491,4 +491,30 @@ void ImGui_Wrapper::NewBuffer()
     ApplyDisplayOption();
 }
 
+float ImGui_Wrapper::GetIOFramerate()
+{
+    return ImGui::GetIO().Framerate;
+}
+
+glm::vec2 ImGui_Wrapper::GetMouseDelta()
+{
+    ImVec2 mouse_delta = ImGui::GetIO().MouseDelta;
+    return glm::vec2(mouse_delta.x, mouse_delta.y);
+}
+
+glm::vec2 ImGui_Wrapper::GetMousePosition()
+{
+    ImVec2 mouse_position = ImGui::GetIO().MousePos;
+    return glm::vec2(mouse_position.x, mouse_position.y);
+}
+
+
+
+
+
+
+
+
+
+
 } // namespace opengl_gui_viewer
