@@ -21,6 +21,7 @@ add_executable(${PROJECT_NAME}
     ImGui_Wrapper.cpp
     Sim_Object.cpp
     Viewer.cpp
+    World.cpp
     )
 
 target_link_libraries(${PROJECT_NAME}

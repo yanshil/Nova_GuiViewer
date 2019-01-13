@@ -1,13 +1,12 @@
-#include "Viewer.h"
+#include "World.h"
 
 using namespace opengl_gui_viewer;
 
 int main(int argc, char const *argv[])
 {
-    Viewer viewer;
-    viewer.Initialize();
-    viewer.Main_Loop();
-    viewer.Terminate();
+    World world(800, 600);
+    world.Initialize();
+    world.Main_Loop();
 
     return 0;
 }
