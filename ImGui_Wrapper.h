@@ -10,6 +10,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+
 namespace opengl_gui_viewer
 {
 
@@ -27,6 +29,8 @@ public:
 
   GLuint VBO, VAO, EBO;
 
+  // ============ Considering Manage Render Object in another file ========
+
   void UIFrame();
   void DisplayUI();
 
@@ -36,14 +40,23 @@ public:
   // Listen for every frame
   void ApplyDisplayOption();
 
-  // ImGui Orbit Control
+  // ============ Considering Manage Render Object in another file ========
+
+  // ImGui IO
   void MouseWheelScrollCallback(float yoffset);
+  void MouseButtonCallback(const int button, const int action);
+  void KeyboardCallback(const int key, const int action);
+  float GetIOFramerate();
+  glm::vec2 GetMouseDelta();
+  glm::vec2 GetMousePosition();
   void UpdateTest(int t);
+
 private:
   // Mouse states.
   bool _mouse_pressed_[3];
   float _mouse_wheel_;
 
+  // ============ Considering Manage Render Object in another file ========
   // Cube Paras
   double tmpParas_cube[3];
 
@@ -52,8 +65,7 @@ private:
   void DisplayOptionModule();
   void DisplayGenerateModule();
   void DisplayAnimation();
-  
-
+  // ============ Considering Manage Render Object in another file ========
 };
 
 } // namespace opengl_gui_viewer

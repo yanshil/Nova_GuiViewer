@@ -22,7 +22,7 @@ namespace opengl_gui_viewer
  */
 ImGui_Wrapper::ImGui_Wrapper()
     : _window(NULL), main_object(NULL),
-    _mouse_wheel_(0.0f), _mouse_pressed_{false, false, false}
+      _mouse_wheel_(0.0f), _mouse_pressed_{false, false, false}
 {
 }
 
@@ -65,6 +65,27 @@ ImGui_Wrapper::~ImGui_Wrapper()
 void ImGui_Wrapper::MouseWheelScrollCallback(float yoffset)
 {
     _mouse_wheel_ += yoffset;
+}
+
+void ImGui_Wrapper::MouseButtonCallback(const int button, const int action)
+{
+    if (action == GLFW_PRESS && button >= 0 && button < 3)
+        _mouse_pressed_[button] = true;
+}
+
+void ImGui_Wrapper::KeyboardCallback(const int key, const int action)
+{
+    ImGuiIO &io = ImGui::GetIO();
+
+    if (action == GLFW_PRESS)
+        io.KeysDown[key] = true;
+    if (action == GLFW_RELEASE)
+        io.KeysDown[key] = false;
+
+    io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+    io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+    io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+    io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 }
 
 void ImGui_Wrapper::Render()
@@ -112,7 +133,7 @@ void ImGui_Wrapper::DisplayCubeModule()
     // ======================================================
     ImGui::Text("Enter cube size below (depth, width, height)"); // Display some text (you can use a format strings too)
 
-    static double tmp_d = 5.0, tmp_w = 5.0, tmp_h = 0.1;
+    static double tmp_d = 5.0, tmp_w = 5.0, tmp_h = 5.0;
     ImGui::InputDouble("Depth", &tmp_d, 0.01f, 0.2f, "%.4f");
     ImGui::InputDouble("Width", &tmp_w, 0.01f, 0.2f, "%.4f");
     ImGui::InputDouble("Height", &tmp_h, 0.01f, 0.2f, "%.4f");
@@ -334,6 +355,7 @@ void ImGui_Wrapper::DisplayHoleModule()
 void ImGui_Wrapper::DisplayOptionModule()
 {
     ImGui::Checkbox("Wireframe", &main_object->option_wireframe);
+    ImGui::Checkbox("Show Path", &main_object->option_path);
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
@@ -345,6 +367,8 @@ void ImGui_Wrapper::ApplyDisplayOption()
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    
 }
 
 void ImGui_Wrapper::DisplayGenerateModule()
@@ -375,7 +399,6 @@ void ImGui_Wrapper::DisplayGenerateModule()
             main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
 
             NewBuffer();
-
         }
     }
 
@@ -398,6 +421,7 @@ void ImGui_Wrapper::DisplayGenerateModule()
 void ImGui_Wrapper::DisplayAnimation()
 {
     ImGui::Checkbox("Wireframe", &(main_object->option_wireframe));
+    ImGui::Checkbox("Show Path",&(main_object->option_path));
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
@@ -405,7 +429,7 @@ void ImGui_Wrapper::DisplayAnimation()
 void ImGui_Wrapper::test_GenObject()
 {
     main_object = new Sim_Object();
-    main_object->cube = new Cuboid(5, 5, 0.1);
+    main_object->cube = new Cuboid(5, 5, 5);
     main_object->holes = new HoleList();
     main_object->trimesh = new TriMesh();
     main_object->holes->AddHole(Hole(2, 1, 0.5));
@@ -439,9 +463,9 @@ void ImGui_Wrapper::NewBuffer()
 
     for (int i = 0; i < vertex_size; i++)
     {
-        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max - main_object->cube->depth/main_object->cube->edge_max;
-        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max - main_object->cube->width/main_object->cube->edge_max;
-        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - main_object->cube->height/main_object->cube->edge_max;
+        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max - 0.5* main_object->cube->depth/main_object->cube->edge_max;
+        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max - 0.5* main_object->cube->width/main_object->cube->edge_max;
+        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - 0.5* main_object->cube->height/main_object->cube->edge_max;
     }
 
     unsigned int indices[3 * triangle_size];
@@ -470,6 +494,27 @@ void ImGui_Wrapper::NewBuffer()
     ApplyDisplayOption();
 }
 
+float ImGui_Wrapper::GetIOFramerate()
+{
+    return ImGui::GetIO().Framerate;
+}
+
+glm::vec2 ImGui_Wrapper::GetMouseDelta()
+{
+    ImVec2 mouse_delta = ImGui::GetIO().MouseDelta;
+    return glm::vec2(mouse_delta.x, mouse_delta.y);
+}
+
+glm::vec2 ImGui_Wrapper::GetMousePosition()
+{
+    ImVec2 mouse_position = ImGui::GetIO().MousePos;
+    return glm::vec2(mouse_position.x, mouse_position.y);
+}
+
+
+
+
+
 
 void ImGui_Wrapper::UpdateTest(int t)
 {
@@ -479,9 +524,9 @@ void ImGui_Wrapper::UpdateTest(int t)
 
     for (int i = 0; i < vertex_size; i++)
     {
-        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max - main_object->cube->depth/main_object->cube->edge_max;
-        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max - main_object->cube->width/main_object->cube->edge_max;
-        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - main_object->cube->height/main_object->cube->edge_max- 5*sin(t * 0.0005)/main_object->cube->edge_max;
+        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max - 0.5* main_object->cube->depth/main_object->cube->edge_max;
+        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max - 0.5* main_object->cube->width/main_object->cube->edge_max;
+        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - 0.5* main_object->cube->height/main_object->cube->edge_max- 5*sin(t * 0.0005)/main_object->cube->edge_max;
     }
 
     unsigned int indices[3 * triangle_size];
@@ -509,6 +554,8 @@ void ImGui_Wrapper::UpdateTest(int t)
     // =======================================
     ApplyDisplayOption();             
 }
+
+
 
 
 } // namespace opengl_gui_viewer

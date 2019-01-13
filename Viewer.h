@@ -1,3 +1,7 @@
+// @yanshi
+//#####################################################################
+// Class OGL_Viewer
+//######################################################################
 #ifndef OGL_VIEWER_
 #define OGL_VIEWER_
 
@@ -5,12 +9,13 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <math.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "ImGui_Wrapper.h"
+#include "Camera.h"
 
 namespace opengl_gui_viewer
 {
@@ -20,54 +25,32 @@ class Viewer
 private:
   // Window
   GLFWwindow *window;
-  Shader shader;
-
-  // Static data member.
-  static Viewer viewer_;
-
-  unsigned int SCR_WIDTH = 600;
-  unsigned int SCR_HEIGHT = 800;
-
-  // Orbit Control (Only works for Object view?)
-  glm::vec3 local_camera_pos;
-  glm::vec3 local_camera_front;
-  glm::vec3 local_camera_up;
-
-  glm::vec3 global_camera_pos;
-  glm::vec3 global_camera_front;
-  glm::vec3 global_camera_up;
-
-  bool firstMouse;
-  float yaw;
-  float pitch;
-  float lastX;
-  float lastY;
-  float fov;
-
-  // timing
-  float deltaTime;
-  float lastFrame;
+  Camera* global_camera;
+  Camera* local_camera;
+  bool    draw_path;
+  int view_width;
+  int view_height;
   int t = 0;
-  int t_copy = 0;
+
 public:
-  Viewer();
+  // Viewer();
+  Viewer(GLFWwindow *window, const int size_x, const int size_y);
   ~Viewer();
 
-  static Viewer &GetViewer();
-
   ImGui_Wrapper guiWrapper;
+  Shader shader;
+
+  Shader &GetShader();
+  Camera* GetGlobalCamera();
+  Camera* GetLocalCamera();
 
   int Initialize();
-  void Main_Loop();
-  void Terminate();
-  void MouseWheelScrollCallback(const float y_offset);
-  void MouseDragCallback(const float x_pos, const float y_pos);
-  void KeyboardCallback(const int key);
-  void SizeCallback(const int width, const int height);
 
+  void Update();
+  void Resize(const int w, const int h);
+  void DrawFrame();
+  void DrawPath();
   void UpdateTest(int t);
-
-
 }; // namespace opengl_gui_viewer
 
 } // namespace opengl_gui_viewer

@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.1)
+set(ENABLE_GUIVIEWER_ORIGIN OFF CACHE BOOL "Enable Gui 0")
 
+if(ENABLE_GUIVIEWER_ORIGIN)
 project(gui_viewer CXX)
 set(CMAKE_CXX_STANDARD 11)
 
@@ -20,6 +21,7 @@ add_executable(${PROJECT_NAME}
     ImGui_Wrapper.cpp
     Sim_Object.cpp
     Viewer.cpp
+    World.cpp
     )
 
 target_link_libraries(${PROJECT_NAME}
@@ -52,3 +54,5 @@ target_link_libraries(${PROJECT_NAME}
     GLEW
     ${OPENGL_LIBRARIES}    
     )
+
+endif()
