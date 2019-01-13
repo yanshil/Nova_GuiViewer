@@ -22,7 +22,7 @@ class Camera
 {
   public:
     Camera(const int size_x, const int size_y)
-        :Position(glm::vec3(0.0f, 0.0f, 3.0f)),
+        : Position(glm::vec3(0.0f, 0.0f, 3.0f)),
           Front(glm::vec3(0.0f, 0.0f, -1.0f)),
           Up(glm::vec3(0.0f, 1.0f, 0.0f)),
           WorldUp(glm::vec3(0.0f, 0.0f, 1.0f)),
@@ -153,11 +153,20 @@ class Camera
         // change the pitch and heading
         if (Move_Camera)
         {
-            std::cout << Mouse_Delta.x << "???" << Mouse_Delta.y << std::endl;
-            Change_Heading(.08f * Mouse_Delta.x);
-            Change_Pitch(.08f * Mouse_Delta.y);
+            std::cout << Mouse_Delta.x << "\t" << Mouse_Delta.y << std::endl;
 
-            Position += Position_Delta;
+            // Change_Heading(.08f * Mouse_Delta.x);
+            // Change_Pitch(Mouse_Delta.y);
+
+            Yaw += .08f * Mouse_Delta.x;
+            Pitch += .08f * Mouse_Delta.y;
+
+            glm::vec3 front;
+            front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+            front.y = sin(glm::radians(Pitch));
+            front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+            Front = glm::normalize(front);
+
             Update();
         }
         Mouse_Position = glm::vec3(x, y, 0);

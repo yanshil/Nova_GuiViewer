@@ -175,7 +175,7 @@ void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, in
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    // Port to Camera.h?
+    // Port to Camera.h -> ImGui.IO
     glm::vec2 mouse_position = world->viewer->guiWrapper.GetMousePosition();
     world->viewer->GetCamera()->Set_Pos(button, action, mouse_position.x, mouse_position.y);
 }
@@ -183,7 +183,7 @@ void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, in
 void World::Mouse_Position_Callback(GLFWwindow *window, double x, double y)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
-    
+
     glm::vec2 mouse_position = world->viewer->guiWrapper.GetMousePosition();
     world->viewer->GetCamera()->Move_2D(mouse_position.x, mouse_position.y);
 }
