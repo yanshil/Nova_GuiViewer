@@ -463,9 +463,9 @@ void ImGui_Wrapper::NewBuffer()
 
     for (int i = 0; i < vertex_size; i++)
     {
-        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max - 0.5* main_object->cube->depth/main_object->cube->edge_max;
-        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max - 0.5* main_object->cube->width/main_object->cube->edge_max;
-        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - 0.5* main_object->cube->height/main_object->cube->edge_max;
+        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max;
+        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max;
+        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max;
     }
 
     unsigned int indices[3 * triangle_size];
@@ -524,9 +524,9 @@ void ImGui_Wrapper::UpdateTest(int t)
 
     for (int i = 0; i < vertex_size; i++)
     {
-        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max - 0.5* main_object->cube->depth/main_object->cube->edge_max;
-        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max - 0.5* main_object->cube->width/main_object->cube->edge_max;
-        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - 0.5* main_object->cube->height/main_object->cube->edge_max- 5*sin(t * 0.0005)/main_object->cube->edge_max;
+        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max;
+        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max;
+        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max-5*sin(t * 0.0005)/main_object->cube->edge_max;
     }
 
     unsigned int indices[3 * triangle_size];

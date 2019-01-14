@@ -93,6 +93,7 @@ class Cuboid
     double width;
     double height;
     double edge_max;
+    void Update();
 };
 
 class Segment
