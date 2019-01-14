@@ -25,12 +25,19 @@ class Viewer
 private:
   // Window
   GLFWwindow *window;
+<<<<<<< HEAD
+  Camera * camera;
+
+  int view_width;
+  int view_height;
+=======
   Camera* global_camera;
   Camera* local_camera;
   bool    draw_path;
   int view_width;
   int view_height;
   int t = 0;
+>>>>>>> Nova
 
 public:
   // Viewer();
@@ -41,16 +48,24 @@ public:
   Shader shader;
 
   Shader &GetShader();
+<<<<<<< HEAD
+  Camera * GetCamera();
+=======
   Camera* GetGlobalCamera();
   Camera* GetLocalCamera();
+>>>>>>> Nova
 
   int Initialize();
 
   void Update();
+<<<<<<< HEAD
+  void DrawFrame();
+=======
   void Resize(const int w, const int h);
   void DrawFrame();
   void DrawPath();
   void UpdateTest(int t);
+>>>>>>> Nova
 }; // namespace opengl_gui_viewer
 
 } // namespace opengl_gui_viewer

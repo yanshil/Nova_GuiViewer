@@ -5,7 +5,7 @@ namespace opengl_gui_viewer
 
 Sim_Object::Sim_Object()
   :cube(nullptr), holes(nullptr), trimesh(nullptr),
-  option_wireframe(true)
+  option_wireframe(true),option_path(false)
 {}
 
 Sim_Object::~Sim_Object()

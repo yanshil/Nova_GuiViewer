@@ -36,6 +36,8 @@ public:
   std::vector<double> geometry_center;
   // ============ Considering Manage Render Object in another file ========
 
+  // ============ Considering Manage Render Object in another file ========
+
   void UIFrame();
   void DisplayUI();
 
@@ -54,7 +56,11 @@ public:
   float GetIOFramerate();
   glm::vec2 GetMouseDelta();
   glm::vec2 GetMousePosition();
+<<<<<<< HEAD
+
+=======
   void UpdateTest(int t);
+>>>>>>> Nova
 
 private:
   // Mouse states.

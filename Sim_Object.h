@@ -23,7 +23,7 @@ public:
   // Display Options
   bool option_wireframe;
   // int option_material;
-
+  bool option_path;
   // Auxiliary Functions
   bool Check_Out_Of_Boundary(Hole &h_, Cuboid &c_);
   bool Check_Validation(Cuboid &tmpc_);

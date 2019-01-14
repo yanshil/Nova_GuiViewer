@@ -192,15 +192,15 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
     
     if (hs_.size() == 0) 
     {
-        vertex_list.Append(Vector<double,3>({0,0,0}));
-        vertex_list.Append(Vector<double,3>({0,cuboid_.width,0}));
-        vertex_list.Append(Vector<double,3>({cuboid_.depth,cuboid_.width,0}));
-        vertex_list.Append(Vector<double,3>({cuboid_.depth,0,0}));
+        vertex_list.Append(Vector<double,3>({-0.5*cuboid_.depth,-0.5*cuboid_.width,-0.5*cuboid_.height}));
+        vertex_list.Append(Vector<double,3>({0.5*cuboid_.depth, -0.5*cuboid_.width,-0.5*cuboid_.height}));
+        vertex_list.Append(Vector<double,3>({0.5*cuboid_.depth,0.5*cuboid_.width,-0.5*cuboid_.height}));
+        vertex_list.Append(Vector<double,3>({-0.5*cuboid_.depth,0.5*cuboid_.width,-0.5*cuboid_.height}));
         
-        vertex_list.Append(Vector<double,3>({0,0,cuboid_.height}));
-        vertex_list.Append(Vector<double,3>({0,cuboid_.width,cuboid_.height}));
-        vertex_list.Append(Vector<double,3>({cuboid_.depth,cuboid_.width,cuboid_.height}));
-        vertex_list.Append(Vector<double,3>({cuboid_.depth,0,cuboid_.height}));
+        vertex_list.Append(Vector<double,3>({-0.5*cuboid_.depth,-0.5*cuboid_.width,0.5*cuboid_.height}));
+        vertex_list.Append(Vector<double,3>({0.5*cuboid_.depth,-0.5*cuboid_.width,0.5*cuboid_.height}));
+        vertex_list.Append(Vector<double,3>({0.5*cuboid_.depth,0.5*cuboid_.width,0.5*cuboid_.height}));
+        vertex_list.Append(Vector<double,3>({-0.5*cuboid_.depth,0.5*cuboid_.width,0.5*cuboid_.height}));
 
         triangle_list.Append(Vector<int,3>({0,1,2}));
         triangle_list.Append(Vector<int,3>({0,2,3}));
@@ -228,10 +228,10 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
         hole_vertices_.clear();
         rect_vertices_.clear();
 
-        rect_vertices_.push_back(Vertex(0,0));
-        rect_vertices_.push_back(Vertex(cuboid_.depth,0));
-        rect_vertices_.push_back(Vertex(cuboid_.depth,cuboid_.width));
-        rect_vertices_.push_back(Vertex(0,cuboid_.width));
+        rect_vertices_.push_back(Vertex(-0.5*cuboid_.depth,-0.5*cuboid_.width));
+        rect_vertices_.push_back(Vertex(0.5*cuboid_.depth,-0.5*cuboid_.width));
+        rect_vertices_.push_back(Vertex(0.5*cuboid_.depth,0.5*cuboid_.width));
+        rect_vertices_.push_back(Vertex(-0.5*cuboid_.depth,0.5*cuboid_.width));
         
 
 
@@ -264,8 +264,8 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
         // add hole vertices
         for (int i = 0; i < hole_vertices_.size(); i++)
         {
-            in.pointlist[2*rect_vertices_.size()+2 * i] = hole_vertices_[i].x;
-            in.pointlist[2*rect_vertices_.size()+2 * i + 1] = hole_vertices_[i].y;
+            in.pointlist[2*rect_vertices_.size()+2 * i] = hole_vertices_[i].x - 0.5*cuboid_.depth;
+            in.pointlist[2*rect_vertices_.size()+2 * i + 1] = hole_vertices_[i].y - 0.5*cuboid_.width;
 
         }
 
@@ -345,12 +345,12 @@ void TriMesh::GenMesh(Cuboid cuboid_, std::vector<Hole> hs_)
         
         for(int i = 0; i < mid.numberofpoints; i++)
         {
-            vertex_list.Append(Vector<double,3>({mid.pointlist[2*i],mid.pointlist[2*i+1],0.0}));
+            vertex_list.Append(Vector<double,3>({mid.pointlist[2*i],mid.pointlist[2*i+1],-0.5*cuboid_.height}));
         }
 
         for(int i = 0; i < mid.numberofpoints; i++)
         {
-            vertex_list.Append(Vector<double,3>({mid.pointlist[2*i],mid.pointlist[2*i+1],cuboid_.height}));
+            vertex_list.Append(Vector<double,3>({mid.pointlist[2*i],mid.pointlist[2*i+1],0.5*cuboid_.height}));
         }
 
         // bottom
