@@ -18,7 +18,7 @@ namespace opengl_gui_viewer
 class ImGui_Wrapper
 {
 public:
-  ImGui_Wrapper();
+  ImGui_Wrapper(Sim_Object * object);
   ~ImGui_Wrapper();
 
   void Initialize(GLFWwindow *window);
@@ -29,8 +29,6 @@ public:
   
   GLuint VBO, VAO, EBO;
   GLuint path_VBO, path_VAO, path_EBO;
-
-
 
   std::vector<std::vector<double>> geometry_centers;
   std::vector<double> geometry_center;

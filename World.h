@@ -1,6 +1,8 @@
 // @yanshi
 //#####################################################################
 // Class OGL_World
+// Refer from  Nova 
+// https://github.com/OrionQuest/Nova_Examples/blob/c1edc9e662d83048700a412025a8ecd142058c5a/opengl/World.h
 //######################################################################
 #ifndef OGL_WORLD_
 #define OGL_WORLD_
@@ -8,8 +10,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-// #include "Camera.h"
 #include "Viewer.h"
+#include "Sim_Object.h" // Something should be in Application Factory
 
 namespace opengl_gui_viewer
 {
@@ -18,12 +20,16 @@ class World
 {
   private:
     GLFWwindow *window;
-    Viewer *viewer;
+    // TODO: Array of viewers
+    Viewer *local_viewer;
+    Viewer *global_viewer;
     int window_width, window_height;
-    glm::vec2 mouse_position = glm::vec2(0,0);
+
+    Sim_Object *object;
+
+    // glm::vec2 mouse_position = glm::vec2(0,0);
     // Initialize
     void Initialize_Viewer();
-    // void Initialize_Camera_Controls();
 
   public:
     World(int size_x, int size_y);

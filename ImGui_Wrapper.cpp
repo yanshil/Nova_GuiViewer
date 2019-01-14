@@ -20,8 +20,8 @@ namespace opengl_gui_viewer
 /**
  * Constructor
  */
-ImGui_Wrapper::ImGui_Wrapper()
-    : _window(NULL), main_object(NULL),
+ImGui_Wrapper::ImGui_Wrapper(Sim_Object * object_input)
+    : _window(NULL), main_object(object_input),
       _mouse_wheel_(0.0f), _mouse_pressed_{false, false, false}
 {
 }
@@ -430,7 +430,7 @@ void ImGui_Wrapper::DisplayAnimation()
 
 void ImGui_Wrapper::test_GenObject()
 {
-    main_object = new Sim_Object();
+    // main_object = new Sim_Object();
     main_object->cube = new Cuboid(5, 5, 5);
     main_object->holes = new HoleList();
     main_object->trimesh = new TriMesh();
