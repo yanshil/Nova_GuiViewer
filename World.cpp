@@ -146,7 +146,16 @@ void World::Close_Callback(GLFWwindow *window)
 void World::Scroll_Callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
-    world->viewer->GetGlobalCamera()->ProcessMouseScroll(yoffset);
+    if(world->mouse_position[0]<world->window_width * 0.5)
+    {
+        world->viewer->GetLocalCamera()->ProcessMouseScroll(yoffset);
+    }
+    
+    else
+    {
+        world->viewer->GetGlobalCamera()->ProcessMouseScroll(yoffset);
+    }
+    
 }
 
 void World::Reshape_Callback(GLFWwindow *window, int w, int h)
@@ -165,25 +174,34 @@ void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int act
 
     float camVel = world->viewer->guiWrapper.GetIOFramerate() / 50000.0;
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        world->viewer->GetLocalCamera()->Position += camVel * world->viewer->GetLocalCamera()->Front;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        world->viewer->GetLocalCamera()->Position -= camVel * world->viewer->GetLocalCamera()->Front;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        world->viewer->GetLocalCamera()->Position -= glm::normalize(glm::cross(world->viewer->GetLocalCamera()->Front, world->viewer->GetLocalCamera()->Up)) * camVel;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        world->viewer->GetLocalCamera()->Position += glm::normalize(glm::cross(world->viewer->GetLocalCamera()->Front, world->viewer->GetLocalCamera()->Up)) * camVel;
+    if(world->mouse_position[0]<world->window_width * 0.5)
+    {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            world->viewer->GetLocalCamera()->Position += camVel * world->viewer->GetLocalCamera()->Front;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            world->viewer->GetLocalCamera()->Position -= camVel * world->viewer->GetLocalCamera()->Front;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            world->viewer->GetLocalCamera()->Position -= glm::normalize(glm::cross(world->viewer->GetLocalCamera()->Front, world->viewer->GetLocalCamera()->Up)) * camVel;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            world->viewer->GetLocalCamera()->Position += glm::normalize(glm::cross(world->viewer->GetLocalCamera()->Front, world->viewer->GetLocalCamera()->Up)) * camVel;
 
+    }
+    
+    else
+    {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            world->viewer->GetGlobalCamera()->Position += camVel * world->viewer->GetGlobalCamera()->Front;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            world->viewer->GetGlobalCamera()->Position -= camVel * world->viewer->GetGlobalCamera()->Front;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            world->viewer->GetGlobalCamera()->Position -= glm::normalize(glm::cross(world->viewer->GetGlobalCamera()->Front, world->viewer->GetGlobalCamera()->Up)) * camVel;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            world->viewer->GetGlobalCamera()->Position += glm::normalize(glm::cross(world->viewer->GetGlobalCamera()->Front, world->viewer->GetGlobalCamera()->Up)) * camVel;
 
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        world->viewer->GetGlobalCamera()->Position += camVel * world->viewer->GetGlobalCamera()->Front;
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        world->viewer->GetGlobalCamera()->Position -= camVel * world->viewer->GetGlobalCamera()->Front;
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        world->viewer->GetGlobalCamera()->Position -= glm::normalize(glm::cross(world->viewer->GetGlobalCamera()->Front, world->viewer->GetGlobalCamera()->Up)) * camVel;
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        world->viewer->GetGlobalCamera()->Position += glm::normalize(glm::cross(world->viewer->GetGlobalCamera()->Front, world->viewer->GetGlobalCamera()->Up)) * camVel;
+    }
+    
 
+    
 
 
 }
@@ -193,14 +211,39 @@ void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, in
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
     // Port to Camera.h -> ImGui.IO
-    glm::vec2 mouse_position = world->viewer->guiWrapper.GetMousePosition();
+    world->mouse_position = world->viewer->guiWrapper.GetMousePosition();
+    //std::cout<<mouse_position[0]<<","<<mouse_position[1]<<std::endl;
     //world->viewer->GetGlobalCamera()->Set_Pos(button, action, mouse_position.x, mouse_position.y);
+    if(world->mouse_position[0]<world->window_width * 0.5)
+    {
+
+    }
+
+    
+    else
+    {
+        
+    }
+    
+
 }
 
 void World::Mouse_Position_Callback(GLFWwindow *window, double x, double y)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    glm::vec2 mouse_position = world->viewer->guiWrapper.GetMousePosition();
+    //world->mouse_position = world->viewer->guiWrapper.GetMousePosition();
+
     //world->viewer->GetGlobalCamera()->Move_2D(mouse_position.x, mouse_position.y);
+
+    if(world->mouse_position[0]<world->window_width * 0.5)
+    {
+
+    }
+
+    
+    else
+    {
+        
+    }
 }

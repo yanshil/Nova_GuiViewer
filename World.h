@@ -20,7 +20,7 @@ class World
     GLFWwindow *window;
     Viewer *viewer;
     int window_width, window_height;
-
+    glm::vec2 mouse_position = glm::vec2(0,0);
     // Initialize
     void Initialize_Viewer();
     // void Initialize_Camera_Controls();
@@ -28,7 +28,7 @@ class World
   public:
     World(int size_x, int size_y);
     ~World();
-
+    
     void Initialize();
     void Main_Loop();
 
