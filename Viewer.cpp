@@ -79,7 +79,7 @@ void Viewer::DrawFrame()
     //glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawElements(GL_TRIANGLES, 3 * guiWrapper.main_object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0); // no need to unbind it every time 
-    if(t> 10000)DrawPath();
+    if(guiWrapper.main_object->option_path)    DrawPath();
     UpdateTest(t);
     guiWrapper.ApplyDisplayOption();
     guiWrapper.Render();
