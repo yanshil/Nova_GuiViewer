@@ -60,6 +60,9 @@ ImGui_Wrapper::~ImGui_Wrapper()
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
+    glDeleteBuffers(1, &path_VAO);
+    glDeleteBuffers(1, &path_VBO);
+    glDeleteBuffers(1, &path_EBO);
 }
 
 void ImGui_Wrapper::MouseWheelScrollCallback(float yoffset)
@@ -446,6 +449,10 @@ void ImGui_Wrapper::InitBuffer()
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
+    glGenVertexArrays(1, &path_VAO);
+    glGenBuffers(1, &path_VBO);
+    glGenBuffers(1, &path_EBO);
+
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
 
@@ -524,11 +531,15 @@ void ImGui_Wrapper::UpdateTest(int t)
 
     for (int i = 0; i < vertex_size; i++)
     {
-        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max;
-        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max;
+        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max + 1*sin(t * 0.00015)/main_object->cube->edge_max;
+        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max + 2*sin(t * 0.00025)/main_object->cube->edge_max;
         vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max-5*sin(t * 0.0005)/main_object->cube->edge_max;
     }
-
+    geometry_center.clear();
+    geometry_center.push_back(1*sin(t * 0.00015)/main_object->cube->edge_max);
+    geometry_center.push_back(2*sin(t * 0.00025)/main_object->cube->edge_max);
+    geometry_center.push_back(-5*sin(t * 0.0005)/main_object->cube->edge_max);
+    geometry_centers.push_back(geometry_center);
     unsigned int indices[3 * triangle_size];
     for (int i = 0; i < triangle_size; i++)
     {

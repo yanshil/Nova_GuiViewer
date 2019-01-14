@@ -99,7 +99,7 @@ class Camera
     }
     void Follow(int t, double max)
     {
-        Position += glm::vec3(0.0f, 0.0f,  -5*0.0005*cos(t * 0.0005)/max);
+        Position += glm::vec3(1.0f*0.00015f*cos(t * 0.00015)/max, 2.0f*0.00025f*cos(t * 0.00025)/max,  -5.0f*0.0005f*cos(t * 0.0005)/max);
     }
     void Update()
     {

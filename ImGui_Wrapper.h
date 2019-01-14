@@ -26,9 +26,14 @@ public:
 
   Sim_Object *main_object;
   GLFWwindow *_window;
-
+  
   GLuint VBO, VAO, EBO;
+  GLuint path_VBO, path_VAO, path_EBO;
 
+
+
+  std::vector<std::vector<double>> geometry_centers;
+  std::vector<double> geometry_center;
   // ============ Considering Manage Render Object in another file ========
 
   void UIFrame();
