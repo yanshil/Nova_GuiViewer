@@ -29,10 +29,10 @@ private:
   ViewportManager *viewports;
   int window_width, window_height;
 
-  Sim_Object *object;
+  Sim_Object object;
 
   // Initialize
-  void Initialize_Viewer();
+  void Initialize_Viewports();
 
 public:
   World(int size_x, int size_y);

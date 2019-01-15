@@ -7,7 +7,7 @@ World::World(int size_x, int size_y)
       viewports(nullptr),
       window_width(size_x), window_height(size_y)
 {
-    object = new Sim_Object();
+    // object = new Sim_Object();
 }
 
 World::~World()
@@ -67,18 +67,11 @@ void World::Initialize()
     glfwGetFramebufferSize(window, &window_width, &window_height);
 
     glfwSetWindowUserPointer(window, this); // Wow This is a Magic!
-
-    //---------------
 }
 
 void World::Main_Loop()
 {
-    viewports = new ViewportManager(window);
-    viewports->InitializeViewports(window_width, window_height);
-    viewports->ViewportSetting(object);
-
-    Initialize_Viewer();
-
+    Initialize_Viewports();
 
     while (!glfwWindowShouldClose(window))
     {
@@ -90,30 +83,6 @@ void World::Main_Loop()
 
         // Update Viewer & Camera
         viewports->Update();
-
-        // TODO: Multiple Viewport Rendering From Nova
-
-        // // For every viewport, update its camera and draw the scene.
-        // for (int v = 0; v < viewport->NumViewports(); v++)
-        // {
-        //     viewport->SetViewport(v);
-        //     viewport->Update();
-
-        //     if (viewport->RenderStyle(ViewportManager::RS_SLICE))
-        //     {
-        //         GLStateEnable enableClip0(GL_CLIP_DISTANCE0);
-        //         GLStateEnable enableClip1(GL_CLIP_DISTANCE1);
-        //         _app.GetScene().Draw();
-        //     }
-        //     else
-        //     {
-        //         GLStateDisable enableClip0(GL_CLIP_DISTANCE0);
-        //         GLStateDisable enableClip1(GL_CLIP_DISTANCE1);
-        //         _app.GetScene().Draw();
-        //     }
-        // }
-
-        //###################################################
 
         // render
         // ------
@@ -128,9 +97,13 @@ void World::Main_Loop()
     }
 }
 
-void World::Initialize_Viewer()
+void World::Initialize_Viewports()
 {
-    // Other Initialization has been implemented in constructor
+    viewports = new ViewportManager(window);
+    viewports->InitializeViewports(window_width, window_height);
+    viewports->ViewportSetting(&object);
+
+    // Set up Imgui in Viewport0
     viewports->GetViewport(0).Initialize_Gui();
 }
 
@@ -169,15 +142,14 @@ void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, in
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    glm::vec2 mouse_position = world->viewports->GetViewport(0).guiWrapper->GetMousePosition();
-    world->viewports->GetViewport(0).GetCamera()->Set_Pos(button, action, mouse_position.x, mouse_position.y);
+    // glm::vec2 mouse_position = world->viewports->GetViewport(0).guiWrapper->GetMousePosition();
+    // world->viewports->GetViewport(0).GetCamera()->Set_Pos(button, action, mouse_position.x, mouse_position.y);
 }
 
 void World::Mouse_Position_Callback(GLFWwindow *window, double x, double y)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    glm::vec2 mouse_position = world->viewports->GetViewport(0).guiWrapper->GetMousePosition();
-    world->viewports->GetViewport(0).GetCamera()->Move_2D(mouse_position.x, mouse_position.y);
-
+    // glm::vec2 mouse_position = world->viewports->GetViewport(0).guiWrapper->GetMousePosition();
+    // world->viewports->GetViewport(0).GetCamera()->Move_2D(mouse_position.x, mouse_position.y);
 }

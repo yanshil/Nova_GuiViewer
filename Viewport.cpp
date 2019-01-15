@@ -6,36 +6,38 @@ Viewport::Viewport(GLFWwindow *window, const int size_x, const int size_y)
     : window(window), ox(0), oy(0), object(nullptr),
       view_width(size_x), view_height(size_y), guiWrapper(nullptr)
 {
-    this->camera = new Camera(view_width, view_height);
 }
 
 Viewport::Viewport(GLFWwindow *window, const int ox, const int oy, const int size_x, const int size_y)
     : window(window), ox(ox), oy(oy), object(nullptr),
       view_width(size_x), view_height(size_y), guiWrapper(nullptr)
 {
-    this->camera = new Camera(view_width, view_height);
 }
 
 Viewport::~Viewport()
 {
 }
 
-void Viewport::SetRenderObject(Sim_Object *object)
+void Viewport::SetWindow(GLFWwindow *window_input)
 {
-    this->object = object;
+    window = window_input;
 }
+
+void Viewport::SetCamera(Camera *camera) { this->camera = camera; }
+void Viewport::SetShader(Shader *shader) { this->shader = shader; }
+void Viewport::SetRenderObject(Sim_Object *object) { this->object = object; }
 
 void Viewport::Initialize()
 {
-    // Shader
-    shader.initializeFromFile("camera.vs", "camera.fs");
-
-    shader.use();
+    SetCamera(new Camera(view_width, view_height));
+    SetShader(new Shader());
+    shader->initializeFromFile("camera.vs", "camera.fs");
+    shader->use();
 }
 
 void Viewport::Initialize_Gui()
 {
-    // object = new Sim_Object();
+
     guiWrapper = new ImGui_Wrapper(object);
     // TODO: If local, initialize guiWrapper
     guiWrapper->Initialize(window);
@@ -43,7 +45,7 @@ void Viewport::Initialize_Gui()
     guiWrapper->InitBuffer();
 }
 
-Shader &Viewport::GetShader()
+Shader *Viewport::GetShader()
 {
     return shader;
 }
@@ -78,24 +80,29 @@ void Viewport::Update()
 void Viewport::DrawFrame()
 {
     // set up camera
-    shader.setMat4("projection", camera->GetProjectionMatrix());
-    shader.setMat4("view", camera->GetViewMatrix());
-    shader.setMat4("model", camera->GetModelMatrix());
+    shader->setMat4("projection", camera->GetProjectionMatrix());
+    shader->setMat4("view", camera->GetViewMatrix());
+    shader->setMat4("model", camera->GetModelMatrix());
     glViewport(ox, oy, view_width, view_height);
 
     glDrawElements(GL_TRIANGLES, 3 * object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
 
     // // set up global camera
-    // shader.setMat4("projection", global_camera->GetProjectionMatrix());
-    // shader.setMat4("view", global_camera->GetViewMatrix());
-    // shader.setMat4("model", global_camera->GetModelMatrix());
+    // shader->setMat4("projection", global_camera->GetProjectionMatrix());
+    // shader->setMat4("view", global_camera->GetViewMatrix());
+    // shader->setMat4("model", global_camera->GetModelMatrix());
     // glViewport(0.5 * view_width, 0, 0.5 * view_width, view_height);
 
     // if (guiWrapper->main_object->option_path)
     //     DrawPath();
-    // UpdateTest(t);
+
     if (guiWrapper)
     {
+        if (guiWrapper->main_object->option_path)
+            DrawPath();
+            
+        UpdateTest(t);
+
         guiWrapper->ApplyDisplayOption();
         guiWrapper->Render();
     }
@@ -250,10 +257,11 @@ void ViewportManager::Scroll_Callback(double yoffset)
 
 void ViewportManager::ViewportSetting(Sim_Object *object)
 {
-    // Local
+    // Set Camera
     viewport_list[0].GetCamera()->SetAsLocal();
     viewport_list[1].GetCamera()->SetAsGlobal();
 
+    // Set Object
     viewport_list[0].SetRenderObject(object);
     viewport_list[1].SetRenderObject(object);
 }
