@@ -6,11 +6,6 @@ Viewport::Viewport(GLFWwindow *window, const int size_x, const int size_y)
     : window(window), ox(0), oy(0), object(nullptr),
       view_width(size_x), view_height(size_y), guiWrapper(nullptr)
 {
-    // this->global_camera = new Camera(view_width * 0.5, view_height);
-    // this->global_camera->SetAsGlobal();
-    // this->local_camera = new Camera(view_width * 0.5, view_height);
-    // this->local_camera->SetAsLocal();
-
     this->camera = new Camera(view_width, view_height);
 }
 

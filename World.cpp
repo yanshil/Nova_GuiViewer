@@ -4,7 +4,6 @@ using namespace opengl_gui_viewer;
 
 World::World(int size_x, int size_y)
     : window(nullptr),
-      //   local_viewer(nullptr), global_viewer(nullptr),
       viewports(nullptr),
       window_width(size_x), window_height(size_y)
 {
@@ -18,10 +17,6 @@ World::~World()
         glfwTerminate();
         window = NULL;
     }
-    // if (local_viewer)
-    //     delete local_viewer;
-    // if (global_viewer)
-    //     delete global_viewer;
     if (viewports)
         delete viewports;
 }
@@ -81,18 +76,9 @@ void World::Main_Loop()
     viewports = new ViewportManager(window);
     viewports->InitializeViewports(window_width, window_height);
     viewports->ViewportSetting(object);
-    // // Setup Viewer
-    // this->local_viewer = new Viewer(window, window_width / 2, window_height);
-    // this->local_viewer->GetCamera()->SetAsLocal();
-
-    // this->global_viewer = new Viewer(window, window_width / 2, 0, window_width / 2, window_height);
-    // this->global_viewer->GetCamera()->SetAsGlobal();
-
-    // local_viewer->SetRenderObject(object);
-    // global_viewer->SetRenderObject(object);
 
     Initialize_Viewer();
-    // Initialize_Camera_Controls();
+
 
     while (!glfwWindowShouldClose(window))
     {
@@ -103,10 +89,6 @@ void World::Main_Loop()
         glEnable(GL_DEPTH_TEST);
 
         // Update Viewer & Camera
-
-        // local_viewer->Update();
-        // global_viewer->Update();
-
         viewports->Update();
 
         // TODO: Multiple Viewport Rendering From Nova
@@ -138,8 +120,6 @@ void World::Main_Loop()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // local_viewer->DrawFrame();
-        // global_viewer->DrawFrame();
         viewports->DrawFrame();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -150,12 +130,8 @@ void World::Main_Loop()
 
 void World::Initialize_Viewer()
 {
-    // local_viewer->Initialize();
-    // global_viewer->Initialize();
-
+    // Other Initialization has been implemented in constructor
     viewports->GetViewport(0).Initialize_Gui();
-
-    // local_viewer->Initialize_Gui();
 }
 
 void World::Close_Callback(GLFWwindow *window)
@@ -188,6 +164,7 @@ void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int act
     world->viewports->Mouse_Button_Callback(key, action, mode);
 }
 
+// TODO: Some bug with Camera->set pos
 void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, int mods)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
