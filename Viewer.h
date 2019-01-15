@@ -54,24 +54,44 @@ public:
   void DrawPath();
   void UpdateTest(int t);
 
-  void Scroll_Callback();
-  void Reshape_Callback();
-  void Keyboard_Callback();
-  void Mouse_Button_Callback();
-  void Mouse_Position_Callback();
+  bool InsideCurrView();
 
 }; // class Viewer
 
+/** Class ViewportManager
+ * 
+ * 
+ */
 class ViewportManager
 {
 private:
-  int numViewport;
-
+  GLFWwindow * window;
 public:
-  /**
-   * Get current Viewport from mouse position 
-   */
-  Viewer GetCurrViewport();
+  enum ViewportConfiguration {SINGLE_VIEWPORT, DUAL_VIEWPORT};
+  ViewportConfiguration _currconfig;
+
+  std::vector<Viewer> viewport_list;
+
+  ViewportManager(GLFWwindow * window);
+  ~ViewportManager();
+
+  void SetWindowGeometry(const int global_x, const int global_y);
+  void InitializeViewports(const int global_x, const int global_y);
+  void ViewportSetting(Sim_Object * object);
+  void Update();
+  void DrawFrame();
+
+  Viewer & GetViewer(int i);
+
+  unsigned int NumViewports();
+
+  // ============ Control ==============
+  Viewer & GetCurrViewport();
+  void Scroll_Callback(double yoffset);
+  // void Reshape_Callback();
+  void Keyboard_Callback();
+  void Mouse_Button_Callback(int key, int action, int mode);
+  void Mouse_Position_Callback();
 };
 
 } // namespace opengl_gui_viewer

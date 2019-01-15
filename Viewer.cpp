@@ -88,9 +88,7 @@ void Viewer::DrawFrame()
     shader.setMat4("model", camera->GetModelMatrix());
     glViewport(ox, oy, view_width, view_height);
 
-    printf("%d, %d, %d, %d\n", ox, oy, ox + view_width, oy + view_height);
     glDrawElements(GL_TRIANGLES, 3 * object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
-    std::cout << 3 * object->trimesh->triangle_list.size() << std::endl;
 
     // // set up global camera
     // shader.setMat4("projection", global_camera->GetProjectionMatrix());
@@ -162,4 +160,136 @@ void Viewer::DrawPath()
     //glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawElements(GL_LINES, 2 * (vertex_size - 1), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0); // no need to unbind it every time
+}
+
+bool Viewer::InsideCurrView()
+{
+    glm::vec2 mouse_pos = guiWrapper->GetMousePosition();
+
+    if (mouse_pos.x < ox)
+        return false;
+    if (mouse_pos.x > ox + view_width)
+        return false;
+    if (mouse_pos.y < oy)
+        return false;
+    if (mouse_pos.y > oy + view_height)
+        return false;
+
+    return true;
+}
+
+/**
+ * TODO:
+ * Current for Duble Viewport
+ */
+ViewportManager::ViewportManager(GLFWwindow *window)
+    : _currconfig(DUAL_VIEWPORT), window(window)
+{
+}
+
+ViewportManager::~ViewportManager()
+{
+    viewport_list.clear();
+}
+
+void ViewportManager::InitializeViewports(const int global_x, const int global_y)
+{
+
+    viewport_list.clear();
+
+    switch (_currconfig)
+    {
+    case SINGLE_VIEWPORT:
+        viewport_list.push_back(Viewer(window, global_x, global_y));
+        break;
+    case DUAL_VIEWPORT:
+        viewport_list.push_back(Viewer(window, 0, 0, global_x / 2, global_y));
+        viewport_list.push_back(Viewer(window, global_x / 2, 0, global_x / 2, global_y));
+        break;
+
+    default:
+        break;
+    }
+
+    for (int i = 0; i < viewport_list.size(); i++)
+    {
+        viewport_list[i].Initialize();
+    }
+}
+
+unsigned int ViewportManager::NumViewports() { return viewport_list.size(); }
+
+void ViewportManager::SetWindowGeometry(const int global_x, const int global_y)
+{
+    switch (_currconfig)
+    {
+    case SINGLE_VIEWPORT:
+        viewport_list[0].Resize(0, 0, global_x, global_y);
+        break;
+
+    case DUAL_VIEWPORT:
+        viewport_list[0].Resize(0, 0, global_x / 2, global_y);
+        viewport_list[1].Resize(global_x / 2, 0, global_x / 2, global_y);
+        break;
+
+    default:
+        break;
+    }
+}
+
+Viewer &ViewportManager::GetCurrViewport()
+{
+    for (int i = 0; i < viewport_list.size(); i++)
+    {
+        if (viewport_list[i].InsideCurrView())
+            return viewport_list[i];
+    }
+
+    return viewport_list[0];
+}
+
+void ViewportManager::Scroll_Callback(double yoffset)
+{
+    GetCurrViewport().GetCamera()->ProcessMouseScroll(yoffset);
+}
+
+void ViewportManager::ViewportSetting(Sim_Object *object)
+{
+    // Local
+    viewport_list[0].GetCamera()->SetAsLocal();
+    viewport_list[1].GetCamera()->SetAsGlobal();
+
+    viewport_list[0].SetRenderObject(object);
+    viewport_list[1].SetRenderObject(object);
+}
+
+void ViewportManager::Update()
+{
+    for (int i = 0; i < viewport_list.size(); i++)
+        viewport_list[i].Update();
+}
+
+void ViewportManager::DrawFrame()
+{
+    for (int i = 0; i < viewport_list.size(); i++)
+        viewport_list[i].DrawFrame();
+}
+
+Viewer &ViewportManager::GetViewer(int i)
+{
+    return viewport_list[i];
+}
+
+void ViewportManager::Mouse_Button_Callback(int key, int action, int mode)
+{
+    float camVel = GetViewer(0).guiWrapper->GetIOFramerate() / 50000.0;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        GetViewer(0).GetCamera()->Position += camVel * GetViewer(0).GetCamera()->Front;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        GetViewer(0).GetCamera()->Position -= camVel * GetViewer(0).GetCamera()->Front;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        GetViewer(0).GetCamera()->Position -= glm::normalize(glm::cross(GetViewer(0).GetCamera()->Front, GetViewer(0).GetCamera()->Up)) * camVel;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        GetViewer(0).GetCamera()->Position += glm::normalize(glm::cross(GetViewer(0).GetCamera()->Front, GetViewer(0).GetCamera()->Up)) * camVel;
 }

@@ -16,18 +16,23 @@
 namespace opengl_gui_viewer
 {
 
+/** Class World
+ * 
+ *  Manage glfwWindowm, viewports and IO control.
+ * 
+ */
 class World
 {
   private:
     GLFWwindow *window;
-    // TODO: Array of viewers
-    Viewer *local_viewer;
-    Viewer *global_viewer;
+    // TODO: Array of viewers / Viewport Manager
+    // Viewer *local_viewer;
+    // Viewer *global_viewer;
+    ViewportManager  * viewports;
     int window_width, window_height;
 
     Sim_Object *object;
 
-    // glm::vec2 mouse_position = glm::vec2(0,0);
     // Initialize
     void Initialize_Viewer();
 

@@ -4,7 +4,8 @@ using namespace opengl_gui_viewer;
 
 World::World(int size_x, int size_y)
     : window(nullptr),
-      local_viewer(nullptr), global_viewer(nullptr),
+      //   local_viewer(nullptr), global_viewer(nullptr),
+      viewports(nullptr),
       window_width(size_x), window_height(size_y)
 {
     object = new Sim_Object();
@@ -17,10 +18,12 @@ World::~World()
         glfwTerminate();
         window = NULL;
     }
-    if (local_viewer)
-        delete local_viewer;
-    if (global_viewer)
-        delete global_viewer;
+    // if (local_viewer)
+    //     delete local_viewer;
+    // if (global_viewer)
+    //     delete global_viewer;
+    if (viewports)
+        delete viewports;
 }
 
 void World::Initialize()
@@ -75,16 +78,18 @@ void World::Initialize()
 
 void World::Main_Loop()
 {
+    viewports = new ViewportManager(window);
+    viewports->InitializeViewports(window_width, window_height);
+    viewports->ViewportSetting(object);
+    // // Setup Viewer
+    // this->local_viewer = new Viewer(window, window_width / 2, window_height);
+    // this->local_viewer->GetCamera()->SetAsLocal();
 
-    // Setup Viewer
-    this->local_viewer = new Viewer(window, window_width / 2, window_height);
-    this->local_viewer->GetCamera()->SetAsLocal();
+    // this->global_viewer = new Viewer(window, window_width / 2, 0, window_width / 2, window_height);
+    // this->global_viewer->GetCamera()->SetAsGlobal();
 
-    this->global_viewer = new Viewer(window, window_width / 2, 0, window_width / 2, window_height);
-    this->global_viewer->GetCamera()->SetAsGlobal();
-
-    local_viewer->SetRenderObject(object);
-    global_viewer->SetRenderObject(object);
+    // local_viewer->SetRenderObject(object);
+    // global_viewer->SetRenderObject(object);
 
     Initialize_Viewer();
     // Initialize_Camera_Controls();
@@ -99,8 +104,10 @@ void World::Main_Loop()
 
         // Update Viewer & Camera
 
-        local_viewer->Update();
-        global_viewer->Update();
+        // local_viewer->Update();
+        // global_viewer->Update();
+
+        viewports->Update();
 
         // TODO: Multiple Viewport Rendering From Nova
 
@@ -131,8 +138,9 @@ void World::Main_Loop()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        local_viewer->DrawFrame();
-        global_viewer->DrawFrame();
+        // local_viewer->DrawFrame();
+        // global_viewer->DrawFrame();
+        viewports->DrawFrame();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -142,10 +150,12 @@ void World::Main_Loop()
 
 void World::Initialize_Viewer()
 {
-    local_viewer->Initialize();    
-    global_viewer->Initialize();
-    
-    local_viewer->Initialize_Gui();
+    // local_viewer->Initialize();
+    // global_viewer->Initialize();
+
+    viewports->GetViewer(0).Initialize_Gui();
+
+    // local_viewer->Initialize_Gui();
 }
 
 void World::Close_Callback(GLFWwindow *window)
@@ -157,18 +167,7 @@ void World::Scroll_Callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    // Get Mouse Position
-    // Port to the correlated viewer
-    
-    // if (world->mouse_position[0] < world->window_width * 0.5)
-    // {
-    //     world->viewer->GetLocalCamera()->ProcessMouseScroll(yoffset);
-    // }
-
-    // else
-    // {
-    //     world->viewer->GetGlobalCamera()->ProcessMouseScroll(yoffset);
-    // }
+    world->viewports->GetCurrViewport().GetCamera()->ProcessMouseScroll(yoffset);
 }
 
 void World::Reshape_Callback(GLFWwindow *window, int w, int h)
@@ -177,9 +176,7 @@ void World::Reshape_Callback(GLFWwindow *window, int w, int h)
     world->window_width = w;
     world->window_height = h;
 
-    world->local_viewer->Resize(0, 0, w / 2, h);
-    world->global_viewer->Resize(w /2, 0, w, h);
-    
+    world->viewports->SetWindowGeometry(w, h);
 }
 
 void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int action, int mode)
@@ -188,61 +185,22 @@ void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int act
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    // float camVel = world->viewer->guiWrapper.GetIOFramerate() / 50000.0;
-
-    // if (world->mouse_position[0] < world->window_width * 0.5)
-    // {
-    //     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    //         world->viewer->GetLocalCamera()->Position += camVel * world->viewer->GetLocalCamera()->Front;
-    //     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    //         world->viewer->GetLocalCamera()->Position -= camVel * world->viewer->GetLocalCamera()->Front;
-    //     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    //         world->viewer->GetLocalCamera()->Position -= glm::normalize(glm::cross(world->viewer->GetLocalCamera()->Front, world->viewer->GetLocalCamera()->Up)) * camVel;
-    //     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    //         world->viewer->GetLocalCamera()->Position += glm::normalize(glm::cross(world->viewer->GetLocalCamera()->Front, world->viewer->GetLocalCamera()->Up)) * camVel;
-    // }
-
-    // else
-    // {
-    //     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    //         world->viewer->GetGlobalCamera()->Position += camVel * world->viewer->GetGlobalCamera()->Front;
-    //     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    //         world->viewer->GetGlobalCamera()->Position -= camVel * world->viewer->GetGlobalCamera()->Front;
-    //     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    //         world->viewer->GetGlobalCamera()->Position -= glm::normalize(glm::cross(world->viewer->GetGlobalCamera()->Front, world->viewer->GetGlobalCamera()->Up)) * camVel;
-    //     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    //         world->viewer->GetGlobalCamera()->Position += glm::normalize(glm::cross(world->viewer->GetGlobalCamera()->Front, world->viewer->GetGlobalCamera()->Up)) * camVel;
-    // }
+    world->viewports->Mouse_Button_Callback(key, action, mode);
 }
 
 void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, int mods)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    // // Port to Camera.h -> ImGui.IO
-    // world->mouse_position = world->viewer->guiWrapper.GetMousePosition();
-    // //std::cout<<mouse_position[0]<<","<<mouse_position[1]<<std::endl;
-    // //world->viewer->GetGlobalCamera()->Set_Pos(button, action, mouse_position.x, mouse_position.y);
-    // if (world->mouse_position[0] < world->window_width * 0.5)
-    // {
-    // }
-    // else
-    // {
-    // }
+    glm::vec2 mouse_position = world->viewports->GetViewer(0).guiWrapper->GetMousePosition();
+    world->viewports->GetViewer(0).GetCamera()->Set_Pos(button, action, mouse_position.x, mouse_position.y);
 }
 
 void World::Mouse_Position_Callback(GLFWwindow *window, double x, double y)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    //world->mouse_position = world->viewer->guiWrapper.GetMousePosition();
+    glm::vec2 mouse_position = world->viewports->GetViewer(0).guiWrapper->GetMousePosition();
+    world->viewports->GetViewer(0).GetCamera()->Move_2D(mouse_position.x, mouse_position.y);
 
-    //world->viewer->GetGlobalCamera()->Move_2D(mouse_position.x, mouse_position.y);
-
-    // if (world->mouse_position[0] < world->window_width * 0.5)
-    // {
-    // }
-    // else
-    // {
-    // }
 }
