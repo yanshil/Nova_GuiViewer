@@ -1,9 +1,9 @@
 // @yanshi
 //#####################################################################
-// Class OGL_Viewer
+// Class OGL_Viewport
 //######################################################################
-#ifndef OGL_VIEWER_
-#define OGL_VIEWER_
+#ifndef OGL_Viewport_
+#define OGL_Viewport_
 
 #include "shader.h"
 
@@ -21,7 +21,11 @@
 namespace opengl_gui_viewer
 {
 
-class Viewer
+/** Viewport
+ * 
+ *  A Single Viewport with its camera control.
+ */
+class Viewport
 {
 private:
   // Window
@@ -33,9 +37,9 @@ private:
   int t = 0;
 
 public:
-  Viewer(GLFWwindow *window, const int ox, const int oy, const int size_x, const int size_y);
-  Viewer(GLFWwindow *window, const int size_x, const int size_y); // For origin = (0,0)
-  ~Viewer();
+  Viewport(GLFWwindow *window, const int ox, const int oy, const int size_x, const int size_y);
+  Viewport(GLFWwindow *window, const int size_x, const int size_y); // For origin = (0,0)
+  ~Viewport();
 
   ImGui_Wrapper *guiWrapper;
   Sim_Object *object;
@@ -56,7 +60,7 @@ public:
 
   bool InsideCurrView();
 
-}; // class Viewer
+}; // class Viewport
 
 /** Class ViewportManager
  * 
@@ -70,7 +74,7 @@ public:
   enum ViewportConfiguration {SINGLE_VIEWPORT, DUAL_VIEWPORT};
   ViewportConfiguration _currconfig;
 
-  std::vector<Viewer> viewport_list;
+  std::vector<Viewport> viewport_list;
 
   ViewportManager(GLFWwindow * window);
   ~ViewportManager();
@@ -81,12 +85,12 @@ public:
   void Update();
   void DrawFrame();
 
-  Viewer & GetViewer(int i);
+  Viewport & GetViewport(int i);
 
   unsigned int NumViewports();
 
   // ============ Control ==============
-  Viewer & GetCurrViewport();
+  Viewport & GetCurrViewport();
   void Scroll_Callback(double yoffset);
   // void Reshape_Callback();
   void Keyboard_Callback();

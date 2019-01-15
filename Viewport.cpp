@@ -1,8 +1,8 @@
-#include "Viewer.h"
+#include "Viewport.h"
 
 using namespace opengl_gui_viewer;
 
-Viewer::Viewer(GLFWwindow *window, const int size_x, const int size_y)
+Viewport::Viewport(GLFWwindow *window, const int size_x, const int size_y)
     : window(window), ox(0), oy(0), object(nullptr),
       view_width(size_x), view_height(size_y), guiWrapper(nullptr)
 {
@@ -14,23 +14,23 @@ Viewer::Viewer(GLFWwindow *window, const int size_x, const int size_y)
     this->camera = new Camera(view_width, view_height);
 }
 
-Viewer::Viewer(GLFWwindow *window, const int ox, const int oy, const int size_x, const int size_y)
+Viewport::Viewport(GLFWwindow *window, const int ox, const int oy, const int size_x, const int size_y)
     : window(window), ox(ox), oy(oy), object(nullptr),
       view_width(size_x), view_height(size_y), guiWrapper(nullptr)
 {
     this->camera = new Camera(view_width, view_height);
 }
 
-Viewer::~Viewer()
+Viewport::~Viewport()
 {
 }
 
-void Viewer::SetRenderObject(Sim_Object *object)
+void Viewport::SetRenderObject(Sim_Object *object)
 {
     this->object = object;
 }
 
-void Viewer::Initialize()
+void Viewport::Initialize()
 {
     // Shader
     shader.initializeFromFile("camera.vs", "camera.fs");
@@ -38,7 +38,7 @@ void Viewer::Initialize()
     shader.use();
 }
 
-void Viewer::Initialize_Gui()
+void Viewport::Initialize_Gui()
 {
     // object = new Sim_Object();
     guiWrapper = new ImGui_Wrapper(object);
@@ -48,17 +48,17 @@ void Viewer::Initialize_Gui()
     guiWrapper->InitBuffer();
 }
 
-Shader &Viewer::GetShader()
+Shader &Viewport::GetShader()
 {
     return shader;
 }
 
-Camera *Viewer::GetCamera()
+Camera *Viewport::GetCamera()
 {
     return camera;
 }
 
-void Viewer::Resize(const int ox, const int oy, const int w, const int h)
+void Viewport::Resize(const int ox, const int oy, const int w, const int h)
 {
     this->ox = ox;
     this->oy = oy;
@@ -66,7 +66,7 @@ void Viewer::Resize(const int ox, const int oy, const int w, const int h)
     this->view_height = h;
 }
 
-void Viewer::Update()
+void Viewport::Update()
 {
     if (guiWrapper)
         guiWrapper->UIFrame();
@@ -80,7 +80,7 @@ void Viewer::Update()
     //local_camera->test_modification();
 }
 
-void Viewer::DrawFrame()
+void Viewport::DrawFrame()
 {
     // set up camera
     shader.setMat4("projection", camera->GetProjectionMatrix());
@@ -109,11 +109,11 @@ void Viewer::DrawFrame()
     //std::cout<<t<<std::endl;
 }
 
-void Viewer::UpdateTest(int t)
+void Viewport::UpdateTest(int t)
 {
     guiWrapper->UpdateTest(t);
 }
-void Viewer::DrawPath()
+void Viewport::DrawPath()
 {
     int vertex_size = guiWrapper->geometry_centers.size();
     double vertices[3 * vertex_size];
@@ -162,7 +162,7 @@ void Viewer::DrawPath()
     glBindVertexArray(0); // no need to unbind it every time
 }
 
-bool Viewer::InsideCurrView()
+bool Viewport::InsideCurrView()
 {
     glm::vec2 mouse_pos = guiWrapper->GetMousePosition();
 
@@ -180,7 +180,7 @@ bool Viewer::InsideCurrView()
 
 /**
  * TODO:
- * Current for Duble Viewport
+ * Current for Double Viewport
  */
 ViewportManager::ViewportManager(GLFWwindow *window)
     : _currconfig(DUAL_VIEWPORT), window(window)
@@ -200,11 +200,11 @@ void ViewportManager::InitializeViewports(const int global_x, const int global_y
     switch (_currconfig)
     {
     case SINGLE_VIEWPORT:
-        viewport_list.push_back(Viewer(window, global_x, global_y));
+        viewport_list.push_back(Viewport(window, global_x, global_y));
         break;
     case DUAL_VIEWPORT:
-        viewport_list.push_back(Viewer(window, 0, 0, global_x / 2, global_y));
-        viewport_list.push_back(Viewer(window, global_x / 2, 0, global_x / 2, global_y));
+        viewport_list.push_back(Viewport(window, 0, 0, global_x / 2, global_y));
+        viewport_list.push_back(Viewport(window, global_x / 2, 0, global_x / 2, global_y));
         break;
 
     default:
@@ -237,7 +237,7 @@ void ViewportManager::SetWindowGeometry(const int global_x, const int global_y)
     }
 }
 
-Viewer &ViewportManager::GetCurrViewport()
+Viewport &ViewportManager::GetCurrViewport()
 {
     for (int i = 0; i < viewport_list.size(); i++)
     {
@@ -275,21 +275,21 @@ void ViewportManager::DrawFrame()
         viewport_list[i].DrawFrame();
 }
 
-Viewer &ViewportManager::GetViewer(int i)
+Viewport &ViewportManager::GetViewport(int i)
 {
     return viewport_list[i];
 }
 
 void ViewportManager::Mouse_Button_Callback(int key, int action, int mode)
 {
-    float camVel = GetViewer(0).guiWrapper->GetIOFramerate() / 50000.0;
+    float camVel = GetViewport(0).guiWrapper->GetIOFramerate() / 50000.0;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        GetViewer(0).GetCamera()->Position += camVel * GetViewer(0).GetCamera()->Front;
+        GetViewport(0).GetCamera()->Position += camVel * GetViewport(0).GetCamera()->Front;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        GetViewer(0).GetCamera()->Position -= camVel * GetViewer(0).GetCamera()->Front;
+        GetViewport(0).GetCamera()->Position -= camVel * GetViewport(0).GetCamera()->Front;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        GetViewer(0).GetCamera()->Position -= glm::normalize(glm::cross(GetViewer(0).GetCamera()->Front, GetViewer(0).GetCamera()->Up)) * camVel;
+        GetViewport(0).GetCamera()->Position -= glm::normalize(glm::cross(GetViewport(0).GetCamera()->Front, GetViewport(0).GetCamera()->Up)) * camVel;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        GetViewer(0).GetCamera()->Position += glm::normalize(glm::cross(GetViewer(0).GetCamera()->Front, GetViewer(0).GetCamera()->Up)) * camVel;
+        GetViewport(0).GetCamera()->Position += glm::normalize(glm::cross(GetViewport(0).GetCamera()->Front, GetViewport(0).GetCamera()->Up)) * camVel;
 }
