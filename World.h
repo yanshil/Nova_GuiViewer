@@ -1,8 +1,9 @@
 // @yanshi
 //#####################################################################
-// Class OGL_World
-// Refer from  Nova
-// https://github.com/OrionQuest/Nova_Examples/blob/c1edc9e662d83048700a412025a8ecd142058c5a/opengl/World.h
+/// Class OGL_World
+/// 
+/// World.h glfw main windows and glfw IO bindings.
+/// Also parse the Renderable Object pointer to its childrens.
 //######################################################################
 #ifndef OGL_WORLD_
 #define OGL_WORLD_

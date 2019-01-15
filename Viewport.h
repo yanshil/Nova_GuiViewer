@@ -1,6 +1,12 @@
 // @yanshi
 //#####################################################################
-// Class OGL_Viewport
+/// Class OGL_Viewport
+///
+/// Viewport Manager to mange different viewport's Initialize, Update, DrawFrame.
+/// * For ImGui Wrapper (Cannot have multiple ImGui Rendering): Always Initialize and Render in viewport[0].
+/// * A pointer of the Renderable Object is parsed from World->viewport(s)->ImGui(Interactive)
+/// * Every viewport has its own camera. Currently all viewport share 
+///   a single orject (by parsing hte object's pointer)
 //######################################################################
 #ifndef OGL_Viewport_
 #define OGL_Viewport_

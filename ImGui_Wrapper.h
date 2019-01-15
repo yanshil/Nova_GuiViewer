@@ -1,6 +1,9 @@
 // Copyright 2019 Yanshi
 //#####################################################################
-// Class ImGui_Wrapper
+/// Class ImGui_Wrapper
+///
+/// TODO: Move! Currently ImGui Wrapper Deal with the VAO, VBO, EBO info for the renderable object
+/// Deal with the UI drawing and interaction with renderable object.
 //######################################################################
 #ifndef IMGUI_WRAPPER_H_
 #define IMGUI_WRAPPER_H_
