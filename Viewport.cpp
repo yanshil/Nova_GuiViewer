@@ -5,17 +5,11 @@ using namespace opengl_gui_viewer;
 Viewport::Viewport()
     : ox(0), oy(0), view_width(0), view_height(0),
       guiWrapper(nullptr), object(nullptr)
-{
-}
+{ }
 
 Viewport::~Viewport()
-{
-}
+{ }
 
-void Viewport::SetWindow(GLFWwindow *window_input)
-{
-    window = window_input;
-}
 
 void Viewport::SetCamera(Camera *camera) { this->camera = camera; }
 void Viewport::SetShader(Shader *shader) { this->shader = shader; }
@@ -24,22 +18,12 @@ void Viewport::SetRenderObject(Sim_Object *object) { this->object = object; }
 void Viewport::Initialize()
 {
     SetCamera(new Camera());
-    camera->SetSize(view_width, view_height);
+    // camera->SetSize(view_width, view_height);
     SetShader(new Shader());
     shader->initializeFromFile("camera.vs", "camera.fs");
     shader->use();
 }
 
-void Viewport::Initialize_Gui()
-{
-    guiWrapper = new ImGui_Wrapper();
-
-    // TODO: If local, initialize guiWrapper
-    guiWrapper->SetRenderObject(object);
-    guiWrapper->Initialize(window);
-    guiWrapper->test_GenObject();
-    guiWrapper->InitBuffer();
-}
 
 Shader *Viewport::GetShader()
 {
@@ -61,8 +45,6 @@ void Viewport::Resize(const int ox, const int oy, const int w, const int h)
 
 void Viewport::Update()
 {
-    // if (guiWrapper)
-    //     guiWrapper->UIFrame();
 
     camera->Update();
     //global_camera->test_modification();
@@ -212,16 +194,10 @@ void ViewportManager::InitializeViewports(const int global_x, const int global_y
     {
     case SINGLE_VIEWPORT:
         viewport_list.push_back(Viewport());
-        viewport_list[0].Resize(0, 0, global_x, global_y);
-        viewport_list[0].SetWindow(window);
         break;
     case DUAL_VIEWPORT:
         viewport_list.push_back(Viewport());
         viewport_list.push_back(Viewport());
-        viewport_list[0].Resize(0, 0, global_x / 2, global_y);
-        viewport_list[0].SetWindow(window);
-        viewport_list[1].Resize(global_x / 2, 0, global_x / 2, global_y);
-        viewport_list[1].SetWindow(window);
         break;
 
     default:
@@ -232,6 +208,7 @@ void ViewportManager::InitializeViewports(const int global_x, const int global_y
     {
         viewport_list[i].Initialize();
     }
+    SetWindowGeometry(global_x, global_y);
 }
 
 unsigned int ViewportManager::NumViewports() { return viewport_list.size(); }
@@ -242,11 +219,21 @@ void ViewportManager::SetWindowGeometry(const int global_x, const int global_y)
     {
     case SINGLE_VIEWPORT:
         viewport_list[0].Resize(0, 0, global_x, global_y);
+        viewport_list[0].GetCamera()->SetSize(global_x, global_y);
+        // Set Camera
+        viewport_list[0].GetCamera()->SetAsLocal();
+
         break;
 
     case DUAL_VIEWPORT:
         viewport_list[0].Resize(0, 0, global_x / 2, global_y);
         viewport_list[1].Resize(global_x / 2, 0, global_x / 2, global_y);
+
+        viewport_list[0].GetCamera()->SetSize(global_x / 2, global_y);
+        viewport_list[1].GetCamera()->SetSize(global_x / 2, global_y);
+
+        viewport_list[0].GetCamera()->SetAsLocal();
+        viewport_list[1].GetCamera()->SetAsGlobal();
         break;
 
     default:
@@ -272,13 +259,12 @@ void ViewportManager::Scroll_Callback(double yoffset)
 
 void ViewportManager::ViewportSetting(Sim_Object *object)
 {
-    // Set Camera
-    viewport_list[0].GetCamera()->SetAsLocal();
-    viewport_list[1].GetCamera()->SetAsGlobal();
-
     // Set Object
-    viewport_list[0].SetRenderObject(object);
-    viewport_list[1].SetRenderObject(object);
+
+    for (int i = 0; i < viewport_list.size(); i++)
+    {
+        viewport_list[i].SetRenderObject(object);
+    }
 }
 
 void ViewportManager::Update()

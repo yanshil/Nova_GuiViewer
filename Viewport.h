@@ -34,8 +34,6 @@ namespace opengl_gui_viewer
 class Viewport
 {
 private:
-  // Window
-  GLFWwindow *window;
   Camera *camera;
   Sim_Object *object;
   Shader *shader;
