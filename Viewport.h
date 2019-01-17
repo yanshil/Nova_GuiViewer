@@ -63,8 +63,6 @@ public:
   // ======= Frame Update  Logic ========
   void Update();
   void DrawFrame();
-  // void DrawPath();
-  // void UpdateTest(int t);
 
   // ====== Controller Callback =============
   bool InsideCurrView(glm::vec2 mouse_pos);

@@ -13,6 +13,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <math.h>
+
 namespace opengl_gui_viewer
 {
 
@@ -22,8 +24,9 @@ class Camera
 {
   public:
     Camera()
-        : Position(glm::vec3(0.0f, -3.0f, 0.0f)),
-          Front(glm::vec3(0.0f, 1.0f, 0.0f)),
+        : Position(glm::vec3(0.0f, 5.0f, 0.0f)),
+          Target(glm::vec3(0.0f, 0.0f, 0.0f)),
+          Front(glm::vec3(0.0f, -1.0f, 0.0f)),
           Up(glm::vec3(0.0f, 0.0f, 1.0f)),
           WorldUp(glm::vec3(0.0f, 0.0f, 1.0f)),
           Position_Delta(glm::vec3(0.0f, 0.0f, 0.0f)),
@@ -31,6 +34,8 @@ class Camera
           Yaw(-90.0f), Pitch(0.0f), Fov(45.0f), Heading(0.0f),
           Screen_Width(0), Screen_Height(0), _config(NOT_CONFIG)
     {
+        Right = glm::normalize(glm::cross(Front, Up));
+        printf("Right = %f, %f, %f", Right.x, Right.y, Right.z);
     }
     ~Camera()
     {
@@ -44,12 +49,13 @@ class Camera
     };
 
     CameraConfiguration _config;
-    glm::vec3 Position, Front, Up, Right;
+    glm::vec3 Position, Front, Up, Right, Target;
     glm::vec3 Position_Delta, Mouse_Position;
     glm::vec3 WorldUp;
 
     GLfloat Yaw;
     GLfloat Pitch;
+    GLfloat Theta, Phi;
 
     GLfloat deltaTime, lastFrame, currentFrame;
     GLfloat MovementSpeed;
@@ -98,20 +104,31 @@ class Camera
     // TODO
     void test_modification()
     {
-        glm::vec3 cubePositions[] = {
-            glm::vec3(0.5f, 0.5f, 0.0f)};
-        model = glm::translate(model, cubePositions[0]);
-        float angle = 20.0f * 0;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+        Target = glm::vec3(0.0f, 0.0f, 0.0f);
+        // Front = Opposite of Direction ?
+        Front = -glm::normalize(Position - Target);
     }
 
     void Follow(int t, double max)
     {
         Position += glm::vec3(1.0f * 0.00015f * cos(t * 0.00015) / max, 2.0f * 0.00025f * cos(t * 0.00025) / max, -5.0f * 0.0005f * cos(t * 0.0005) / max);
     }
+
     void Update()
     {
-        view = glm::lookAt(Position, Position + Front, Up);
+        glm::vec3 offset = Position - Target;
+        float R = std::sqrt(offset.x * offset.x + offset.y * offset.y + offset.z * offset.z);
+
+        if (_config == LOCAL_CAMERA)
+        {
+            Position.x = Target.x + R * cos(Heading / 180 * M_PI) * sin(Yaw / 180 * M_PI);
+            Position.y = Target.y + R * sin(Heading / 180 * M_PI) * sin(Yaw / 180 * M_PI);
+            Position.z = Target.z + R * cos(Yaw / 180 * M_PI);
+            // printf("Position = %f, %f, %f\n", Position.x, Position.y, Position.z);
+        }
+
+        // view = glm::lookAt(Position, Position + Front, Up);
+        view = glm::lookAt(Position, Target, Up);
         projection = glm::perspective(glm::radians(Fov), (float)Screen_Width / (float)Screen_Height, 0.1f, 100.0f);
         model = glm::mat4(1.0f);
 
@@ -128,32 +145,34 @@ class Camera
             this->Fov = 45.0f;
     }
 
-    void Change_Pitch(float degrees)
+    // TODO: In fact not sure what should Yaw, Pitch used for....
+    void Change_Yaw(float degrees)
     {
         // check bounds with the max pitch rate so that we are not moving too fast
-        if (degrees < -5)
-            degrees = -5;
-        else if (degrees > 5)
-            degrees = 5;
+        if (degrees < -180)
+            degrees = -180;
+        else if (degrees > 180)
+            degrees = 180;
 
-        this->Pitch += degrees * 0.02f;
+        this->Yaw += degrees * 0.02f;
 
         // check bounds for the camera pitch
-        if (this->Pitch > 360.0f)
-            this->Pitch -= 360.0f;
-        else if (this->Pitch < -360.0f)
-            this->Pitch += 360.0f;
+        if (this->Yaw > 360.0f)
+            this->Yaw -= 360.0f;
+        else if (this->Yaw < -360.0f)
+            this->Yaw += 360.0f;
     }
+
     //#####################################################################
     // Change_Heading
     //#####################################################################
     void Change_Heading(float degrees)
     {
         // check bounds with the max heading rate so that we are not moving too fast
-        if (degrees < -5)
-            degrees = -5;
-        else if (degrees > 5)
-            degrees = 5;
+        if (degrees < -180)
+            degrees = -180;
+        else if (degrees > 180)
+            degrees = 180;
 
         // this controls how the heading changes if the camera is pointed straight up or down
         // the heading delta direction changes
@@ -177,19 +196,11 @@ class Camera
         // change the pitch and heading
         if (Move_Camera)
         {
-            std::cout << Mouse_Delta.x << "\t" << Mouse_Delta.y << std::endl;
+            // std::cout << Mouse_Delta.x << "\t" << Mouse_Delta.y << std::endl;
 
-            // Change_Heading(.08f * Mouse_Delta.x);
-            // Change_Pitch(Mouse_Delta.y);
-
-            Yaw += .08f * Mouse_Delta.x;
-            Pitch += .08f * Mouse_Delta.y;
-
-            glm::vec3 front;
-            front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-            front.y = sin(glm::radians(Pitch));
-            front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
-            Front = glm::normalize(front);
+            Change_Heading(Mouse_Delta.x * 10);
+            // Change_Pitch(Mouse_Delta.y * 10);
+            Change_Yaw(Mouse_Delta.y);
 
             Update();
         }

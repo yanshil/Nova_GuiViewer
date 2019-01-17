@@ -45,13 +45,8 @@ void Viewport::Resize(const int ox, const int oy, const int w, const int h)
 
 void Viewport::Update()
 {
+    // camera->test_modification();
     camera->Update();
-    //global_camera->test_modification();
-
-    // TODO: If local, follow the object
-    // local_camera->Update();
-    // local_camera->Follow(t, gui->main_object->cube->edge_max);
-    //local_camera->test_modification();
 }
 
 void Viewport::DrawFrame()
@@ -63,29 +58,6 @@ void Viewport::DrawFrame()
     glViewport(ox, oy, view_width, view_height);
 
     glDrawElements(GL_TRIANGLES, 3 * object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
-
-    // // set up global camera
-    // shader->setMat4("projection", global_camera->GetProjectionMatrix());
-    // shader->setMat4("view", global_camera->GetViewMatrix());
-    // shader->setMat4("model", global_camera->GetModelMatrix());
-    // glViewport(0.5 * view_width, 0, 0.5 * view_width, view_height);
-
-    // if (guiWrapper->main_object->option_path)
-    //     DrawPath();
-
-    //==================================
-
-    // if (guiWrapper)
-    // {
-    //     if (guiWrapper->main_object->option_path)
-    //         DrawPath();
-
-    //     UpdateTest(t);
-
-    //     guiWrapper->ApplyDisplayOption();
-    //     guiWrapper->Render();
-    // }
-    //std::cout<<t<<std::endl;
 }
 
 void ViewportManager::UpdateTest(int t)
@@ -103,7 +75,6 @@ void ViewportManager::DrawPath()
         for (int j = 0; j < 3; j++)
         {
             vertices[3 * i + j] = gui->geometry_centers[i][j];
-            //std::cout<<gui->geometry_centers[i][0]<<","<<gui->geometry_centers[i][1]<<","<<gui->geometry_centers[i][2]<<std::endl;
         }
     }
 
@@ -271,8 +242,9 @@ void ViewportManager::Update()
     {
         viewport_list[i].Update();
         // TODO: Should be put in Camera
-        if (viewport_list[i].GetCamera()->_config == Camera::LOCAL_CAMERA)
-            viewport_list[i].GetCamera()->Follow(t, gui->main_object->cube->edge_max);
+
+        // if (viewport_list[i].GetCamera()->_config == Camera::LOCAL_CAMERA)
+        //     viewport_list[i].GetCamera()->Follow(t, gui->main_object->cube->edge_max);
     }
 
     gui->UIFrame();
@@ -288,12 +260,12 @@ void ViewportManager::DrawFrame()
         if (gui->main_object->option_path)
             DrawPath();
 
-        UpdateTest(t);
+        // UpdateTest(t);
 
         gui->ApplyDisplayOption();
         gui->Render();
     }
-    t++;
+    // t++;
 }
 
 Viewport &ViewportManager::GetViewport(int i)
