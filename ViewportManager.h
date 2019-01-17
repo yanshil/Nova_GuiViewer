@@ -92,7 +92,7 @@ class ViewportManager
         std::cout << 222 << std::endl;
 
         std::cout <<_global_viewport.width << std::endl;
-        // std::cout <<_global_viewport.height << std::endl;
+        std::cout <<_global_viewport.height << std::endl;
     
         SetWindowGeometry(_global_viewport.width, _global_viewport.height);
     }
@@ -100,6 +100,7 @@ class ViewportManager
     {
         std::cout << "What??" << std::endl;
         std::cout << _global_viewport.x << std::endl;
+        std::cout.flush();
         // Update the global window viewport
         _global_viewport.x = 0;
         _global_viewport.y = 0;

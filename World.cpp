@@ -108,8 +108,8 @@ void World::Initialize_Viewports()
     // ================================================
 
     viewports = new ViewportManager();
-    std::cout << "111" << std::endl;
-    viewports->ConfigureViewports(ViewportManager::VM_DUAL_VIEWPORT);
+    std::cout << "111-" << std::endl;
+    viewports->ConfigureViewports(ViewportManager::VM_SINGLE_VIEWPORT);
     std::cout << "555" << std::endl;
     viewports->SetRenderObject(&object);
 
