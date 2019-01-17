@@ -62,7 +62,7 @@ void Viewport::DrawFrame()
 
 void ViewportManager::UpdateTest(int t)
 {
-    gui->UpdateTest(t);
+    // gui->UpdateTest(t);
 }
 void ViewportManager::DrawPath()
 {
@@ -175,6 +175,20 @@ void ViewportManager::InitializeViewports(const int global_x, const int global_y
         viewport_list[i].Initialize();
     }
     SetWindowGeometry(global_x, global_y);
+    switch (_currconfig)
+    {
+    case SINGLE_VIEWPORT:
+        // Set Camera
+        viewport_list[0].GetCamera()->ConfigureCamera(Camera::LOCAL_CAMERA);
+        break;
+    case DUAL_VIEWPORT:
+        viewport_list[0].GetCamera()->ConfigureCamera(Camera::LOCAL_CAMERA);
+        viewport_list[1].GetCamera()->ConfigureCamera(Camera::GLOBAL_CAMERA);
+        break;
+
+    default:
+        break;
+    }
 }
 
 unsigned int ViewportManager::NumViewports() { return viewport_list.size(); }
@@ -186,8 +200,6 @@ void ViewportManager::SetWindowGeometry(const int global_x, const int global_y)
     case SINGLE_VIEWPORT:
         viewport_list[0].Resize(0, 0, global_x, global_y);
         viewport_list[0].GetCamera()->SetSize(global_x, global_y);
-        // Set Camera
-        viewport_list[0].GetCamera()->ConfigureCamera(Camera::LOCAL_CAMERA);
 
         break;
 
@@ -197,9 +209,6 @@ void ViewportManager::SetWindowGeometry(const int global_x, const int global_y)
 
         viewport_list[0].GetCamera()->SetSize(global_x / 2, global_y);
         viewport_list[1].GetCamera()->SetSize(global_x / 2, global_y);
-
-        viewport_list[0].GetCamera()->ConfigureCamera(Camera::LOCAL_CAMERA);
-        viewport_list[1].GetCamera()->ConfigureCamera(Camera::GLOBAL_CAMERA);
 
         break;
 
@@ -257,17 +266,23 @@ void ViewportManager::DrawFrame()
 
     if (gui)
     {
-        if (gui->main_object->animation_test)
-        {
-            UpdateTest(t);
-            t++;
-            if (gui->main_object->option_path)
-                DrawPath();
-        }
+        // if (gui->main_object->animation_test)
+        // {
+        //     UpdateTest(t);
+        //     t++;
+        //     if (gui->main_object->option_path)
+        //         DrawPath();
+        // }
+
+        UpdateTest(t);
+
+        if (gui->main_object->option_path)
+            DrawPath();
 
         gui->ApplyDisplayOption();
         gui->Render();
     }
+    t++;
 }
 
 Viewport &ViewportManager::GetViewport(int i)
@@ -275,17 +290,42 @@ Viewport &ViewportManager::GetViewport(int i)
     return viewport_list[i];
 }
 
-// TODO: Fix the WASD 
 void ViewportManager::Mouse_Button_Callback(int key, int action, int mode)
 {
-    float camVel = gui->GetIOFramerate() / 50000.0;
+    // Only Update the modifiable viewport
+    glm::vec2 mouse_position = gui->GetMousePosition();
+    viewport_list[0].GetCamera()->Set_Pos(key, action, mouse_position.x, mouse_position.y);
+}
+
+void ViewportManager::Mouse_Position_Callback(double x, double y)
+{
+    glm::vec2 mouse_position = gui->GetMousePosition();
+    // Only Update the modifiable viewport
+    viewport_list[0].GetCamera()->Move_2D(mouse_position.x, mouse_position.y);
+}
+
+void ViewportManager::Keyboard_Callback(int key, int action, int mode)
+{
+    float camVel = gui->GetIOFramerate() / 20000.0;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
         GetViewport(0).GetCamera()->Position += camVel * GetViewport(0).GetCamera()->Front;
+        GetViewport(0).GetCamera()->Target += camVel * GetViewport(0).GetCamera()->Front;
+    }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
         GetViewport(0).GetCamera()->Position -= camVel * GetViewport(0).GetCamera()->Front;
+        GetViewport(0).GetCamera()->Target -= camVel * GetViewport(0).GetCamera()->Front;
+    }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
         GetViewport(0).GetCamera()->Position -= glm::normalize(glm::cross(GetViewport(0).GetCamera()->Front, GetViewport(0).GetCamera()->Up)) * camVel;
+        GetViewport(0).GetCamera()->Target -= glm::normalize(glm::cross(GetViewport(0).GetCamera()->Front, GetViewport(0).GetCamera()->Up)) * camVel;
+    }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
         GetViewport(0).GetCamera()->Position += glm::normalize(glm::cross(GetViewport(0).GetCamera()->Front, GetViewport(0).GetCamera()->Up)) * camVel;
+        GetViewport(0).GetCamera()->Target += glm::normalize(glm::cross(GetViewport(0).GetCamera()->Front, GetViewport(0).GetCamera()->Up)) * camVel;
+    }
 }

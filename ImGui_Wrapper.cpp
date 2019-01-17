@@ -391,6 +391,9 @@ void ImGui_Wrapper::DisplayGenerateModule()
         ImGui::EndPopup();
     }
 
+    ImGui::PopStyleColor(3);
+    ImGui::PopID();
+
     if(ImGui::Button("Animate Test"))
     {
         main_object->animation_test = true;
@@ -400,9 +403,6 @@ void ImGui_Wrapper::DisplayGenerateModule()
     {
         main_object->animation_test = false;
     }
-
-    ImGui::PopStyleColor(3);
-    ImGui::PopID();
 }
 
 void ImGui_Wrapper::DisplayAnimation()

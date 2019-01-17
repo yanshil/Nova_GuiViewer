@@ -28,14 +28,14 @@ class Camera
           Target(glm::vec3(0.0f, 0.0f, 0.0f)),
           Front(glm::vec3(0.0f, -1.0f, 0.0f)),
           Up(glm::vec3(0.0f, 0.0f, 1.0f)),
-          WorldUp(glm::vec3(0.0f, 0.0f, 1.0f)),
           Position_Delta(glm::vec3(0.0f, 0.0f, 0.0f)),
           MovementSpeed(1.0f), Move_Camera(false),
+          Theta(0.0f), Phi(0.0f), //Spherical Coordinate
           Yaw(-90.0f), Pitch(0.0f), Fov(45.0f), Heading(0.0f),
           Screen_Width(0), Screen_Height(0), _config(NOT_CONFIG)
     {
+        Front = -glm::normalize(Position - Target);
         Right = glm::normalize(glm::cross(Front, Up));
-        printf("Right = %f, %f, %f", Right.x, Right.y, Right.z);
     }
     ~Camera()
     {
@@ -49,15 +49,13 @@ class Camera
     };
 
     CameraConfiguration _config;
-    glm::vec3 Position, Front, Up, Right, Target;
+    glm::vec3 Position, Target, Up, Front, Right;
     glm::vec3 Position_Delta, Mouse_Position;
-    glm::vec3 WorldUp;
 
     GLfloat Yaw;
     GLfloat Pitch;
     GLfloat Theta, Phi;
 
-    GLfloat deltaTime, lastFrame, currentFrame;
     GLfloat MovementSpeed;
     GLfloat Fov;
     GLfloat Heading;
@@ -101,14 +99,6 @@ class Camera
         Screen_Height = y;
     }
 
-    // TODO
-    void test_modification()
-    {
-        Target = glm::vec3(0.0f, 0.0f, 0.0f);
-        // Front = Opposite of Direction ?
-        Front = -glm::normalize(Position - Target);
-    }
-
     void Follow(int t, double max)
     {
         Position += glm::vec3(1.0f * 0.00015f * cos(t * 0.00015) / max, 2.0f * 0.00025f * cos(t * 0.00025) / max, -5.0f * 0.0005f * cos(t * 0.0005) / max);
@@ -116,16 +106,17 @@ class Camera
 
     void Update()
     {
-        glm::vec3 offset = Position - Target;
-        float R = std::sqrt(offset.x * offset.x + offset.y * offset.y + offset.z * offset.z);
-
-        if (_config == LOCAL_CAMERA)
+        if (_config == LOCAL_CAMERA & Move_Camera)
         {
-            Position.x = Target.x + R * cos(Heading / 180 * M_PI) * sin(Yaw / 180 * M_PI);
-            Position.y = Target.y + R * sin(Heading / 180 * M_PI) * sin(Yaw / 180 * M_PI);
-            Position.z = Target.z + R * cos(Yaw / 180 * M_PI);
-            // printf("Position = %f, %f, %f\n", Position.x, Position.y, Position.z);
+            glm::vec3 offset = Position - Target;
+            float R = std::sqrt(offset.x * offset.x + offset.y * offset.y + offset.z * offset.z);
+            Position.x = Target.x + R * cos(Theta) * sin(Phi);
+            Position.y = Target.y + R * sin(Theta) * sin(Phi);
+            Position.z = Target.z + R * cos(Phi);
         }
+
+        Front = -glm::normalize(Position - Target);
+        Right = glm::normalize(glm::cross(Front, Up));
 
         // view = glm::lookAt(Position, Position + Front, Up);
         view = glm::lookAt(Position, Target, Up);
@@ -137,12 +128,12 @@ class Camera
 
     void ProcessMouseScroll(GLfloat yoffset)
     {
-        if (this->Fov >= 1.0f && this->Fov <= 45.0f)
+        if (this->Fov >= 1.0f && this->Fov <= 90.0f)
             this->Fov -= yoffset;
         if (this->Fov <= 1.0f)
             this->Fov = 1.0f;
-        if (this->Fov >= 45.0f)
-            this->Fov = 45.0f;
+        if (this->Fov >= 90.0f)
+            this->Fov = 90.0f;
     }
 
     // TODO: In fact not sure what should Yaw, Pitch used for....
@@ -161,6 +152,8 @@ class Camera
             this->Yaw -= 360.0f;
         else if (this->Yaw < -360.0f)
             this->Yaw += 360.0f;
+
+        this->Phi = Yaw / 180 * M_PI;
     }
 
     //#####################################################################
@@ -186,6 +179,8 @@ class Camera
             this->Heading -= 360.0f;
         else if (this->Heading < -360.0f)
             this->Heading += 360.0f;
+
+        this->Theta = Heading / 180 * M_PI;
     }
 
     void Move_2D(int x, int y)
@@ -196,10 +191,8 @@ class Camera
         // change the pitch and heading
         if (Move_Camera)
         {
-            // std::cout << Mouse_Delta.x << "\t" << Mouse_Delta.y << std::endl;
 
             Change_Heading(Mouse_Delta.x * 10);
-            // Change_Pitch(Mouse_Delta.y * 10);
             Change_Yaw(Mouse_Delta.y);
 
             Update();
@@ -209,11 +202,7 @@ class Camera
 
     void Set_Pos(int button, int state, int x, int y)
     {
-        if (button == 3 && state == GLFW_PRESS)
-            this->Position_Delta += this->Up * .05f;
-        else if (button == 4 && state == GLFW_PRESS)
-            this->Position_Delta -= this->Up * .05f;
-        else if (button == GLFW_MOUSE_BUTTON_LEFT && state == GLFW_PRESS)
+        if (button == GLFW_MOUSE_BUTTON_LEFT && state == GLFW_PRESS)
             Move_Camera = true;
         else if (button == GLFW_MOUSE_BUTTON_LEFT && state == GLFW_RELEASE)
             Move_Camera = false;

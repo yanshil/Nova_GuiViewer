@@ -108,9 +108,9 @@ public:
   Viewport &GetCurrViewport();
   void Scroll_Callback(double yoffset);
   // void Reshape_Callback();
-  void Keyboard_Callback();
+  void Keyboard_Callback(int key, int action, int mode);
   void Mouse_Button_Callback(int key, int action, int mode);
-  void Mouse_Position_Callback();
+  void Mouse_Position_Callback(double x, double y);
 
   //====================================
   void UpdateTest(int t);
