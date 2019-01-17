@@ -29,7 +29,8 @@ void Viewport::SetRenderObject(Sim_Object *object) { this->object = object; }
 
 void Viewport::Initialize()
 {
-    SetCamera(new Camera(view_width, view_height));
+    SetCamera(new Camera());
+    camera->SetSize(view_width, view_height);
     SetShader(new Shader());
     shader->initializeFromFile("camera.vs", "camera.fs");
     shader->use();
@@ -38,8 +39,10 @@ void Viewport::Initialize()
 void Viewport::Initialize_Gui()
 {
 
-    guiWrapper = new ImGui_Wrapper(object);
+    guiWrapper = new ImGui_Wrapper();
+    
     // TODO: If local, initialize guiWrapper
+    guiWrapper->SetRenderObject(object);
     guiWrapper->Initialize(window);
     guiWrapper->test_GenObject();
     guiWrapper->InitBuffer();

@@ -21,7 +21,7 @@ namespace opengl_gui_viewer
 class Camera
 {
   public:
-    Camera(const int size_x, const int size_y)
+    Camera()
         : Position(glm::vec3(0.0f, -3.0f, 0.0f)),
           Front(glm::vec3(0.0f, 1.0f, 0.0f)),
           Up(glm::vec3(0.0f, 0.0f, 1.0f)),
@@ -29,15 +29,12 @@ class Camera
           Position_Delta(glm::vec3(0.0f, 0.0f, 0.0f)),
           MovementSpeed(1.0f), Move_Camera(false),
           Yaw(-90.0f), Pitch(0.0f), Fov(45.0f), Heading(0.0f),
-          Screen_Width(size_x), Screen_Height(size_y)
+          Screen_Width(0), Screen_Height(0)
     {
     }
     ~Camera()
     {
     }
-
-    // Parent Viewer
-    // Viewer *viewer;
 
     glm::vec3 Position, Front, Up, Right;
     glm::vec3 Position_Delta, Mouse_Position;
@@ -61,6 +58,12 @@ class Camera
     glm::mat4 GetProjectionMatrix() { return projection; }
     glm::mat4 GetModelMatrix() { return model; }
     glm::mat4 GetMatrix() { return MVP; }
+
+    void SetSize(const int x, const int y)
+    {
+        Screen_Width = x;
+        Screen_Height = y;
+    }
 
     void SetAsGlobal()
     {

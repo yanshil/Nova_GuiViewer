@@ -21,7 +21,7 @@ namespace opengl_gui_viewer
 class ImGui_Wrapper
 {
 public:
-  ImGui_Wrapper(Sim_Object * object);
+  ImGui_Wrapper();
   ~ImGui_Wrapper();
 
   void Initialize(GLFWwindow *window);
@@ -35,6 +35,9 @@ public:
 
   std::vector<std::vector<double>> geometry_centers;
   std::vector<double> geometry_center;
+
+  void SetRenderObject(Sim_Object * object);
+
   // ============ Considering Manage Render Object in another file ========
 
   void UIFrame();
@@ -49,19 +52,14 @@ public:
   // ============ Considering Manage Render Object in another file ========
 
   // ImGui IO
-  void MouseWheelScrollCallback(float yoffset);
-  void MouseButtonCallback(const int button, const int action);
-  void KeyboardCallback(const int key, const int action);
+
   float GetIOFramerate();
   glm::vec2 GetMouseDelta();
   glm::vec2 GetMousePosition();
+
   void UpdateTest(int t);
 
 private:
-  // Mouse states.
-  bool _mouse_pressed_[3];
-  float _mouse_wheel_;
-
   // ============ Considering Manage Render Object in another file ========
   // Cube Paras
   double tmpParas_cube[3];
