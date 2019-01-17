@@ -40,13 +40,12 @@ private:
   bool draw_path;
   int ox, oy; // Origin of viewport (x, y)
   int view_width, view_height;
-  int t = 0;
 
 public:
   Viewport();
   ~Viewport();
 
-  ImGui_Wrapper *guiWrapper;
+  // ImGui_Wrapper *guiWrapper;
 
   // ======== Getter ============
   Shader *GetShader();
@@ -60,17 +59,15 @@ public:
 
   // ========== Initializer ============
   void Initialize();
-  void Initialize_Gui();
-  void SetWindow(GLFWwindow *window);
 
   // ======= Frame Update  Logic ========
   void Update();
   void DrawFrame();
-  void DrawPath();
-  void UpdateTest(int t);
+  // void DrawPath();
+  // void UpdateTest(int t);
 
   // ====== Controller Callback =============
-  bool InsideCurrView();
+  bool InsideCurrView(glm::vec2 mouse_pos);
 
 }; // class Viewport
 
@@ -82,6 +79,7 @@ class ViewportManager
 {
 private:
   GLFWwindow *window;
+  int t = 0;
 
 public:
   enum ViewportConfiguration
@@ -115,6 +113,11 @@ public:
   void Keyboard_Callback();
   void Mouse_Button_Callback(int key, int action, int mode);
   void Mouse_Position_Callback();
+
+  //====================================
+  void UpdateTest(int t);
+  void DrawPath();
+
 };
 
 } // namespace opengl_gui_viewer

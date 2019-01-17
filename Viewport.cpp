@@ -4,12 +4,13 @@ using namespace opengl_gui_viewer;
 
 Viewport::Viewport()
     : ox(0), oy(0), view_width(0), view_height(0),
-      guiWrapper(nullptr), object(nullptr)
-{ }
+      object(nullptr)
+{
+}
 
 Viewport::~Viewport()
-{ }
-
+{
+}
 
 void Viewport::SetCamera(Camera *camera) { this->camera = camera; }
 void Viewport::SetShader(Shader *shader) { this->shader = shader; }
@@ -23,7 +24,6 @@ void Viewport::Initialize()
     shader->initializeFromFile("camera.vs", "camera.fs");
     shader->use();
 }
-
 
 Shader *Viewport::GetShader()
 {
@@ -45,13 +45,12 @@ void Viewport::Resize(const int ox, const int oy, const int w, const int h)
 
 void Viewport::Update()
 {
-
     camera->Update();
     //global_camera->test_modification();
 
     // TODO: If local, follow the object
     // local_camera->Update();
-    // local_camera->Follow(t, guiWrapper->main_object->cube->edge_max);
+    // local_camera->Follow(t, gui->main_object->cube->edge_max);
     //local_camera->test_modification();
 }
 
@@ -86,18 +85,16 @@ void Viewport::DrawFrame()
     //     guiWrapper->ApplyDisplayOption();
     //     guiWrapper->Render();
     // }
-
-    t++;
     //std::cout<<t<<std::endl;
 }
 
-void Viewport::UpdateTest(int t)
+void ViewportManager::UpdateTest(int t)
 {
-    guiWrapper->UpdateTest(t);
+    gui->UpdateTest(t);
 }
-void Viewport::DrawPath()
+void ViewportManager::DrawPath()
 {
-    int vertex_size = guiWrapper->geometry_centers.size();
+    int vertex_size = gui->geometry_centers.size();
     double vertices[3 * vertex_size];
 
     for (int i = 0; i < vertex_size; i++)
@@ -105,8 +102,8 @@ void Viewport::DrawPath()
 
         for (int j = 0; j < 3; j++)
         {
-            vertices[3 * i + j] = guiWrapper->geometry_centers[i][j];
-            //std::cout<<guiWrapper->geometry_centers[i][0]<<","<<guiWrapper->geometry_centers[i][1]<<","<<guiWrapper->geometry_centers[i][2]<<std::endl;
+            vertices[3 * i + j] = gui->geometry_centers[i][j];
+            //std::cout<<gui->geometry_centers[i][0]<<","<<gui->geometry_centers[i][1]<<","<<gui->geometry_centers[i][2]<<std::endl;
         }
     }
 
@@ -118,12 +115,12 @@ void Viewport::DrawPath()
         indices[2 * i + 1] = i + 1;
     }
 
-    glBindVertexArray(guiWrapper->path_VAO);
+    glBindVertexArray(gui->path_VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, guiWrapper->path_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, gui->path_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, guiWrapper->path_EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gui->path_EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
@@ -138,16 +135,14 @@ void Viewport::DrawPath()
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
-    glBindVertexArray(guiWrapper->path_VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+    glBindVertexArray(gui->path_VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
     //glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawElements(GL_LINES, 2 * (vertex_size - 1), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0); // no need to unbind it every time
 }
 
-bool Viewport::InsideCurrView()
+bool Viewport::InsideCurrView(glm::vec2 mouse_pos)
 {
-    glm::vec2 mouse_pos = guiWrapper->GetMousePosition();
-
     if (mouse_pos.x < ox)
         return false;
     if (mouse_pos.x > ox + view_width)
@@ -221,7 +216,7 @@ void ViewportManager::SetWindowGeometry(const int global_x, const int global_y)
         viewport_list[0].Resize(0, 0, global_x, global_y);
         viewport_list[0].GetCamera()->SetSize(global_x, global_y);
         // Set Camera
-        viewport_list[0].GetCamera()->SetAsLocal();
+        viewport_list[0].GetCamera()->ConfigureCamera(Camera::LOCAL_CAMERA);
 
         break;
 
@@ -232,8 +227,9 @@ void ViewportManager::SetWindowGeometry(const int global_x, const int global_y)
         viewport_list[0].GetCamera()->SetSize(global_x / 2, global_y);
         viewport_list[1].GetCamera()->SetSize(global_x / 2, global_y);
 
-        viewport_list[0].GetCamera()->SetAsLocal();
-        viewport_list[1].GetCamera()->SetAsGlobal();
+        viewport_list[0].GetCamera()->ConfigureCamera(Camera::LOCAL_CAMERA);
+        viewport_list[1].GetCamera()->ConfigureCamera(Camera::GLOBAL_CAMERA);
+
         break;
 
     default:
@@ -243,9 +239,11 @@ void ViewportManager::SetWindowGeometry(const int global_x, const int global_y)
 
 Viewport &ViewportManager::GetCurrViewport()
 {
+    glm::vec2 mouse_pos = gui->GetMousePosition();
+
     for (int i = 0; i < viewport_list.size(); i++)
     {
-        if (viewport_list[i].InsideCurrView())
+        if (viewport_list[i].InsideCurrView(mouse_pos))
             return viewport_list[i];
     }
 
@@ -270,7 +268,12 @@ void ViewportManager::ViewportSetting(Sim_Object *object)
 void ViewportManager::Update()
 {
     for (int i = 0; i < viewport_list.size(); i++)
+    {
         viewport_list[i].Update();
+        // TODO: Should be put in Camera
+        if (viewport_list[i].GetCamera()->_config == Camera::LOCAL_CAMERA)
+            viewport_list[i].GetCamera()->Follow(t, gui->main_object->cube->edge_max);
+    }
 
     gui->UIFrame();
 }
@@ -282,14 +285,15 @@ void ViewportManager::DrawFrame()
 
     if (gui)
     {
-        // if (guiWrapper->main_object->option_path)
-        //     DrawPath();
+        if (gui->main_object->option_path)
+            DrawPath();
 
-        // UpdateTest(t);
+        UpdateTest(t);
 
         gui->ApplyDisplayOption();
         gui->Render();
     }
+    t++;
 }
 
 Viewport &ViewportManager::GetViewport(int i)
@@ -299,7 +303,7 @@ Viewport &ViewportManager::GetViewport(int i)
 
 void ViewportManager::Mouse_Button_Callback(int key, int action, int mode)
 {
-    float camVel = GetViewport(0).guiWrapper->GetIOFramerate() / 50000.0;
+    float camVel = gui->GetIOFramerate() / 50000.0;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         GetViewport(0).GetCamera()->Position += camVel * GetViewport(0).GetCamera()->Front;

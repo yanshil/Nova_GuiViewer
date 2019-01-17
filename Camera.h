@@ -29,13 +29,21 @@ class Camera
           Position_Delta(glm::vec3(0.0f, 0.0f, 0.0f)),
           MovementSpeed(1.0f), Move_Camera(false),
           Yaw(-90.0f), Pitch(0.0f), Fov(45.0f), Heading(0.0f),
-          Screen_Width(0), Screen_Height(0)
+          Screen_Width(0), Screen_Height(0), _config(NOT_CONFIG)
     {
     }
     ~Camera()
     {
     }
 
+    enum CameraConfiguration
+    {
+        LOCAL_CAMERA,
+        GLOBAL_CAMERA,
+        NOT_CONFIG
+    };
+
+    CameraConfiguration _config;
     glm::vec3 Position, Front, Up, Right;
     glm::vec3 Position_Delta, Mouse_Position;
     glm::vec3 WorldUp;
@@ -59,25 +67,34 @@ class Camera
     glm::mat4 GetModelMatrix() { return model; }
     glm::mat4 GetMatrix() { return MVP; }
 
+    void ConfigureCamera(CameraConfiguration camera_config)
+    {
+        _config = camera_config;
+        switch (camera_config)
+        {
+        case LOCAL_CAMERA:
+            Position = glm::vec3(0.0f, -3.0f, 0.0f);
+            Front = glm::vec3(0.0f, 1.0f, 0.0f);
+            Up = glm::vec3(0.0f, 0.0f, 1.0f);
+            break;
+
+        case GLOBAL_CAMERA:
+            Position = glm::vec3(0.0f, -10.0f, 0.0f);
+            Front = glm::vec3(0.0f, 1.0f, 0.0f);
+            Up = glm::vec3(0.0f, 0.0f, 1.0f);
+            break;
+
+        default:
+            break;
+        }
+    }
+
     void SetSize(const int x, const int y)
     {
         Screen_Width = x;
         Screen_Height = y;
     }
 
-    void SetAsGlobal()
-    {
-        Position=glm::vec3(0.0f, -10.0f, 0.0f);
-        Front=glm::vec3(0.0f, 1.0f, 0.0f);
-        Up=glm::vec3(0.0f, 0.0f, 1.0f);
-    }
-
-    void SetAsLocal()
-    {
-        Position=glm::vec3(0.0f, -3.0f, 0.0f);
-        Front=glm::vec3(0.0f, 1.0f, 0.0f);
-        Up=glm::vec3(0.0f, 0.0f, 1.0f);
-    }
     // TODO
     void test_modification()
     {
@@ -88,21 +105,9 @@ class Camera
         model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
     }
 
-    GLfloat GetCameraSpeed()
-    {
-        // currentFrame = glfwGetTime();
-        // deltaTime = currentFrame - lastFrame;
-        // lastFrame = currentFrame;
-
-        // return MovementSpeed * deltaTime;
-
-        // TODO
-
-        return 0.05;
-    }
     void Follow(int t, double max)
     {
-        Position += glm::vec3(1.0f*0.00015f*cos(t * 0.00015)/max, 2.0f*0.00025f*cos(t * 0.00025)/max,  -5.0f*0.0005f*cos(t * 0.0005)/max);
+        Position += glm::vec3(1.0f * 0.00015f * cos(t * 0.00015) / max, 2.0f * 0.00025f * cos(t * 0.00025) / max, -5.0f * 0.0005f * cos(t * 0.0005) / max);
     }
     void Update()
     {
