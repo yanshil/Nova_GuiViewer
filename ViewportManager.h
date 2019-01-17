@@ -37,7 +37,6 @@ class ViewportManager
     }
     ~ViewportManager()
     {
-        
     }
 
     // Global Viewports Sate
@@ -182,16 +181,12 @@ class ViewportManager
     }
 
     // ========= ImGui =========
-    void Gui_InitializeWindow()
+    void Gui_Setting(GLFWwindow *window, Sim_Object *object)
     {
+        
         guiWrapper = new ImGui_Wrapper();
-    }
-    void Gui_LinkObject(Sim_Object *object)
-    {
-        guiWrapper->main_object = object;
-    }
-    void Gui_Setting(GLFWwindow *window)
-    {
+        std::cout << "Initialize Gui" << std::endl;
+        guiWrapper->SetRenderObject(object);
         guiWrapper->Initialize(window);
         guiWrapper->test_GenObject();
         guiWrapper->InitBuffer();

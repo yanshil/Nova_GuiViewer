@@ -45,8 +45,7 @@ private:
   int t = 0;
 
 public:
-  Viewport(GLFWwindow *window, const int ox, const int oy, const int size_x, const int size_y);
-  Viewport(GLFWwindow *window, const int size_x, const int size_y); // For origin = (0,0)
+  Viewport();
   ~Viewport();
 
   ImGui_Wrapper *guiWrapper;
@@ -95,12 +94,14 @@ public:
   ViewportConfiguration _currconfig;
 
   std::vector<Viewport> viewport_list;
+  ImGui_Wrapper * gui;
 
   ViewportManager(GLFWwindow *window);
   ~ViewportManager();
 
   void SetWindowGeometry(const int global_x, const int global_y);
   void InitializeViewports(const int global_x, const int global_y);
+  void InitializeGui(GLFWwindow *window, Sim_Object *object);
   void ViewportSetting(Sim_Object *object);
   void Update();
   void DrawFrame();

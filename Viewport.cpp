@@ -2,15 +2,9 @@
 
 using namespace opengl_gui_viewer;
 
-Viewport::Viewport(GLFWwindow *window, const int size_x, const int size_y)
-    : window(window), ox(0), oy(0), object(nullptr),
-      view_width(size_x), view_height(size_y), guiWrapper(nullptr)
-{
-}
-
-Viewport::Viewport(GLFWwindow *window, const int ox, const int oy, const int size_x, const int size_y)
-    : window(window), ox(ox), oy(oy), object(nullptr),
-      view_width(size_x), view_height(size_y), guiWrapper(nullptr)
+Viewport::Viewport()
+    : ox(0), oy(0), view_width(0), view_height(0),
+      guiWrapper(nullptr), object(nullptr)
 {
 }
 
@@ -38,9 +32,8 @@ void Viewport::Initialize()
 
 void Viewport::Initialize_Gui()
 {
-
     guiWrapper = new ImGui_Wrapper();
-    
+
     // TODO: If local, initialize guiWrapper
     guiWrapper->SetRenderObject(object);
     guiWrapper->Initialize(window);
@@ -68,8 +61,8 @@ void Viewport::Resize(const int ox, const int oy, const int w, const int h)
 
 void Viewport::Update()
 {
-    if (guiWrapper)
-        guiWrapper->UIFrame();
+    // if (guiWrapper)
+    //     guiWrapper->UIFrame();
 
     camera->Update();
     //global_camera->test_modification();
@@ -99,16 +92,18 @@ void Viewport::DrawFrame()
     // if (guiWrapper->main_object->option_path)
     //     DrawPath();
 
-    if (guiWrapper)
-    {
-        if (guiWrapper->main_object->option_path)
-            DrawPath();
-            
-        UpdateTest(t);
+    //==================================
 
-        guiWrapper->ApplyDisplayOption();
-        guiWrapper->Render();
-    }
+    // if (guiWrapper)
+    // {
+    //     if (guiWrapper->main_object->option_path)
+    //         DrawPath();
+
+    //     UpdateTest(t);
+
+    //     guiWrapper->ApplyDisplayOption();
+    //     guiWrapper->Render();
+    // }
 
     t++;
     //std::cout<<t<<std::endl;
@@ -188,13 +183,24 @@ bool Viewport::InsideCurrView()
  * Current for Double Viewport
  */
 ViewportManager::ViewportManager(GLFWwindow *window)
-    : _currconfig(DUAL_VIEWPORT), window(window)
+    : _currconfig(DUAL_VIEWPORT), window(window), gui(nullptr)
 {
 }
 
 ViewportManager::~ViewportManager()
 {
     viewport_list.clear();
+}
+
+void ViewportManager::InitializeGui(GLFWwindow *window, Sim_Object *object)
+{
+    gui = new ImGui_Wrapper();
+
+    // TODO: If local, initialize guiWrapper
+    gui->SetRenderObject(object);
+    gui->Initialize(window);
+    gui->test_GenObject();
+    gui->InitBuffer();
 }
 
 void ViewportManager::InitializeViewports(const int global_x, const int global_y)
@@ -205,11 +211,17 @@ void ViewportManager::InitializeViewports(const int global_x, const int global_y
     switch (_currconfig)
     {
     case SINGLE_VIEWPORT:
-        viewport_list.push_back(Viewport(window, global_x, global_y));
+        viewport_list.push_back(Viewport());
+        viewport_list[0].Resize(0, 0, global_x, global_y);
+        viewport_list[0].SetWindow(window);
         break;
     case DUAL_VIEWPORT:
-        viewport_list.push_back(Viewport(window, 0, 0, global_x / 2, global_y));
-        viewport_list.push_back(Viewport(window, global_x / 2, 0, global_x / 2, global_y));
+        viewport_list.push_back(Viewport());
+        viewport_list.push_back(Viewport());
+        viewport_list[0].Resize(0, 0, global_x / 2, global_y);
+        viewport_list[0].SetWindow(window);
+        viewport_list[1].Resize(global_x / 2, 0, global_x / 2, global_y);
+        viewport_list[1].SetWindow(window);
         break;
 
     default:
@@ -273,12 +285,25 @@ void ViewportManager::Update()
 {
     for (int i = 0; i < viewport_list.size(); i++)
         viewport_list[i].Update();
+
+    gui->UIFrame();
 }
 
 void ViewportManager::DrawFrame()
 {
     for (int i = 0; i < viewport_list.size(); i++)
         viewport_list[i].DrawFrame();
+
+    if (gui)
+    {
+        // if (guiWrapper->main_object->option_path)
+        //     DrawPath();
+
+        // UpdateTest(t);
+
+        gui->ApplyDisplayOption();
+        gui->Render();
+    }
 }
 
 Viewport &ViewportManager::GetViewport(int i)

@@ -7,7 +7,6 @@ World::World(int size_x, int size_y)
       viewports(nullptr),
       window_width(size_x), window_height(size_y)
 {
-    // object = new Sim_Object();
 }
 
 World::~World()
@@ -104,7 +103,16 @@ void World::Initialize_Viewports()
     viewports->ViewportSetting(&object);
 
     // Set up Imgui in Viewport0
-    viewports->GetViewport(0).Initialize_Gui();
+    // viewports->GetViewport(0).Initialize_Gui();
+    viewports->InitializeGui(window, &object);
+
+    // ================================================
+
+    // viewports = new ViewportManager();
+    // viewports->ConfigureViewports(ViewportManager::VM_SINGLE_VIEWPORT);
+    // viewports->SetRenderObject(&object);
+
+    // viewports->Gui_Setting(window, &object);
 }
 
 void World::Close_Callback(GLFWwindow *window)
@@ -116,7 +124,7 @@ void World::Scroll_Callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    world->viewports->GetCurrViewport().GetCamera()->ProcessMouseScroll(yoffset);
+    // world->viewports->GetCurrViewport().GetCamera()->ProcessMouseScroll(yoffset);
 }
 
 void World::Reshape_Callback(GLFWwindow *window, int w, int h)
@@ -134,7 +142,7 @@ void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int act
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    world->viewports->Mouse_Button_Callback(key, action, mode);
+    // world->viewports->Mouse_Button_Callback(key, action, mode);
 }
 
 // TODO: Some bug with Camera->set pos
