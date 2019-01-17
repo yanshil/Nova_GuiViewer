@@ -88,15 +88,25 @@ class ViewportManager
         }
 
         _currentConfiguration = vc;
+
+        std::cout << 222 << std::endl;
+
+        std::cout <<_global_viewport.width << std::endl;
+        // std::cout <<_global_viewport.height << std::endl;
+    
         SetWindowGeometry(_global_viewport.width, _global_viewport.height);
     }
     void SetWindowGeometry(int width, int height)
     {
+        std::cout << "What??" << std::endl;
+        std::cout << _global_viewport.x << std::endl;
         // Update the global window viewport
         _global_viewport.x = 0;
         _global_viewport.y = 0;
         _global_viewport.width = width;
         _global_viewport.height = height;
+
+        std::cout << "222" << std::endl;
 
         // Now update all viewports based on the active configuration
         switch (_currentConfiguration)
@@ -141,6 +151,7 @@ class ViewportManager
     void UpdateViewportGeometry(unsigned int v)
     {
         Viewport &viewport = _viewports.at(v);
+        std::cout << &viewport.camera << std::endl;
         viewport.camera->SetSize(viewport.width, viewport.height);
 
         viewport.shader->initializeFromFile("camera.vs", "camera.fs");
@@ -199,10 +210,10 @@ class ViewportManager
         Viewport(Viewport &&) = default;
         Viewport(const Viewport &) = delete;
         Viewport &operator=(const Viewport &) = delete;
-        int x;
-        int y;
-        int width;
-        int height;
+        int x = 0;
+        int y = 0;
+        int width = 800;
+        int height = 600;
         float clipNear;
         float clipFar;
         std::unique_ptr<Camera> camera;

@@ -98,21 +98,22 @@ void World::Main_Loop()
 
 void World::Initialize_Viewports()
 {
-    viewports = new ViewportManager(window);
-    viewports->InitializeViewports(window_width, window_height);
-    viewports->ViewportSetting(&object);
+    // viewports = new ViewportManager(window);
+    // viewports->InitializeViewports(window_width, window_height);
+    // viewports->ViewportSetting(&object);
 
-    // Set up Imgui in Viewport0
-    // viewports->GetViewport(0).Initialize_Gui();
-    viewports->InitializeGui(window, &object);
+    // // Set up Imgui in Viewport0
+    // viewports->InitializeGui(window, &object);
 
     // ================================================
 
-    // viewports = new ViewportManager();
-    // viewports->ConfigureViewports(ViewportManager::VM_SINGLE_VIEWPORT);
-    // viewports->SetRenderObject(&object);
+    viewports = new ViewportManager();
+    std::cout << "111" << std::endl;
+    viewports->ConfigureViewports(ViewportManager::VM_DUAL_VIEWPORT);
+    std::cout << "555" << std::endl;
+    viewports->SetRenderObject(&object);
 
-    // viewports->Gui_Setting(window, &object);
+    viewports->Gui_Setting(window, &object);
 }
 
 void World::Close_Callback(GLFWwindow *window)
@@ -124,7 +125,7 @@ void World::Scroll_Callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    world->viewports->GetCurrViewport().GetCamera()->ProcessMouseScroll(yoffset);
+    // world->viewports->GetCurrViewport().GetCamera()->ProcessMouseScroll(yoffset);
 }
 
 void World::Reshape_Callback(GLFWwindow *window, int w, int h)
@@ -133,7 +134,7 @@ void World::Reshape_Callback(GLFWwindow *window, int w, int h)
     world->window_width = w;
     world->window_height = h;
 
-    world->viewports->SetWindowGeometry(w, h);
+    // world->viewports->SetWindowGeometry(w, h);
 }
 
 void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int action, int mode)
@@ -142,7 +143,7 @@ void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int act
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    world->viewports->Keyboard_Callback(key, action, mode);
+    // world->viewports->Keyboard_Callback(key, action, mode);
 }
 
 // TODO: Some bug with Camera->set pos
@@ -150,12 +151,12 @@ void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, in
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    world->viewports->Mouse_Button_Callback(button, action, mods);
+    // world->viewports->Mouse_Button_Callback(button, action, mods);
 }
 
 void World::Mouse_Position_Callback(GLFWwindow *window, double x, double y)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    world->viewports->Mouse_Position_Callback(x, y);
+    // world->viewports->Mouse_Position_Callback(x, y);
 }
