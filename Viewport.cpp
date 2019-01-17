@@ -257,15 +257,17 @@ void ViewportManager::DrawFrame()
 
     if (gui)
     {
-        if (gui->main_object->option_path)
-            DrawPath();
-
-        // UpdateTest(t);
+        if (gui->main_object->animation_test)
+        {
+            UpdateTest(t);
+            t++;
+            if (gui->main_object->option_path)
+                DrawPath();
+        }
 
         gui->ApplyDisplayOption();
         gui->Render();
     }
-    // t++;
 }
 
 Viewport &ViewportManager::GetViewport(int i)
@@ -273,6 +275,7 @@ Viewport &ViewportManager::GetViewport(int i)
     return viewport_list[i];
 }
 
+// TODO: Fix the WASD 
 void ViewportManager::Mouse_Button_Callback(int key, int action, int mode)
 {
     float camVel = gui->GetIOFramerate() / 50000.0;
