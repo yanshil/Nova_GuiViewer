@@ -14,6 +14,15 @@
 
 using namespace opengl_gui_viewer;
 
+ViewportManager::ViewportManager()
+    : _currentConfiguration(VM_NOT_CONFIGURED), gui(nullptr)
+{
+}
+
+ViewportManager::~ViewportManager()
+{
+}
+
 void ViewportManager::ConfigureViewports(ViewportConfiguration vc)
 {
     // Setup viewports based on the specific configuration layout.
@@ -62,5 +71,105 @@ void ViewportManager::ConfigureViewports(ViewportConfiguration vc)
     }
 
     _currentConfiguration = vc;
+
     SetWindowGeometry(_global_viewport.width, _global_viewport.height);
+}
+
+void ViewportManager::SetWindowGeometry(int width, int height)
+{
+    // Update the global window viewport
+    _global_viewport.x = 0;
+    _global_viewport.y = 0;
+    _global_viewport.width = width;
+    _global_viewport.height = height;
+
+    // Now update all viewports based on the active configuration
+    switch (_currentConfiguration)
+    {
+    case VM_SINGLE_VIEWPORT:
+    {
+        Viewport &viewport = _viewports[0]; // This mode only has one viewport
+        // ... and its pretty easy to do so.
+        viewport.x = _global_viewport.x;
+        viewport.y = _global_viewport.y;
+        viewport.width = _global_viewport.width;
+        viewport.height = _global_viewport.height;
+    }
+    break;
+    case VM_DUAL_VIEWPORT:
+    {
+        Viewport &viewportA = _viewports[0];
+        viewportA.x = _global_viewport.x;
+        viewportA.y = _global_viewport.y;
+        viewportA.width = _global_viewport.width / 2;
+        viewportA.height = _global_viewport.height;
+
+        Viewport &viewportB = _viewports[1];
+        viewportB.x = _global_viewport.x + _global_viewport.width / 2;
+        viewportB.y = _global_viewport.y;
+        viewportB.width = _global_viewport.width / 2;
+        viewportB.height = _global_viewport.height;
+    }
+    break;
+    default:
+        break;
+    }
+
+    for (int v = 0; v < this->_viewports.size(); v++)
+        // Next, we need to manually update each controller based on its viewport's
+        // unique geometry
+        UpdateViewportGeometry(v);
+}
+
+void ViewportManager::UpdateViewportGeometry(unsigned int v)
+{
+    Viewport &viewport = _viewports.at(v);
+    viewport.camera->SetSize(viewport.width, viewport.height);
+
+    // TODO
+    viewport.shader->initializeFromFile("camera.vs", "camera.fs");
+    viewport.shader->use();
+}
+void ViewportManager::SetRenderObject(Sim_Object *object)
+{
+    for (int v = 0; v < this->_viewports.size(); v++)
+        _viewports[v].object = object;
+}
+
+void ViewportManager::Update()
+{
+    for (int v = 0; v < this->_viewports.size(); v++)
+        _viewports[v].camera->Update();
+
+    if (gui)
+        gui->UIFrame();
+}
+
+void ViewportManager::DrawFrame()
+{
+    for (int v = 0; v < this->_viewports.size(); v++)
+    {
+        _viewports[v].shader->setMat4("projection", _viewports[v].camera->GetProjectionMatrix());
+        _viewports[v].shader->setMat4("view", _viewports[v].camera->GetViewMatrix());
+        _viewports[v].shader->setMat4("model", _viewports[v].camera->GetModelMatrix());
+        glViewport(_viewports[v].x, _viewports[v].y, _viewports[v].width, _viewports[v].height);
+
+        glDrawElements(GL_TRIANGLES, 3 * _viewports[v].object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
+    }
+
+    if (gui)
+    {
+        gui->ApplyDisplayOption();
+        gui->Render();
+    }
+}
+
+void ViewportManager::Gui_Initialize(GLFWwindow *window, Sim_Object *object)
+{
+
+    gui = new ImGui_Wrapper();
+    gui->SetRenderObject(object);
+    gui->Initialize(window);
+    gui->test_GenObject();
+    gui->InitBuffer();
 }

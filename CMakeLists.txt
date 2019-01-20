@@ -20,7 +20,7 @@ add_executable(${PROJECT_NAME}
     TriMesh.cpp
     ImGui_Wrapper.cpp
     Sim_Object.cpp
-    # Viewport.cpp
+    ViewportManager.cpp
     World.cpp
     )
 
