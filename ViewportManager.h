@@ -29,10 +29,10 @@ class ViewportManager
     }; //, VM_QUAD_VIEWPORT };
 
     std::vector<Viewport> _viewports;
-    ImGui_Wrapper *guiWrapper;
+    ImGui_Wrapper *gui;
 
     ViewportManager()
-        : _currentConfiguration(VM_NOT_CONFIGURED), guiWrapper(nullptr)
+        : _currentConfiguration(VM_NOT_CONFIGURED), gui(nullptr)
     {
     }
     ~ViewportManager()
@@ -89,25 +89,16 @@ class ViewportManager
 
         _currentConfiguration = vc;
 
-        std::cout << 222 << std::endl;
-
-        std::cout <<_global_viewport.width << std::endl;
-        std::cout <<_global_viewport.height << std::endl;
     
         SetWindowGeometry(_global_viewport.width, _global_viewport.height);
     }
     void SetWindowGeometry(int width, int height)
     {
-        std::cout << "What??" << std::endl;
-        std::cout << _global_viewport.x << std::endl;
-        std::cout.flush();
         // Update the global window viewport
         _global_viewport.x = 0;
         _global_viewport.y = 0;
         _global_viewport.width = width;
         _global_viewport.height = height;
-
-        std::cout << "222" << std::endl;
 
         // Now update all viewports based on the active configuration
         switch (_currentConfiguration)
@@ -152,9 +143,9 @@ class ViewportManager
     void UpdateViewportGeometry(unsigned int v)
     {
         Viewport &viewport = _viewports.at(v);
-        std::cout << &viewport.camera << std::endl;
         viewport.camera->SetSize(viewport.width, viewport.height);
 
+        // TODO
         viewport.shader->initializeFromFile("camera.vs", "camera.fs");
         viewport.shader->use();
     }
@@ -170,8 +161,8 @@ class ViewportManager
         for (int v = 0; v < this->_viewports.size(); v++)
             _viewports[v].camera->Update();
 
-        if (guiWrapper)
-            guiWrapper->UIFrame();
+        if (gui)
+            gui->UIFrame();
     }
     void DrawFrame()
     {
@@ -185,23 +176,22 @@ class ViewportManager
             glDrawElements(GL_TRIANGLES, 3 * _viewports[v].object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
         }
 
-        if (guiWrapper)
+        if (gui)
         {
-            guiWrapper->ApplyDisplayOption();
-            guiWrapper->Render();
+            gui->ApplyDisplayOption();
+            gui->Render();
         }
     }
 
     // ========= ImGui =========
-    void Gui_Setting(GLFWwindow *window, Sim_Object *object)
+    void Gui_Initialize(GLFWwindow *window, Sim_Object *object)
     {
         
-        guiWrapper = new ImGui_Wrapper();
-        std::cout << "Initialize Gui" << std::endl;
-        guiWrapper->SetRenderObject(object);
-        guiWrapper->Initialize(window);
-        guiWrapper->test_GenObject();
-        guiWrapper->InitBuffer();
+        gui = new ImGui_Wrapper();
+        gui->SetRenderObject(object);
+        gui->Initialize(window);
+        gui->test_GenObject();
+        gui->InitBuffer();
     }
 
   private:
@@ -211,10 +201,10 @@ class ViewportManager
         Viewport(Viewport &&) = default;
         Viewport(const Viewport &) = delete;
         Viewport &operator=(const Viewport &) = delete;
-        int x = 0;
-        int y = 0;
-        int width = 800;
-        int height = 600;
+        int x;
+        int y;
+        int width;
+        int height;
         float clipNear;
         float clipFar;
         std::unique_ptr<Camera> camera;

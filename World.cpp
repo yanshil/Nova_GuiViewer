@@ -108,12 +108,11 @@ void World::Initialize_Viewports()
     // ================================================
 
     viewports = new ViewportManager();
-    std::cout << "111-" << std::endl;
-    viewports->ConfigureViewports(ViewportManager::VM_SINGLE_VIEWPORT);
-    std::cout << "555" << std::endl;
+    viewports->ConfigureViewports(ViewportManager::VM_DUAL_VIEWPORT);
     viewports->SetRenderObject(&object);
+    viewports->SetWindowGeometry(800, 600);
 
-    viewports->Gui_Setting(window, &object);
+    viewports->Gui_Initialize(window, &object);
 }
 
 void World::Close_Callback(GLFWwindow *window)
@@ -134,7 +133,7 @@ void World::Reshape_Callback(GLFWwindow *window, int w, int h)
     world->window_width = w;
     world->window_height = h;
 
-    // world->viewports->SetWindowGeometry(w, h);
+    world->viewports->SetWindowGeometry(w, h);
 }
 
 void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int action, int mode)
