@@ -17,6 +17,9 @@ using namespace opengl_gui_viewer;
 ViewportManager::ViewportManager()
     : _currentConfiguration(VM_NOT_CONFIGURED), gui(nullptr)
 {
+    _shaderman = std::unique_ptr<ShaderManager>( new ShaderManager() );
+    _shaderman->PrependSearchPaths("/scratch/yanshi/Nova/build/bin/");
+    _shaderman->LoadFromFiles("camera");
 }
 
 ViewportManager::~ViewportManager()
@@ -60,7 +63,8 @@ void ViewportManager::ConfigureViewports(ViewportConfiguration vc)
         Viewport viewport;
         // TODO: Also setting camera, shader and Object
         viewport.camera = std::unique_ptr<Camera>(new Camera());
-        viewport.shader = std::unique_ptr<Shader>(new Shader());
+        viewport.shader = _shaderman->GetShader("camera");
+        // viewport.shader = std::unique_ptr<Shader>(new Shader());
 
         _viewports.push_back(std::move(viewport));
     }
@@ -149,8 +153,9 @@ void ViewportManager::UpdateViewportGeometry(unsigned int v)
     viewport.camera->SetSize(viewport.width, viewport.height);
 
     // TODO
-    viewport.shader->initializeFromFile("camera.vs", "camera.fs");
-    viewport.shader->use();
+    // viewport.shader->initializeFromFile("camera.vs", "camera.fs");
+    // viewport.shader->use();
+    viewport.shader->Use();
 }
 void ViewportManager::SetRenderObject(Sim_Object *object)
 {
@@ -171,9 +176,12 @@ void ViewportManager::DrawFrame()
 {
     for (int v = 0; v < this->_viewports.size(); v++)
     {
-        _viewports[v].shader->setMat4("projection", _viewports[v].camera->GetProjectionMatrix());
-        _viewports[v].shader->setMat4("view", _viewports[v].camera->GetViewMatrix());
-        _viewports[v].shader->setMat4("model", _viewports[v].camera->GetModelMatrix());
+        // _viewports[v].shader->setMat4("projection", _viewports[v].camera->GetProjectionMatrix());
+        // _viewports[v].shader->setMat4("view", _viewports[v].camera->GetViewMatrix());
+        // _viewports[v].shader->setMat4("model", _viewports[v].camera->GetModelMatrix());
+        _viewports[v].shader->SetMatrix4("projection", _viewports[v].camera->GetProjectionMatrix());
+        _viewports[v].shader->SetMatrix4("view", _viewports[v].camera->GetViewMatrix());
+        _viewports[v].shader->SetMatrix4("model", _viewports[v].camera->GetModelMatrix());
         glViewport(_viewports[v].x, _viewports[v].y, _viewports[v].width, _viewports[v].height);
 
         glDrawElements(GL_TRIANGLES, 3 * _viewports[v].object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
@@ -231,14 +239,14 @@ void ViewportManager::Keyboard_Callback(GLFWwindow *window, int key, int action,
 
 void ViewportManager::Mouse_Button_Callback(int button, int action, int mods)
 {
-    // CurrentViewport();
-    //TODO: Only Update the modifiable viewport
+    CurrentViewport();
+    //Only Update the modifiable viewport (Based on Camera Configuration)
     glm::vec2 mouse_position = gui->GetMousePosition();
-    _viewports[0].camera->Set_Pos(button, action, mouse_position.x, mouse_position.y);
+    _viewports[_activeViewport].camera->Set_Pos(button, action, mouse_position.x, mouse_position.y);
 }
 void ViewportManager::Mouse_Position_Callback(double x, double y)
 {
-    // CurrentViewport();
+    CurrentViewport();
     glm::vec2 mouse_position = gui->GetMousePosition();
-    _viewports[0].camera->Move_2D(mouse_position.x, mouse_position.y);
+    _viewports[_activeViewport].camera->Move_2D(mouse_position.x, mouse_position.y);
 }

@@ -16,12 +16,15 @@ add_definitions(
 
 add_executable(${PROJECT_NAME} 
     main.cpp
+    World.cpp
+    ViewportManager.cpp
     triangle.cpp
     TriMesh.cpp
     ImGui_Wrapper.cpp
     Sim_Object.cpp
-    ViewportManager.cpp
-    World.cpp
+    ShaderManager.cpp
+    ResourceManager.cpp
+    Shader.cpp
     )
 
 target_link_libraries(${PROJECT_NAME}

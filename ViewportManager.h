@@ -1,3 +1,8 @@
+//====================================================
+// @Yanshi
+// Modified from
+// https://github.com/OrionQuest/Nova_Examples/blob/master/opengl/ViewportManager.h
+//====================================================
 #ifndef OGL_VIEWPORT_MANAGER_H__
 #define OGL_VIEWPORT_MANAGER_H__
 
@@ -10,7 +15,8 @@
 
 #include "ImGui_Wrapper.h"
 #include "Camera.h"
-#include "shader.h"
+// #include "shader.h"
+#include "ShaderManager.h"
 #include "Sim_Object.h"
 
 namespace opengl_gui_viewer
@@ -29,6 +35,7 @@ class ViewportManager
     }; //, VM_QUAD_VIEWPORT };
 
     std::vector<Viewport> _viewports;
+    std::unique_ptr<ShaderManager> _shaderman;
     ImGui_Wrapper *gui;
 
     ViewportManager();
