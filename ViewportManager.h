@@ -15,7 +15,6 @@
 
 #include "ImGui_Wrapper.h"
 #include "Camera.h"
-// #include "shader.h"
 #include "ShaderManager.h"
 #include "Sim_Object.h"
 
@@ -45,7 +44,7 @@ class ViewportManager
     void ConfigureViewports(ViewportConfiguration vc);
 
     void SetWindowGeometry(int width, int height);
-    
+
     unsigned int NumViewports() { return _viewports.size(); }
     unsigned int CurrentViewport();
 
@@ -65,6 +64,12 @@ class ViewportManager
     void Keyboard_Callback(GLFWwindow *window, int key, int action, int mode);
     void Mouse_Button_Callback(int button, int action, int mods);
     void Mouse_Position_Callback(double x, double y);
+
+    // TODO: @Haozhe update test
+    //====================================
+    int t = 0;
+    void UpdateTest(int t);
+    void DrawPath();
 
   private:
     struct Viewport

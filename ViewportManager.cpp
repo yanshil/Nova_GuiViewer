@@ -9,7 +9,6 @@
 
 #include "ImGui_Wrapper.h"
 #include "Camera.h"
-#include "shader.h"
 #include "Sim_Object.h"
 
 using namespace opengl_gui_viewer;
@@ -17,7 +16,7 @@ using namespace opengl_gui_viewer;
 ViewportManager::ViewportManager()
     : _currentConfiguration(VM_NOT_CONFIGURED), gui(nullptr)
 {
-    _shaderman = std::unique_ptr<ShaderManager>( new ShaderManager() );
+    _shaderman = std::unique_ptr<ShaderManager>(new ShaderManager());
     _shaderman->PrependSearchPaths("./bin");
     _shaderman->LoadFromFiles("camera");
 }
@@ -125,9 +124,9 @@ void ViewportManager::SetWindowGeometry(int width, int height)
         // unique geometry
         UpdateViewportGeometry(v);
 
-        // TODO
+    // TODO
     _viewports[0].camera->ConfigureCamera(Camera::LOCAL_CAMERA);
-    if(_viewports.size() > 1)
+    if (_viewports.size() > 1)
         _viewports[1].camera->ConfigureCamera(Camera::GLOBAL_CAMERA);
 }
 
@@ -186,6 +185,17 @@ void ViewportManager::DrawFrame()
 
         glDrawElements(GL_TRIANGLES, 3 * _viewports[v].object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
     }
+
+    // TODO: updatetest
+    if (gui)
+    {
+        UpdateTest(t);
+
+        if (gui->main_object->option_path)
+            DrawPath();
+    }
+
+    t++;
 
     if (gui)
     {
@@ -249,4 +259,59 @@ void ViewportManager::Mouse_Position_Callback(double x, double y)
     CurrentViewport();
     glm::vec2 mouse_position = gui->GetMousePosition();
     _viewports[_activeViewport].camera->Move_2D(mouse_position.x, mouse_position.y);
+}
+
+// TODO: @Haozhe
+//============ update test===============
+
+void ViewportManager::UpdateTest(int t)
+{
+    gui->UpdateTest(t);
+}
+void ViewportManager::DrawPath()
+{
+    int vertex_size = gui->geometry_centers.size();
+    double vertices[3 * vertex_size];
+
+    for (int i = 0; i < vertex_size; i++)
+    {
+
+        for (int j = 0; j < 3; j++)
+        {
+            vertices[3 * i + j] = gui->geometry_centers[i][j];
+        }
+    }
+
+    unsigned int indices[2 * (vertex_size - 1)];
+
+    for (int i = 0; i < vertex_size - 1; i++)
+    {
+        indices[2 * i] = i;
+        indices[2 * i + 1] = i + 1;
+    }
+
+    glBindVertexArray(gui->path_VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, gui->path_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gui->path_EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+    glBindVertexArray(0);
+    glBindVertexArray(gui->path_VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawElements(GL_LINES, 2 * (vertex_size - 1), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0); // no need to unbind it every time
 }
