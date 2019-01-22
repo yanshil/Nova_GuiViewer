@@ -192,7 +192,6 @@ class Camera
         // change the pitch and heading
         if (Move_Camera)
         {
-            std::cout <<Mouse_Delta.x << ">>>"<<Mouse_Delta.y << std::endl;
             Change_Heading(Mouse_Delta.x * 10);
             Change_Yaw(Mouse_Delta.y);
 

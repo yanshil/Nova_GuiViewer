@@ -1,4 +1,4 @@
-#include "World.h"
+#include "OGL_World.h"
 
 using namespace opengl_gui_viewer;
 

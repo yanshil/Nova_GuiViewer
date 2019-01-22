@@ -1,4 +1,4 @@
-#include "ViewportManager.h"
+#include "OGL_ViewportManager.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -8,7 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "ImGui_Wrapper.h"
-#include "Camera.h"
+#include "OGL_Camera.h"
 #include "Sim_Object.h"
 
 using namespace opengl_gui_viewer;

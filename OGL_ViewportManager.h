@@ -13,8 +13,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "OGL_Camera.h"
 #include "ImGui_Wrapper.h"
-#include "Camera.h"
 #include "ShaderManager.h"
 #include "Sim_Object.h"
 

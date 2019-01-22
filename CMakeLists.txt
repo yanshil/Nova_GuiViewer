@@ -19,8 +19,8 @@ add_subdirectory(externals)
 
 add_executable(${PROJECT_NAME} 
     main.cpp
-    World.cpp
-    ViewportManager.cpp
+    OGL_World.cpp
+    OGL_ViewportManager.cpp
     triangle.cpp
     TriMesh.cpp
     ImGui_Wrapper.cpp
