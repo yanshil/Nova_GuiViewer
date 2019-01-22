@@ -32,23 +32,7 @@ Try to see Repo->Boards (menu on hte left hand side of the repo). Since I did no
 * Fix the CMakeLists's imgui bug (see below)
 
 ## Bugs need to be fixed
-1. I make a folder called 'externals' to reference git submodules for imgui. But the CMakeLists.txt not working as I expected.
-[Refer](https://github.com/mit-gfx/opengl_viewer)
-Currently I commented `#add_subdirectory(externals)` in the `./CMakeLists.txt` and use 
-
-```
-### imgui
-include_directories(./externals/imgui)
-include_directories(./externals/imgui/examples)
-
-add_library(imgui ./externals/imgui/imgui.cpp ./externals/imgui/imgui_demo.cpp ./externals/imgui/imgui_draw.cpp ./externals/imgui/imgui_widgets.cpp ./externals/imgui/examples/imgui_impl_glfw.cpp ./externals/imgui/examples/imgui_impl_opengl3.cpp)
-```
-
-for external imgui library instead.
-
-In fact the `./externals/CMakeLists.txt` should do this things but it not works.
-
-
+1. ImGui CMake: Fix.
 ---
 
 ## Basic Git Branch Usage

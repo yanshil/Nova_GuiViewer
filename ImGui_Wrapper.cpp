@@ -9,10 +9,10 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // Imgui
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_internal.h"
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_internal.h"
+#include "externals/imgui/examples/imgui_impl_glfw.h"
+#include "externals/imgui/examples/imgui_impl_opengl3.h"
 
 namespace opengl_gui_viewer
 {
