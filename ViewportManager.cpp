@@ -71,6 +71,7 @@ void ViewportManager::ConfigureViewports(ViewportConfiguration vc)
     }
 
     _currentConfiguration = vc;
+    _activeViewport = 0;
 
     SetWindowGeometry(_global_viewport.width, _global_viewport.height);
 }
@@ -119,6 +120,27 @@ void ViewportManager::SetWindowGeometry(int width, int height)
         // Next, we need to manually update each controller based on its viewport's
         // unique geometry
         UpdateViewportGeometry(v);
+
+        // TODO
+    _viewports[0].camera->ConfigureCamera(Camera::LOCAL_CAMERA);
+    if(_viewports.size() > 1)
+        _viewports[1].camera->ConfigureCamera(Camera::GLOBAL_CAMERA);
+}
+
+unsigned int ViewportManager::CurrentViewport()
+{
+    glm::vec2 mouse_pos = gui->GetMousePosition();
+
+    for (int i = 0; i < _viewports.size(); i++)
+    {
+        Viewport &viewport = _viewports.at(i);
+        if ((mouse_pos.x >= viewport.x) &
+            (mouse_pos.x <= viewport.x + viewport.width) &
+            (mouse_pos.y >= viewport.y) &
+            (mouse_pos.y <= viewport.y + viewport.height))
+            _activeViewport = i;
+    }
+    return _activeViewport;
 }
 
 void ViewportManager::UpdateViewportGeometry(unsigned int v)
@@ -166,10 +188,57 @@ void ViewportManager::DrawFrame()
 
 void ViewportManager::Gui_Initialize(GLFWwindow *window, Sim_Object *object)
 {
-
     gui = new ImGui_Wrapper();
     gui->SetRenderObject(object);
     gui->Initialize(window);
     gui->test_GenObject();
     gui->InitBuffer();
+}
+
+void ViewportManager::Scroll_Callback(double yoffset)
+{
+    CurrentViewport();
+    _viewports[_activeViewport].camera->ProcessMouseScroll(yoffset);
+}
+
+void ViewportManager::Keyboard_Callback(GLFWwindow *window, int key, int action, int mode)
+{
+    CurrentViewport();
+
+    float camVel = gui->GetIOFramerate() / 20000.0;
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        _viewports[_activeViewport].camera->Position += camVel * _viewports[_activeViewport].camera->Front;
+        _viewports[_activeViewport].camera->Target += camVel * _viewports[_activeViewport].camera->Front;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        _viewports[_activeViewport].camera->Position -= camVel * _viewports[_activeViewport].camera->Front;
+        _viewports[_activeViewport].camera->Target -= camVel * _viewports[_activeViewport].camera->Front;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        _viewports[_activeViewport].camera->Position -= glm::normalize(glm::cross(_viewports[_activeViewport].camera->Front, _viewports[_activeViewport].camera->Up)) * camVel;
+        _viewports[_activeViewport].camera->Target -= glm::normalize(glm::cross(_viewports[_activeViewport].camera->Front, _viewports[_activeViewport].camera->Up)) * camVel;
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        _viewports[_activeViewport].camera->Position += glm::normalize(glm::cross(_viewports[_activeViewport].camera->Front, _viewports[_activeViewport].camera->Up)) * camVel;
+        _viewports[_activeViewport].camera->Target += glm::normalize(glm::cross(_viewports[_activeViewport].camera->Front, _viewports[_activeViewport].camera->Up)) * camVel;
+    }
+}
+
+void ViewportManager::Mouse_Button_Callback(int button, int action, int mods)
+{
+    // CurrentViewport();
+    //TODO: Only Update the modifiable viewport
+    glm::vec2 mouse_position = gui->GetMousePosition();
+    _viewports[0].camera->Set_Pos(button, action, mouse_position.x, mouse_position.y);
+}
+void ViewportManager::Mouse_Position_Callback(double x, double y)
+{
+    // CurrentViewport();
+    glm::vec2 mouse_position = gui->GetMousePosition();
+    _viewports[0].camera->Move_2D(mouse_position.x, mouse_position.y);
 }

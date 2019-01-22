@@ -47,11 +47,17 @@ class ViewportManager
 
     // ======= Frame Update  Logic ========
     void Update();
-
     void DrawFrame();
 
     // ========= ImGui =========
     void Gui_Initialize(GLFWwindow *window, Sim_Object *object);
+
+    // ======== Callbak =======
+
+    void Scroll_Callback(double yoffset);
+    void Keyboard_Callback(GLFWwindow *window, int key, int action, int mode);
+    void Mouse_Button_Callback(int button, int action, int mods);
+    void Mouse_Position_Callback(double x, double y);
 
   private:
     struct Viewport
@@ -73,6 +79,7 @@ class ViewportManager
 
     ViewportConfiguration _currentConfiguration;
     Viewport _global_viewport;
+    unsigned int _activeViewport;
 };
 
 } // namespace opengl_gui_viewer

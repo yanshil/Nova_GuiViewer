@@ -124,7 +124,8 @@ void World::Scroll_Callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    // world->viewports->GetCurrViewport().GetCamera()->ProcessMouseScroll(yoffset);
+    world->viewports->Scroll_Callback(yoffset);
+    
 }
 
 void World::Reshape_Callback(GLFWwindow *window, int w, int h)
@@ -142,7 +143,7 @@ void World::Keyboard_Callback(GLFWwindow *window, int key, int scancode, int act
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
-    // world->viewports->Keyboard_Callback(key, action, mode);
+    world->viewports->Keyboard_Callback(window, key, action, mode);
 }
 
 // TODO: Some bug with Camera->set pos
@@ -150,12 +151,12 @@ void World::Mouse_Button_Callback(GLFWwindow *window, int button, int action, in
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    // world->viewports->Mouse_Button_Callback(button, action, mods);
+    world->viewports->Mouse_Button_Callback(button, action, mods);
 }
 
 void World::Mouse_Position_Callback(GLFWwindow *window, double x, double y)
 {
     World *world = static_cast<World *>(glfwGetWindowUserPointer(window));
 
-    // world->viewports->Mouse_Position_Callback(x, y);
+    world->viewports->Mouse_Position_Callback(x, y);
 }
