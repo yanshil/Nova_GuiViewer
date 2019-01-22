@@ -10,6 +10,9 @@ set(CMAKE_CXX_STANDARD 11)
 configure_file(./camera.fs ${CMAKE_BINARY_DIR}/bin/camera.fs COPYONLY)
 configure_file(./camera.vs ${CMAKE_BINARY_DIR}/bin/camera.vs COPYONLY)
 
+configure_file(./camera.frag ${CMAKE_BINARY_DIR}/bin/camera.frag COPYONLY)
+configure_file(./camera.vert ${CMAKE_BINARY_DIR}/bin/camera.vert COPYONLY)
+
 add_definitions(
   -DIMGUI_IMPL_OPENGL_LOADER_GLEW
 )

@@ -18,7 +18,7 @@ ViewportManager::ViewportManager()
     : _currentConfiguration(VM_NOT_CONFIGURED), gui(nullptr)
 {
     _shaderman = std::unique_ptr<ShaderManager>( new ShaderManager() );
-    _shaderman->PrependSearchPaths("/scratch/yanshi/Nova/build/bin/");
+    _shaderman->PrependSearchPaths("./bin");
     _shaderman->LoadFromFiles("camera");
 }
 
