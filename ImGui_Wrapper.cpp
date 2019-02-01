@@ -343,7 +343,6 @@ void ImGui_Wrapper::ApplyDisplayOption()
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
 }
 
 void ImGui_Wrapper::DisplayGenerateModule()
@@ -460,14 +459,10 @@ void ImGui_Wrapper::NewBuffer()
     }
 
     unsigned int indices[3 * triangle_size];
-    for (int i = 0; i < triangle_size; i++)
-    {
 
+    for (int i = 0; i < triangle_size; i++)
         for (int j = 0; j < 3; j++)
-        {
             indices[3 * i + j] = main_object->trimesh->triangle_list[i][j];
-        }
-    }
 
     // // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
@@ -502,6 +497,8 @@ glm::vec2 ImGui_Wrapper::GetMousePosition()
     return glm::vec2(mouse_position.x, mouse_position.y);
 }
 
+// =========================================
+// @Haoshe
 void ImGui_Wrapper::UpdateTest(int t)
 {
     int vertex_size = main_object->trimesh->vertex_list.size();
@@ -520,14 +517,10 @@ void ImGui_Wrapper::UpdateTest(int t)
     geometry_center.push_back(-5 * sin(t * 0.0005) / main_object->cube->edge_max);
     geometry_centers.push_back(geometry_center);
     unsigned int indices[3 * triangle_size];
-    for (int i = 0; i < triangle_size; i++)
-    {
 
+    for (int i = 0; i < triangle_size; i++)
         for (int j = 0; j < 3; j++)
-        {
             indices[3 * i + j] = main_object->trimesh->triangle_list[i][j];
-        }
-    }
 
     // // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
@@ -538,7 +531,7 @@ void ImGui_Wrapper::UpdateTest(int t)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    
+
     glEnableVertexAttribArray(0);
 }
 

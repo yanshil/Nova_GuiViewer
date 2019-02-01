@@ -180,9 +180,12 @@ void ViewportManager::DrawFrame()
         _viewports[v].shader->SetMatrix4("model", _viewports[v].camera->GetModelMatrix());
         glViewport(_viewports[v].x, _viewports[v].y, _viewports[v].width, _viewports[v].height);
 
-        glBindVertexArray(gui->VAO);
-        glDrawElements(GL_TRIANGLES, 3 * _viewports[v].object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        if (_viewports[v].object)
+        {
+            glBindVertexArray(gui->VAO);
+            glDrawElements(GL_TRIANGLES, 3 * _viewports[v].object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
     }
 
     t++;
@@ -203,7 +206,7 @@ void ViewportManager::DrawFrame()
         }
     }
 
-    if(gui)
+    if (gui)
     {
         gui->ApplyDisplayOption();
         gui->Render();
@@ -275,13 +278,8 @@ void ViewportManager::DrawPath()
     double vertices[3 * vertex_size];
 
     for (int i = 0; i < vertex_size; i++)
-    {
-
         for (int j = 0; j < 3; j++)
-        {
             vertices[3 * i + j] = gui->geometry_centers[i][j];
-        }
-    }
 
     unsigned int indices[2 * (vertex_size - 1)];
 
