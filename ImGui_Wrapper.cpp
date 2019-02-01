@@ -25,12 +25,10 @@ ImGui_Wrapper::ImGui_Wrapper()
 {
 }
 
-void ImGui_Wrapper::SetRenderObject(Sim_Object * object)
+void ImGui_Wrapper::SetRenderObject(Sim_Object *object)
 {
     main_object = object;
 }
-
-
 
 void ImGui_Wrapper::Initialize(GLFWwindow *window)
 {
@@ -345,6 +343,7 @@ void ImGui_Wrapper::ApplyDisplayOption()
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 }
 
 void ImGui_Wrapper::DisplayGenerateModule()
@@ -375,7 +374,6 @@ void ImGui_Wrapper::DisplayGenerateModule()
             main_object->trimesh->GenMesh(*(main_object->cube), (main_object->holes->holes));
 
             NewBuffer();
-
         }
     }
 
@@ -394,12 +392,12 @@ void ImGui_Wrapper::DisplayGenerateModule()
     ImGui::PopStyleColor(3);
     ImGui::PopID();
 
-    if(ImGui::Button("Animate Test"))
+    if (ImGui::Button("Animate Test"))
     {
         main_object->animation_test = true;
     }
 
-    if(ImGui::Button("Stop Animate Test"))
+    if (ImGui::Button("Stop Animate Test"))
     {
         main_object->animation_test = false;
     }
@@ -408,7 +406,7 @@ void ImGui_Wrapper::DisplayGenerateModule()
 void ImGui_Wrapper::DisplayAnimation()
 {
     ImGui::Checkbox("Wireframe", &(main_object->option_wireframe));
-    ImGui::Checkbox("Show Path",&(main_object->option_path));
+    ImGui::Checkbox("Show Path", &(main_object->option_path));
 
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 }
@@ -437,13 +435,15 @@ void ImGui_Wrapper::InitBuffer()
     glGenBuffers(1, &path_VBO);
     glGenBuffers(1, &path_EBO);
 
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
     NewBuffer();
 }
 
-// Only called after main_object is assigned with data...
+/**
+ * Only called when:
+ * 1. Init Buffer
+ * 2. "Generate" Button is clicked
+ * 
+ */
 void ImGui_Wrapper::NewBuffer()
 {
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -510,14 +510,14 @@ void ImGui_Wrapper::UpdateTest(int t)
 
     for (int i = 0; i < vertex_size; i++)
     {
-        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max + 1*sin(t * 0.00015)/main_object->cube->edge_max;
-        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max + 2*sin(t * 0.00025)/main_object->cube->edge_max;
-        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max-5*sin(t * 0.0005)/main_object->cube->edge_max;
+        vertices[3 * i] = main_object->trimesh->vertex_list[i][0] / main_object->cube->edge_max + 1 * sin(t * 0.00015) / main_object->cube->edge_max;
+        vertices[3 * i + 1] = main_object->trimesh->vertex_list[i][1] / main_object->cube->edge_max + 2 * sin(t * 0.00025) / main_object->cube->edge_max;
+        vertices[3 * i + 2] = main_object->trimesh->vertex_list[i][2] / main_object->cube->edge_max - 5 * sin(t * 0.0005) / main_object->cube->edge_max;
     }
     geometry_center.clear();
-    geometry_center.push_back(1*sin(t * 0.00015)/main_object->cube->edge_max);
-    geometry_center.push_back(2*sin(t * 0.00025)/main_object->cube->edge_max);
-    geometry_center.push_back(-5*sin(t * 0.0005)/main_object->cube->edge_max);
+    geometry_center.push_back(1 * sin(t * 0.00015) / main_object->cube->edge_max);
+    geometry_center.push_back(2 * sin(t * 0.00025) / main_object->cube->edge_max);
+    geometry_center.push_back(-5 * sin(t * 0.0005) / main_object->cube->edge_max);
     geometry_centers.push_back(geometry_center);
     unsigned int indices[3 * triangle_size];
     for (int i = 0; i < triangle_size; i++)
@@ -534,15 +534,12 @@ void ImGui_Wrapper::UpdateTest(int t)
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
+    
     glEnableVertexAttribArray(0);
-
-    // =======================================
-    ApplyDisplayOption();             
 }
 
 } // namespace opengl_gui_viewer

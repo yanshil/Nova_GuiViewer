@@ -175,29 +175,35 @@ void ViewportManager::DrawFrame()
 {
     for (int v = 0; v < this->_viewports.size(); v++)
     {
-        // _viewports[v].shader->setMat4("projection", _viewports[v].camera->GetProjectionMatrix());
-        // _viewports[v].shader->setMat4("view", _viewports[v].camera->GetViewMatrix());
-        // _viewports[v].shader->setMat4("model", _viewports[v].camera->GetModelMatrix());
         _viewports[v].shader->SetMatrix4("projection", _viewports[v].camera->GetProjectionMatrix());
         _viewports[v].shader->SetMatrix4("view", _viewports[v].camera->GetViewMatrix());
         _viewports[v].shader->SetMatrix4("model", _viewports[v].camera->GetModelMatrix());
         glViewport(_viewports[v].x, _viewports[v].y, _viewports[v].width, _viewports[v].height);
 
+        glBindVertexArray(gui->VAO);
         glDrawElements(GL_TRIANGLES, 3 * _viewports[v].object->trimesh->triangle_list.size(), GL_UNSIGNED_INT, 0);
-    }
-
-    // TODO: updatetest
-    if (gui)
-    {
-        UpdateTest(t);
-
-        if (gui->main_object->option_path)
-            DrawPath();
+        glBindVertexArray(0);
     }
 
     t++;
 
+    // TODO: updatetest
     if (gui)
+    {
+        gui->UpdateTest(t);
+
+        if (gui->main_object->option_path)
+        {
+            // Better named as "BindPathBuffer"
+            DrawPath();
+
+            glBindVertexArray(gui->path_VAO);
+            glDrawElements(GL_LINES, 2 * (gui->geometry_centers.size() - 1), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+        }
+    }
+
+    if(gui)
     {
         gui->ApplyDisplayOption();
         gui->Render();
@@ -263,11 +269,6 @@ void ViewportManager::Mouse_Position_Callback(double x, double y)
 
 // TODO: @Haozhe
 //============ update test===============
-
-void ViewportManager::UpdateTest(int t)
-{
-    gui->UpdateTest(t);
-}
 void ViewportManager::DrawPath()
 {
     int vertex_size = gui->geometry_centers.size();
@@ -291,27 +292,15 @@ void ViewportManager::DrawPath()
     }
 
     glBindVertexArray(gui->path_VAO);
-
+    // VBO
     glBindBuffer(GL_ARRAY_BUFFER, gui->path_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
+    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
+    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // EBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gui->path_EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 3 * sizeof(double), (void *)0);
     glEnableVertexAttribArray(0);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
-    glBindVertexArray(gui->path_VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-    //glDrawArrays(GL_TRIANGLES, 0, 6);
-    glDrawElements(GL_LINES, 2 * (vertex_size - 1), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0); // no need to unbind it every time
 }
